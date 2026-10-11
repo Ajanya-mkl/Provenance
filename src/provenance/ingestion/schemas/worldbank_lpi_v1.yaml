@@ -1,0 +1,15 @@
+version: 1
+source: worldbank_lpi
+expected_columns:
+  - indicator
+  - country
+  - countryiso3code
+  - date
+  - value
+  - unit
+  - obs_status
+  - decimal
+  - _batch_id
+  - _source
+  - _source_file
+  - _loaded_at

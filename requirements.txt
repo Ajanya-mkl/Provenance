@@ -1,0 +1,14 @@
+dagster==1.13.26
+dagster-webserver==1.13.26
+duckdb==1.1.3
+dbt-core==1.9.2
+dbt-duckdb==1.9.2
+great_expectations==1.23.2
+langgraph==0.2.60
+langchain-core==0.3.28
+anthropic==0.42.0
+pandas==2.2.3
+pyarrow==18.1.0
+PyYAML==6.0.2
+python-dotenv==1.0.1
+pydantic==2.10.4

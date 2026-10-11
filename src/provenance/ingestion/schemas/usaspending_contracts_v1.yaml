@@ -1,0 +1,68 @@
+version: 1
+source: usaspending_contracts
+expected_columns:
+  - internal_id
+  - Award ID
+  - Recipient Name
+  - Recipient UEI
+  - recipient_id
+  - Start Date
+  - End Date
+  - Award Amount
+  - Awarding Agency
+  - Awarding Sub Agency
+  - Contract Award Type
+  - NAICS
+  - PSC
+  - awarding_agency_id
+  - agency_slug
+  - generated_internal_id
+  - _batch_id
+  - _source
+  - _source_file
+  - _loaded_at
+
+profile_findings:
+  sample_rows: 10000
+  record_key:
+    column: generated_internal_id
+    distinct_values: 10000
+    note: Unique in this sample; use as its row key.
+  award_id:
+    distinct_values: 8991
+    note: >-
+      Not unique. Repeats are legitimate records for different recipients,
+      amounts, and award types under the same agency. Do not deduplicate
+      bronze records or join on Award ID alone.
+  recipient_uei:
+    null_values: 0
+    distinct_ueis: 4244
+    distinct_recipient_names: 4161
+    uei_with_multiple_names: 0
+    note: Key recipient matching on UEI, never on name.
+  start_date:
+    minimum: "1978-09-15"
+    maximum: "2028-09-29"
+    before_2000: 8
+    after_profile_date: 95
+    profile_date: "2026-10-11"
+    phase_3_policy: Treat these date extremes as warnings, not failures.
+  attribute_history:
+    available: false
+    note: This sample has no attribute change history and cannot supply real SCD2 history.
+  query_evidence:
+    filters:
+      award_type_codes: [A, B, C, D]
+      time_period:
+        - start_date: "2026-09-01"
+          end_date: "2026-09-30"
+    page_limit: 100
+    cached_page_rows: 100
+    cached_page_has_next: true
+    cached_page_records_in_bronze: 100
+    total_row_cap: false
+    note: >-
+      The bronze table has 10000 rows and contains all 100 generated_internal_id
+      values from the cached first page. The cached request therefore matches
+      this sample. Limit is per page, not a total cap; the loader paginates
+      until hasNext is false.

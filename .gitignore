@@ -1,0 +1,55 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+!.env.example
+
+.idea/
+.vscode/
+*.code-workspace
+
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.egg-info/
+build/
+dist/
+
+# dbt
+
+target/
+dbt_packages/
+logs/dbt.log
+
+# Great Expectations
+
+great_expectations/uncommitted/
+gx/uncommitted/
+great_expectations/checkpoints/
+great_expectations/expectations/
+
+# Local data and runtime logs
+
+data/**
+!data/**/
+!data/**/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# DuckDB database files
+
+data/*.duckdb
+*.duckdb
+
+.DS_Store
+Thumbs.db
+Desktop.ini

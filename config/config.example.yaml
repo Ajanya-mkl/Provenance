@@ -1,0 +1,15 @@
+warehouse:
+  duckdb_path: "data/provenance.duckdb"
+  schemas:
+    bronze: "bronze"
+    silver: "silver"
+    gold: "gold"
+    agent: "agent"
+
+storage:
+  base_path: "data"
+  raw: "data/raw"
+  bronze: "data/bronze"
+  silver: "data/silver"
+  gold: "data/gold"
+  quarantine: "data/quarantine"
