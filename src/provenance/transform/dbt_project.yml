@@ -27,6 +27,8 @@ vars:
   delivery_band_high_min: 0.65
   # A new delivery band must persist across this many eligible quarters.
   band_change_confirming_quarters: 2
+  # Number of prior eligible destination mixes used for gold country risk.
+  country_risk_trailing_eligible_quarters: 4
   # volume_band from the quarterly shipment count: low < 100 <= medium < 1000
   # <= high. Volumes are bimodal; these sit in the gap (p40 = 110, p67 = 1044).
   volume_band_low_max: 100

@@ -91,8 +91,10 @@ models:
     description: >
       One row per supplier per eligible quarter. Country risk is destination
       risk, not supplier-origin risk; LPI is the most recent score no later
-      than the quarter, with missing scores imputed to the quarter median.
-      country_coverage is the shipment share with an observed LPI score.
+      than each quarter, with missing scores imputed to the quarter median.
+      Country mix is shipment-weighted over the last four eligible quarters
+      (configured by the risk rules); country_coverage is the observed-LPI
+      shipment share over that same trailing window.
     tests:
       - unique:
           column_name: "supplier_key || '-' || quarter"

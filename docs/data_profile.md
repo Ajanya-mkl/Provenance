@@ -314,22 +314,39 @@ for the current view; in this data that resolves to 2017-Q4. A quarter-start
 ISO date can be configured to select another available quarter for that view.
 Historical replay compares each eligible quarter with that category's
 previous eligible quarter; first-ever quarters do not create risk flags.
+Because quarter-level destination mix moves sharply across the dataset, country
+risk is now shipment-weighted over the last **4 eligible quarters** for that
+category. A rising tier flags immediately only when the score increases by
+more than **0.15**; otherwise the new tier must persist for **2 consecutive
+eligible quarters**. The window and hysteresis settings are in the risk rules.
+
+The prior replay had **43 flags**, with **27 (62.8%)** in two quarters, and the
+largest weighted input change was country risk for 36 flags. The destination
+market share changes markedly quarter to quarter; market shares are 100% LATAM
+in 2015-Q1, 100% Europe in 2015-Q3 and 2017-Q3, and 99% USCA in 2016-Q2. This
+points to dataset-wide market-mix changes rather than supplier-specific
+delivery changes, so the calibration below uses stabilized trailing country
+risk.
 
 Calibration uses all **211 eligible supplier-quarters** across **45**
-categories, rather than only the 18 rows in 2017-Q4:
+categories, not only the 18 rows in 2017-Q4. Late rate and delay standard
+deviation retain their observed quarterly values; country risk is recomputed
+over each supplier's trailing four eligible quarter shipment mixes:
 
 | Input | p5 | p10 | median | p90 | p95 | SD |
 |---|---:|---:|---:|---:|---:|---:|
 | Late rate | 0.504 | 0.529 | 0.573 | 0.617 | 0.633 | 0.0394 |
 | Delay standard deviation | 1.379 | 1.428 | 1.495 | 1.608 | 1.644 | 0.0758 |
-| Country risk | 0.253 | 0.254 | 0.390 | 0.535 | 0.540 | 0.1061 |
+| Trailing country risk | 0.321 | 0.324 | 0.406 | 0.495 | 0.534 | 0.0665 |
 
 The applied p5-p95 bounds are rounded to late rate **0.50–0.64**, delay
-standard deviation **1.38–1.65**, and country risk **0.25–0.54**; values
-outside these bounds are clipped. Late rate has a p10-p90 spread of **0.089**
-and SD **0.0394**, materially narrower than the other inputs. Its weight is
-therefore **0.20**, compared with **0.30** for delay standard deviation and
-**0.50** for country risk. With medium and high thresholds **0.35** and
-**0.68**, respectively, the full-history distribution is **57 low, 108
-medium, and 46 high** (21.8% high). Full confidence still requires at least
-**3** eligible quarters to date and **95%** destination-country LPI coverage.
+standard deviation **1.38–1.65**, and trailing country risk **0.32–0.53**;
+values outside these bounds are clipped. Late rate's p10-p90 spread is
+**0.089** and SD **0.0394**, so its weight is **0.25**, below the weight of
+delay standard deviation (**0.35**) and trailing country risk (**0.40**).
+Medium and high thresholds are **0.38** and **0.68**. This yields **61 low,
+130 medium, and 20 high** supplier-quarters. The replay emits **20 flags**
+(9.5% of supplier-quarters), with at most **6 flags in one quarter** (30%)
+and no supplier with more than **2 flags**. Full confidence still requires at
+least **3** eligible quarters to date and **95%** destination-country LPI
+coverage.

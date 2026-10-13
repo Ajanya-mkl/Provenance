@@ -75,6 +75,20 @@ def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> dict[str, Any]:
         ):
             raise ValueError("An explicit as_of_quarter must be the first day of a quarter.")
 
+    trailing_window = int(rules["country_risk_trailing_eligible_quarters"])
+    if trailing_window < 1:
+        raise ValueError("country_risk_trailing_eligible_quarters must be positive.")
+
+    hysteresis = rules.get("flag_hysteresis")
+    if not isinstance(hysteresis, dict):
+        raise ValueError("Risk rules must define flag_hysteresis.")
+    margin = float(hysteresis["score_increase_margin"])
+    confirmations = int(hysteresis["confirming_eligible_quarters"])
+    if not 0 <= margin <= 1:
+        raise ValueError("score_increase_margin must be between 0 and 1.")
+    if confirmations < 2:
+        raise ValueError("confirming_eligible_quarters must be at least 2.")
+
     tier_order = rules.get("tier_order")
     if not isinstance(tier_order, list) or len(tier_order) != 3:
         raise ValueError("Risk rules must define an ordered list of three tiers.")
@@ -240,40 +254,85 @@ def _historical_tier_flags(
     rules: Mapping[str, Any],
 ) -> list[dict[str, Any]]:
     ranks = {tier: rank for rank, tier in enumerate(rules["tier_order"])}
-    previous_tiers: dict[str, str] = {}
     flags: list[dict[str, Any]] = []
-    ordered_scores = sorted(
-        scores,
-        key=lambda score: (score["quarter"], score["supplier_key"]),
-    )
-    for score in ordered_scores:
-        supplier_key = str(score["supplier_key"])
-        old_tier = previous_tiers.get(supplier_key)
-        if old_tier is not None and ranks[score["tier"]] > ranks[old_tier]:
-            top_factor_name, top_factor = max(
-                score["contributing_factors"].items(),
-                key=lambda item: item[1]["weighted_contribution"],
+    grouped_scores: dict[str, list[Mapping[str, Any]]] = {}
+    for score in scores:
+        grouped_scores.setdefault(str(score["supplier_key"]), []).append(score)
+
+    hysteresis = rules["flag_hysteresis"]
+    score_margin = float(hysteresis["score_increase_margin"])
+    confirming_quarters = int(hysteresis["confirming_eligible_quarters"])
+    for supplier_scores in grouped_scores.values():
+        ordered_scores = sorted(supplier_scores, key=lambda score: score["quarter"])
+        for index in range(1, len(ordered_scores)):
+            previous = ordered_scores[index - 1]
+            score = ordered_scores[index]
+            old_tier = str(previous["tier"])
+            new_tier = str(score["tier"])
+            if ranks[new_tier] <= ranks[old_tier]:
+                continue
+
+            score_increase = float(score["score"]) - float(previous["score"])
+            transition_score = score
+            confirmed_index = index
+            if score_increase <= score_margin:
+                confirmed_index = index + confirming_quarters - 1
+                if confirmed_index >= len(ordered_scores):
+                    continue
+                if any(
+                    ordered_scores[held_index]["tier"] != new_tier
+                    for held_index in range(index, confirmed_index + 1)
+                ):
+                    continue
+                score = ordered_scores[confirmed_index]
+
+            contributing_changes = {
+                name: float(factor["weighted_contribution"])
+                - float(previous["contributing_factors"][name]["weighted_contribution"])
+                for name, factor in transition_score["contributing_factors"].items()
+            }
+            top_factor_name = max(
+                contributing_changes,
+                key=lambda name: abs(contributing_changes[name]),
             )
+            top_factor = {
+                **transition_score["contributing_factors"][top_factor_name],
+                "weighted_contribution_change": contributing_changes[top_factor_name],
+                "observed_quarter": transition_score["quarter"].isoformat(),
+            }
             flags.append(
                 {
                     **score,
                     "old_tier": old_tier,
-                    "top_factor": {
-                        "name": top_factor_name,
-                        **top_factor,
-                    },
+                    "top_factor": {"name": top_factor_name, **top_factor},
                     "prior_eligible_quarters": (
                         int(score["eligible_quarters_to_date"]) - 1
                     ),
                 }
             )
-        previous_tiers[supplier_key] = str(score["tier"])
     return flags
 
 
-def _supersede_first_quarter_flags(
+def _supersede_previous_flags(
     connection: duckdb.DuckDBPyConnection,
+    rules_version: str,
 ) -> None:
+    active_prefix = f"risk_flag:{rules_version}:"
+    active_flag_keys = {
+        (supplier_key, quarter)
+        for supplier_key, quarter in connection.execute(
+            """
+            SELECT
+                json_extract_string(payload, '$.supplier_key'),
+                try_cast(json_extract_string(payload, '$.quarter') AS DATE)
+            FROM agent.events
+            WHERE event_type = 'risk_flag'
+              AND source = 'risk_engine'
+              AND event_id LIKE ?
+            """,
+            [f"{active_prefix}%"],
+        ).fetchall()
+    }
     obsolete_events = connection.execute(
         """
         SELECT
@@ -283,27 +342,33 @@ def _supersede_first_quarter_flags(
         FROM agent.events
         WHERE event_type = 'risk_flag'
           AND source = 'risk_engine'
-          AND resolved_at IS NULL
-          AND json_extract_string(payload, '$.old_tier') IS NULL
-        """
+          AND event_id NOT LIKE ?
+        """,
+        [f"{active_prefix}%"],
     ).fetchall()
     for event_id, supplier_key, quarter in obsolete_events:
         connection.execute(
             """
             UPDATE agent.events
             SET resolved_at = current_timestamp,
-                resolution = 'superseded by historical replay'
+                resolution = 'superseded by stabilised scoring'
             WHERE event_id = ?
+              AND resolution IS DISTINCT FROM 'superseded by stabilised scoring'
             """,
             [event_id],
         )
-        connection.execute(
-            """
-            DELETE FROM gold.supplier_risk_flags
-            WHERE supplier_key = ? AND quarter = ?
-            """,
-            [supplier_key, quarter],
-        )
+        if (
+            supplier_key is not None
+            and quarter is not None
+            and (supplier_key, quarter) not in active_flag_keys
+        ):
+            connection.execute(
+                """
+                DELETE FROM gold.supplier_risk_flags
+                WHERE supplier_key = ? AND quarter = ?
+                """,
+                [supplier_key, quarter],
+            )
 
 
 def _write_flags_and_events(
@@ -321,30 +386,48 @@ def _write_flags_and_events(
             """,
             [flag["supplier_key"], flag["quarter"]],
         ).fetchone()
+        flag_values = [
+            flag["old_tier"],
+            flag["tier"],
+            flag["score"],
+            json.dumps(flag["top_factor"], sort_keys=True),
+            flag["confidence"],
+        ]
         if existing_flag:
-            continue
-
-        connection.execute(
-            """
-            INSERT INTO gold.supplier_risk_flags (
-                supplier_key, quarter, old_tier, new_tier, score,
-                top_contributing_factor, confidence
+            connection.execute(
+                """
+                UPDATE gold.supplier_risk_flags
+                SET old_tier = ?, new_tier = ?, score = ?,
+                    top_contributing_factor = ?::JSON, confidence = ?
+                WHERE supplier_key = ? AND quarter = ?
+                """,
+                [
+                    *flag_values,
+                    flag["supplier_key"],
+                    flag["quarter"],
+                ],
             )
-            VALUES (?, ?, ?, ?, ?, ?::JSON, ?)
-            """,
-            [
-                flag["supplier_key"],
-                flag["quarter"],
-                flag["old_tier"],
-                flag["tier"],
-                flag["score"],
-                json.dumps(flag["top_factor"], sort_keys=True),
-                flag["confidence"],
-            ],
-        )
-        flags_added += 1
+        else:
+            connection.execute(
+                """
+                INSERT INTO gold.supplier_risk_flags (
+                    supplier_key, quarter, old_tier, new_tier, score,
+                    top_contributing_factor, confidence
+                )
+                VALUES (?, ?, ?, ?, ?, ?::JSON, ?)
+                """,
+                [
+                    flag["supplier_key"],
+                    flag["quarter"],
+                    *flag_values,
+                ],
+            )
+            flags_added += 1
 
-        event_id = f"risk_flag:{flag['quarter']}:{flag['supplier_key']}"
+        event_id = (
+            f"risk_flag:{flag['rules_version']}:"
+            f"{flag['quarter']}:{flag['supplier_key']}"
+        )
         event = {
             "supplier_key": flag["supplier_key"],
             "quarter": flag["quarter"].isoformat(),
@@ -355,6 +438,24 @@ def _write_flags_and_events(
             "confidence": flag["confidence"],
             "prior_eligible_quarters": flag["prior_eligible_quarters"],
         }
+        existing_event = connection.execute(
+            "SELECT 1 FROM agent.events WHERE event_id = ?",
+            [event_id],
+        ).fetchone()
+        if existing_event:
+            connection.execute(
+                """
+                UPDATE agent.events
+                SET batch_id = ?, payload = ?::JSON
+                WHERE event_id = ?
+                """,
+                [
+                    flag["quarter"].isoformat(),
+                    json.dumps(event, sort_keys=True),
+                    event_id,
+                ],
+            )
+            continue
         result = connection.execute(
             """
             INSERT INTO agent.events (
@@ -402,7 +503,7 @@ def score_supplier_risk(
                 f"as_of_quarter {current_quarter.isoformat()} has no eligible "
                 "supplier-quarter rows."
             )
-        _supersede_first_quarter_flags(connection)
+        _supersede_previous_flags(connection, str(rules["rules_version"]))
         flags = _historical_tier_flags(scores, rules)
         _insert_or_update_scores(connection, scores)
         flags_added, events_added = _write_flags_and_events(connection, flags)

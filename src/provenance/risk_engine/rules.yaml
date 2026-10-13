@@ -1,11 +1,12 @@
-rules_version: "1.1"
+rules_version: "1.2"
 
 as_of_quarter: latest_complete
+country_risk_trailing_eligible_quarters: 4
 
 weights:
-  late_rate: 0.20
-  delay_stddev: 0.30
-  country_risk: 0.50
+  late_rate: 0.25
+  delay_stddev: 0.35
+  country_risk: 0.40
 
 normalization_bounds:
   late_rate:
@@ -15,12 +16,16 @@ normalization_bounds:
     min: 1.38
     max: 1.65
   country_risk:
-    min: 0.25
-    max: 0.54
+    min: 0.32
+    max: 0.53
 
 tier_thresholds:
-  medium_min: 0.35
+  medium_min: 0.38
   high_min: 0.68
+
+flag_hysteresis:
+  score_increase_margin: 0.15
+  confirming_eligible_quarters: 2
 
 confidence:
   minimum_eligible_quarters: 3

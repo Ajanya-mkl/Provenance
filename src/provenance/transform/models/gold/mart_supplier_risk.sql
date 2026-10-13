@@ -49,6 +49,7 @@ supplier_destination_shipments as (
     select
         eligible.supplier_key,
         eligible.quarter_start,
+        eligible.eligible_quarters_to_date,
         shipments.order_country_iso3,
         count(*) as shipment_count
     from eligible_quarters as eligible
@@ -59,27 +60,53 @@ supplier_destination_shipments as (
     group by
         eligible.supplier_key,
         eligible.quarter_start,
+        eligible.eligible_quarters_to_date,
         shipments.order_country_iso3
 ),
 
-country_risk as (
+quarterly_destination_risk as (
     select
         destinations.supplier_key,
         destinations.quarter_start,
+        destinations.eligible_quarters_to_date,
         sum(
             destinations.shipment_count
             * (5 - coalesce(lpi.lpi_score, median_lpi.median_lpi_score)) / 4
-        ) / sum(destinations.shipment_count) as country_risk,
+        ) as weighted_country_risk,
+        sum(destinations.shipment_count) as shipment_count,
         sum(destinations.shipment_count) filter (
             where lpi.lpi_score is not null
-        )::double / sum(destinations.shipment_count) as country_coverage
+        ) as lpi_shipment_count
     from supplier_destination_shipments as destinations
     left join quarter_lpi as lpi
         on lpi.quarter_start = destinations.quarter_start
         and lpi.country_iso3 = destinations.order_country_iso3
     inner join quarter_lpi_median as median_lpi
         on median_lpi.quarter_start = destinations.quarter_start
-    group by destinations.supplier_key, destinations.quarter_start
+    group by
+        destinations.supplier_key,
+        destinations.quarter_start,
+        destinations.eligible_quarters_to_date
+),
+
+trailing_destination_risk as (
+    select
+        current.supplier_key,
+        current.quarter_start,
+        sum(history.weighted_country_risk)
+        / sum(history.shipment_count) as country_risk,
+        sum(history.lpi_shipment_count)::double
+        / sum(history.shipment_count) as country_coverage
+    from eligible_quarters as current
+    inner join quarterly_destination_risk as history
+        on history.supplier_key = current.supplier_key
+        and history.eligible_quarters_to_date between greatest(
+            current.eligible_quarters_to_date
+                - {{ var('country_risk_trailing_eligible_quarters', 4) }}
+                + 1,
+            1
+        ) and current.eligible_quarters_to_date
+    group by current.supplier_key, current.quarter_start
 )
 
 select
@@ -102,6 +129,6 @@ inner join {{ ref('dim_supplier_scd2') }} as dimension
         dimension.effective_to > eligible.quarter_start
         or dimension.effective_to is null
     )
-inner join country_risk as risk
+inner join trailing_destination_risk as risk
     on risk.supplier_key = eligible.supplier_key
     and risk.quarter_start = eligible.quarter_start

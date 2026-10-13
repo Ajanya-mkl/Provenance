@@ -76,6 +76,10 @@ def _replay_rules(path: Path) -> Path:
     }
     rules["tier_thresholds"] = {"medium_min": 0.25, "high_min": 0.75}
     rules["as_of_quarter"] = "latest_complete"
+    rules["flag_hysteresis"] = {
+        "score_increase_margin": 0.15,
+        "confirming_eligible_quarters": 2,
+    }
     path.write_text(yaml.safe_dump(rules), encoding="utf-8")
     return path
 
@@ -220,6 +224,29 @@ def test_first_eligible_quarter_does_not_emit_a_flag(tmp_path: Path) -> None:
         ).fetchone()[0] == 0
 
 
+def test_tier_rise_below_margin_waits_for_two_consecutive_quarters(
+    tmp_path: Path,
+) -> None:
+    db_path = tmp_path / "risk.duckdb"
+    _scoring_database(
+        db_path,
+        [
+            _mart_row(date(2016, 1, 1), 0.20, 1),
+            _mart_row(date(2016, 4, 1), 0.30, 2),
+            _mart_row(date(2016, 7, 1), 0.31, 3),
+        ],
+    )
+
+    result = score_supplier_risk(db_path, _replay_rules(tmp_path / "rules.yaml"))
+
+    assert result.flags_emitted == 1
+    with duckdb.connect(str(db_path), read_only=True) as connection:
+        flag = connection.execute(
+            "SELECT quarter, old_tier, new_tier FROM gold.supplier_risk_flags"
+        ).fetchone()
+    assert flag == (date(2016, 7, 1), "low", "medium")
+
+
 def test_superseded_events_are_kept_and_resolved(tmp_path: Path) -> None:
     db_path = tmp_path / "risk.duckdb"
     _scoring_database(
@@ -288,7 +315,7 @@ def test_superseded_events_are_kept_and_resolved(tmp_path: Path) -> None:
         ).fetchone()[0]
     assert count == 1
     assert resolved_at is not None
-    assert resolution == "superseded by historical replay"
+    assert resolution == "superseded by stabilised scoring"
     assert remaining_flags == 0
 
 
