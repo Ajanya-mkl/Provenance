@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: bronze
+    description: >
+      Raw bronze tables written by the Phase 2 loaders. Silver reads only
+      batches whose gate status in dq_results is in var('approved_gate_statuses').
+    schema: bronze
+    tables:
+      - name: dataco_shipments
+        description: DataCo order-item rows, one per order item, untouched.
+      - name: usaspending_contracts
+        description: USASpending contract awards, untouched.
+      - name: worldbank_lpi
+        description: World Bank LPI observations, including regional/income aggregates.
+      - name: dq_results
+        description: Phase 3 gate outcome per (source, batch_id).

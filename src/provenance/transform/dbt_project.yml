@@ -1,0 +1,44 @@
+name: provenance
+version: "0.1.0"
+config-version: 2
+profile: provenance
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+target-path: target
+log-path: logs
+clean-targets: [target, logs]
+
+vars:
+  # Gate statuses (bronze.dq_results.status) that silver may read.
+  approved_gate_statuses: ["validated", "passed_with_warnings"]
+  # A supplier-quarter below this many shipments is low_volume.
+  min_quarter_shipments: 30
+  # A quarter is partial when the data does not cover its whole calendar
+  # range, or when fewer than this share of its days have any order.
+  partial_quarter_min_day_coverage: 0.9
+  # delivery_band from the quarterly late rate (non-cancelled shipments):
+  # low < 0.50 <= medium < 0.65 <= high. Rated quarters centre on 0.575 with
+  # sampling noise of about 0.043 at the median 134 shipments, so the bands sit
+  # about 1.7 noise-SDs either side (near p8 and p92). See docs/data_profile.md.
+  delivery_band_low_max: 0.50
+  delivery_band_high_min: 0.65
+  # volume_band from the quarterly shipment count: low < 100 <= medium < 1000
+  # <= high. Volumes are bimodal; these sit in the gap (p40 = 110, p67 = 1044).
+  volume_band_low_max: 100
+  volume_band_high_min: 1000
+
+models:
+  provenance:
+    +materialized: table
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    gold:
+      +enabled: false  # Phase 5 placeholders
+
+seeds:
+  provenance:
+    +quote_columns: false

@@ -193,6 +193,72 @@ is sparse. Phase 4 must therefore:
 - flag or exclude partial 2018Q1 and thin 2017Q4;
 - not treat a missing quarter as a change in attributes.
 
+### Phase 4 band thresholds
+
+These were measured on `silver.int_supplier_quarter_metrics` on 2026-10-13.
+There are 315 supplier-quarters: 40 low-volume and 10 in the partial
+2018-Q1, leaving 266 rated.
+
+| Late rate of rated quarters | p5 | p10 | p25 | p50 | p75 | p90 | p95 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| | 0.492 | 0.516 | 0.552 | 0.574 | 0.597 | 0.639 | 0.676 |
+
+Late rates cluster tightly (mean 0.578, sd 0.053), and most of the spread is
+sampling noise:
+
+- In rated quarters with 300 or more shipments, the sd is only 0.017. With
+  fewer than 300 shipments it is 0.069.
+- At the median 134 shipments, chance alone gives an sd of about 0.043.
+
+Tercile cut-offs (p33 = 0.562, p67 = 0.586) would be 2.4 points apart and would
+change version on noise (3.6 versions per supplier). The chosen dbt vars are:
+
+- `delivery_band`: low < **0.50** ≤ medium < **0.65** ≤ high. These are about
+  1.7 noise-SDs from the centre, near p8 and p92.
+- `volume_band`: low < **100** ≤ medium < **1,000** ≤ high. Volume is bimodal
+  (p40 = 110, p67 = 1,044).
+
+Result: **119 versions for 50 suppliers (2.38 per supplier)**. 29 suppliers
+never change. 11 suppliers have 6–8 versions; most are small categories that
+ship about 80–120 a quarter, right on the volume cut-off, with noisy late rates
+(for example `cat_golf_gloves`). A hysteresis rule would remove that churn, for
+example requiring two consecutive quarters, or a margin, before changing band.
+
+2017-Q4 is not flagged partial: every day has orders. Volume fell to about
+2,100 orders a month from October 2017 and stayed there in January 2018, so it
+is a level shift. For example, `cat_cleats` drops from about 2,200 shipments a
+quarter to 37 and changes to low/low in 2017-Q4.
+
+### Country mapping (seed `country_iso3_map`)
+
+All 164 Spanish `Order Country` values are mapped to ISO3. Eight mappings are
+marked `uncertain` in the seed with a note: Hong Kong, Macedonia, Suazilandia,
+Sáhara Occidental, Guayana Francesa, Martinica, Guadalupe, Taiwán.
+
+Match against World Bank economies (seed `wb_country_reference`, fetched
+2026-10-13 from `https://api.worldbank.org/v2/country?format=json&per_page=500`,
+with 217 economies and 79 aggregates):
+
+| Match | Countries | Shipments |
+|---|---:|---:|
+| In the World Bank economy list | 159 / 164 (97.0%) | 180,323 / 180,519 (99.89%) |
+| Also has an LPI score | 154 / 164 (93.9%) | 180,175 / 180,519 (99.81%) |
+
+- **Not World Bank economies:** Martinica (MTQ, 120 shipments), Guadalupe
+  (GLP, 36), Taiwán (TWN, 29), Guayana Francesa (GUF, 9), Sáhara Occidental
+  (ESH, 2). The French overseas departments are not folded into FRA.
+- **No LPI score:** Barbados (117), Belice (13), Surinam (8), Sudán del Sur
+  (5), Suazilandia (5).
+- **No aggregate codes:** no mapped ISO3 is a World Bank aggregate; the dbt
+  test `country_map_has_no_aggregates` checks this.
+
+World Bank aggregates have scores in bronze (336 scored aggregate rows), so
+`stg_worldbank_lpi` removes them by joining on the 2-letter code to the seed
+and dropping `is_aggregate`. It uses the 2-letter code because five
+aggregates (High income, Low income, Lower middle income, Upper middle income,
+Not classified) have a blank 3-letter code. The dbt test `worldbank_codes_known` fails if
+bronze contains a code that is not in the seed.
+
 `Order Country` values are in **Spanish** (164 values, for example
 `Estados Unidos`, `Francia`, `México`, `Alemania`, `Brasil`, `Reino Unido`).
 None of the English forms appears. `Customer Country` is also Spanish

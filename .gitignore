@@ -29,6 +29,8 @@ dist/
 target/
 dbt_packages/
 logs/dbt.log
+src/provenance/transform/logs/
+.user.yml
 
 # Great Expectations
 

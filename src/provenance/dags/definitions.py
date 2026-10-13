@@ -8,6 +8,7 @@ from provenance.dags.ingestion_assets import (
     usaspending_contracts,
     worldbank_lpi,
 )
+from provenance.dags.silver_assets import dbt_resource, silver_dbt_assets
 
 ingest_all_sources = define_asset_job(
     "ingest_all_sources",
@@ -38,6 +39,17 @@ ingest_and_validate_all_sources = define_asset_job(
     executor_def=in_process_executor,
 )
 
+gates_and_silver = define_asset_job(
+    "gates_and_silver",
+    selection=AssetSelection.assets(
+        gate_dataco_shipments,
+        gate_usaspending_contracts,
+        gate_worldbank_lpi,
+        silver_dbt_assets,
+    ),
+    executor_def=in_process_executor,
+)
+
 defs = Definitions(
     assets=[
         dataco_shipments,
@@ -46,6 +58,13 @@ defs = Definitions(
         gate_dataco_shipments,
         gate_usaspending_contracts,
         gate_worldbank_lpi,
+        silver_dbt_assets,
     ],
-    jobs=[ingest_all_sources, bronze_quality_gates, ingest_and_validate_all_sources],
+    jobs=[
+        ingest_all_sources,
+        bronze_quality_gates,
+        ingest_and_validate_all_sources,
+        gates_and_silver,
+    ],
+    resources={"dbt": dbt_resource},
 )

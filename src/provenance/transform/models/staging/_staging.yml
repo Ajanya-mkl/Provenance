@@ -1,0 +1,45 @@
+version: 2
+
+models:
+  - name: stg_dataco_order_items
+    description: >
+      DataCo order items from gate-approved batches, snake_case and typed.
+      Personal data columns are not selected; customer_id is an opaque key.
+    columns:
+      - name: order_item_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: supplier_key
+        tests: [not_null]
+      - name: order_ts
+        tests: [not_null]
+      - name: order_country_es
+        tests:
+          - not_null
+          - relationships:
+              to: ref('country_iso3_map')
+              field: order_country_es
+
+  - name: stg_usaspending_awards
+    description: >
+      USASpending awards from gate-approved batches. date_valid is false when
+      start_date > end_date or start_date is outside 1990-2030; rows are kept.
+    columns:
+      - name: generated_internal_id
+        tests: [unique, not_null]
+      - name: date_valid
+        tests: [not_null]
+
+  - name: stg_worldbank_lpi
+    description: >
+      Scored LPI observations for World Bank economies only; aggregates are
+      removed using the wb_country_reference seed.
+    tests:
+      - unique:
+          column_name: "country_iso3 || '-' || lpi_year"
+    columns:
+      - name: country_iso3
+        tests: [not_null]
+      - name: lpi_score
+        tests: [not_null]

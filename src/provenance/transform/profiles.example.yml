@@ -1,0 +1,10 @@
+# profiles.yml in this folder is committed and has no secrets. Copy this file
+# to ~/.dbt/profiles.yml only if you want a different warehouse location.
+provenance:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "C:/path/to/provenance-structure/data/provenance.duckdb"
+      schema: silver
+      threads: 1

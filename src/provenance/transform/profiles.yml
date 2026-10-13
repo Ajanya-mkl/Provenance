@@ -1,0 +1,10 @@
+provenance:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      # Relative paths resolve from the working directory; run dbt from the
+      # repo root, or set PROVENANCE_DUCKDB_PATH to an absolute path.
+      path: "{{ env_var('PROVENANCE_DUCKDB_PATH', 'data/provenance.duckdb') }}"
+      schema: silver
+      threads: 1

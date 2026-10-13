@@ -1,0 +1,86 @@
+version: 2
+
+models:
+  - name: int_supplier_quarter_metrics
+    description: >
+      One row per supplier (DataCo category) per quarter with shipments.
+      Late rate and delay exclude cancelled shipments. low_volume is
+      shipment_count < var('min_quarter_shipments'); partial_quarter is
+      detected from data coverage, not hardcoded.
+    tests:
+      - unique:
+          column_name: "supplier_key || '-' || order_quarter"
+    columns:
+      - name: supplier_key
+        tests: [not_null]
+      - name: shipment_count
+        tests: [not_null]
+      - name: low_volume
+        tests: [not_null]
+      - name: partial_quarter
+        tests: [not_null]
+
+  - name: fact_shipments
+    description: One row per DataCo order item.
+    columns:
+      - name: order_item_id
+        tests: [unique, not_null]
+      - name: order_id
+        tests: [not_null]
+      - name: supplier_key
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_supplier_scd2')
+              field: supplier_key
+      - name: order_date
+        tests: [not_null]
+      - name: order_quarter
+        tests: [not_null]
+      - name: order_country_iso3
+        tests: [not_null]
+      - name: late_flag
+        tests: [not_null]
+
+  - name: fact_purchase_orders
+    description: One row per DataCo order.
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: order_date
+        tests: [not_null]
+      - name: item_count
+        tests: [not_null]
+      - name: order_total
+        tests: [not_null]
+
+  - name: dim_supplier_scd2
+    description: >
+      Supplier SCD Type 2 built from the quarterly series (gaps-and-islands).
+      Tracked attributes: delivery_band and volume_band. Low-volume and partial
+      quarters carry the previous bands forward and never open a version.
+      effective_to is exclusive (the next version's effective_from).
+    tests:
+      - unique:
+          column_name: "supplier_key || '-' || version_number"
+    columns:
+      - name: supplier_key
+        tests: [not_null]
+      - name: delivery_band
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["low", "medium", "high", "unrated"]
+      - name: volume_band
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["low", "medium", "high", "unrated"]
+      - name: row_hash
+        tests: [not_null]
+      - name: effective_from
+        tests: [not_null]
+      - name: is_current
+        tests: [not_null]
+      - name: version_number
+        tests: [not_null]

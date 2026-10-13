@@ -42,6 +42,30 @@ supplier-linkage decision are documented in [docs/data_profile.md](docs/data_pro
 The selected approach is option A: any future DataCo-to-USAspending mapping
 must be explicitly simulated, not presented as a source-backed supplier join.
 
+## Phase 4: Silver layer (dbt)
+
+Stop `dagster dev` first; DuckDB allows only one writer. From the repository
+root, with the virtual environment active:
+
+```powershell
+dbt build --project-dir src/provenance/transform --profiles-dir src/provenance/transform
+```
+
+`profiles.yml` reads
+`PROVENANCE_DUCKDB_PATH` and falls back to `data/provenance.duckdb`, which is
+relative to the folder you run dbt from. To run from another folder, set an
+absolute path first:
+
+```powershell
+$env:PROVENANCE_DUCKDB_PATH = "$PWD\data\provenance.duckdb"
+```
+
+`dbt build` loads the seeds, builds the staging, intermediate and silver models
+in the `silver` schema, and runs every test. To run the gates and silver
+together in Dagster, use the `gates_and_silver` job. Design notes are in
+[docs/architecture.md](docs/architecture.md); thresholds and the country mapping
+are in [docs/data_profile.md](docs/data_profile.md).
+
 ## Repository layout
 
 - `config/`: non-secret application and logging config.

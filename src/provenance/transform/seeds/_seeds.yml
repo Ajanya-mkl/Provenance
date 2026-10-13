@@ -1,0 +1,44 @@
+version: 2
+
+seeds:
+  - name: country_iso3_map
+    description: >
+      Every distinct Spanish DataCo "Order Country" value mapped to an ISO3
+      code. mapping_confidence is 'uncertain' where the mapping needs judgement;
+      notes explains why.
+    config:
+      column_types:
+        order_country_es: varchar
+        iso3: varchar
+        country_name_en: varchar
+        mapping_confidence: varchar
+        notes: varchar
+    columns:
+      - name: order_country_es
+        tests: [unique, not_null]
+      - name: iso3
+        tests: [unique, not_null]
+      - name: mapping_confidence
+        tests:
+          - accepted_values:
+              values: ["certain", "uncertain"]
+
+  - name: wb_country_reference
+    description: >
+      World Bank country and aggregate list, fetched 2026-10-13 from
+      https://api.worldbank.org/v2/country?format=json&per_page=500 (296 rows:
+      217 economies, 79 aggregates). is_aggregate is true where the API's
+      region is 'Aggregates'. Refresh by re-running that request.
+    config:
+      column_types:
+        iso3: varchar
+        iso2: varchar
+        country_name: varchar
+        region: varchar
+        income_level: varchar
+        is_aggregate: boolean
+    columns:
+      - name: iso3
+        tests: [unique, not_null]
+      - name: iso2
+        tests: [unique, not_null]
