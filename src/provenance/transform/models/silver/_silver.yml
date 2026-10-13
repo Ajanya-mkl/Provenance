@@ -86,3 +86,51 @@ models:
         tests: [not_null]
       - name: version_number
         tests: [not_null]
+
+  - name: mart_supplier_risk
+    description: >
+      One row per supplier per eligible quarter. Country risk is destination
+      risk, not supplier-origin risk; LPI is the most recent score no later
+      than the quarter, with missing scores imputed to the quarter median.
+      country_coverage is the shipment share with an observed LPI score.
+    tests:
+      - unique:
+          column_name: "supplier_key || '-' || quarter"
+    columns:
+      - name: supplier_key
+        tests: [not_null]
+      - name: quarter
+        tests: [not_null]
+      - name: late_rate
+        tests: [not_null]
+      - name: delay_stddev
+        tests: [not_null]
+      - name: shipment_count
+        tests: [not_null]
+      - name: eligible_quarters_to_date
+        tests: [not_null]
+      - name: delivery_band
+        tests: [not_null]
+      - name: country_risk
+        tests: [not_null]
+      - name: country_coverage
+        tests: [not_null]
+
+  - name: mart_shipment_delay
+    description: Shipment-grain delay and destination-country drill-down.
+    tests:
+      - unique:
+          column_name: shipment_id
+    columns:
+      - name: shipment_id
+        tests: [not_null]
+      - name: supplier_key
+        tests: [not_null]
+      - name: quarter
+        tests: [not_null]
+      - name: delay_days
+        tests: [not_null]
+      - name: late_flag
+        tests: [not_null]
+      - name: shipping_mode
+        tests: [not_null]

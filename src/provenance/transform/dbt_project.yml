@@ -40,7 +40,9 @@ models:
     intermediate:
       +materialized: view
     gold:
-      +enabled: false  # Phase 5 placeholders
+      +enabled: true
+      +materialized: table
+      +schema: gold
 
 seeds:
   provenance:

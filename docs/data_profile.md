@@ -278,3 +278,24 @@ bronze contains a code that is not in the seed.
 None of the English forms appears. `Customer Country` is also Spanish
 (`EE. UU.`, `Puerto Rico`). Joining to World Bank LPI requires a
 Spanish-name-to-ISO3 mapping.
+
+### Phase 5 destination-country risk
+
+Gold supplier risk uses each shipment's **destination country** to calculate
+country risk; this is destination risk, **not supplier-origin risk**. For each
+quarter and destination country it uses the latest scored LPI observation no
+later than that quarter. Destinations with no such score are imputed with the
+median available LPI for that quarter, and `country_coverage` reports the
+shipment share with an observed LPI score.
+
+The scorer configuration is kept in `src/provenance/risk_engine/rules.yaml`.
+For 2017-Q4, late rate has a narrow distribution (mean **0.572**, SD **0.031**),
+while country risk has the greatest relative spread (mean **0.348**, SD
+**0.050**). The configured weights are 0.25 for late rate, 0.20 for delay
+standard deviation, and 0.55 for country risk; inputs are clipped and
+normalized over late rate **0.50–0.65**, delay standard deviation **1.30–1.70**,
+and country risk **0.20–0.50**. Tier boundaries are low below **0.42**, medium
+from **0.42** to below **0.58**, and high from **0.58**. This yields 4 high
+suppliers among the 18 eligible suppliers in 2017-Q4. Full confidence requires
+at least **3** eligible quarters to date and **95%** destination-country LPI
+coverage.

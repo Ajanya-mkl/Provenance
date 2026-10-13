@@ -39,11 +39,15 @@ class GatedSilverTranslator(DagsterDbtTranslator):
             return SOURCE_GATES[dbt_resource_props["name"]]
         return super().get_asset_key(dbt_resource_props)
 
-    def get_group_name(self, dbt_resource_props: Mapping[str, Any]) -> str | None:
+    def get_group_name(self, _dbt_resource_props: Mapping[str, Any]) -> str | None:
         return "silver"
 
 
 @dbt_assets(
+    select=(
+        "path:models/staging path:models/intermediate "
+        "path:models/silver path:seeds"
+    ),
     manifest=dbt_project.manifest_path,
     project=dbt_project,
     dagster_dbt_translator=GatedSilverTranslator(),
