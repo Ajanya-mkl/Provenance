@@ -1,0 +1,112 @@
+{
+  "suites": {
+    "bronze_dataco_shipments": {
+      "name": "bronze_dataco_shipments",
+      "notes": "DataCo bronze rules. Category Name is the user-selected supplier proxy, not a true supplier key.",
+      "meta": {"source": "dataco_shipments", "version": 1},
+      "expectations": [
+        {"type": "expect_table_columns_to_match_ordered_list", "kwargs": {"column_list": ["Type", "Days for shipping (real)", "Days for shipment (scheduled)", "Benefit per order", "Sales per customer", "Delivery Status", "Late_delivery_risk", "Category Id", "Category Name", "Customer City", "Customer Country", "Customer Email", "Customer Fname", "Customer Id", "Customer Lname", "Customer Password", "Customer Segment", "Customer State", "Customer Street", "Customer Zipcode", "Department Id", "Department Name", "Latitude", "Longitude", "Market", "Order City", "Order Country", "Order Customer Id", "order date (DateOrders)", "Order Id", "Order Item Cardprod Id", "Order Item Discount", "Order Item Discount Rate", "Order Item Id", "Order Item Product Price", "Order Item Profit Ratio", "Order Item Quantity", "Sales", "Order Item Total", "Order Profit Per Order", "Order Region", "Order State", "Order Status", "Order Zipcode", "Product Card Id", "Product Category Id", "Product Description", "Product Image", "Product Name", "Product Price", "Product Status", "shipping date (DateOrders)", "Shipping Mode", "_batch_id", "_source", "_source_file", "_loaded_at"]}},
+        {"type": "expect_table_row_count_to_be_between", "kwargs": {"min_value": 1}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Id"}},
+        {"type": "expect_column_values_to_be_unique", "kwargs": {"column": "Order Item Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Customer Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Customer Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Department Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Category Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Product Card Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Product Category Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Cardprod Id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Category Name"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Late_delivery_risk"}},
+        {"type": "expect_column_values_to_be_in_set", "kwargs": {"column": "Late_delivery_risk", "value_set": [0, 1]}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "order date (DateOrders)"}},
+        {"type": "expect_column_values_to_be_dateutil_parseable", "kwargs": {"column": "order date (DateOrders)"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "shipping date (DateOrders)"}},
+        {"type": "expect_column_values_to_be_dateutil_parseable", "kwargs": {"column": "shipping date (DateOrders)"}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Days for shipping (real)", "type_list": ["int64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Days for shipment (scheduled)", "type_list": ["int64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Benefit per order", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Sales per customer", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Discount", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Discount Rate", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Product Price", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Profit Ratio", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Quantity", "type_list": ["int64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Sales", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Item Total", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Order Profit Per Order", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Product Price", "type_list": ["float64"]}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Sales per customer"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Discount"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Discount Rate"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Product Price"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Quantity"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Sales"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Order Item Total"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Product Price"}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Sales per customer", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Order Item Discount", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Order Item Discount Rate", "min_value": 0, "max_value": 1}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Order Item Product Price", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Order Item Quantity", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Sales", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Order Item Total", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Product Price", "min_value": 0}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Days for shipping (real)", "min_value": 0, "max_value": 30, "mostly": 0.99}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Days for shipment (scheduled)", "min_value": 0, "max_value": 30, "mostly": 0.99}}
+      ]
+    },
+    "bronze_usaspending_contracts": {
+      "name": "bronze_usaspending_contracts",
+      "notes": "Award ID is intentionally not unique. generated_internal_id is the row key.",
+      "meta": {"source": "usaspending_contracts", "version": 1},
+      "expectations": [
+        {"type": "expect_table_columns_to_match_ordered_list", "kwargs": {"column_list": ["internal_id", "Award ID", "Recipient Name", "Recipient UEI", "recipient_id", "Start Date", "End Date", "Award Amount", "Awarding Agency", "Awarding Sub Agency", "Contract Award Type", "NAICS", "PSC", "awarding_agency_id", "agency_slug", "generated_internal_id", "_batch_id", "_source", "_source_file", "_loaded_at"]}},
+        {"type": "expect_table_row_count_to_be_between", "kwargs": {"min_value": 1}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "generated_internal_id"}},
+        {"type": "expect_column_values_to_be_unique", "kwargs": {"column": "generated_internal_id"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Recipient UEI"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Award ID"}},
+        {"type": "expect_column_values_to_be_in_type_list", "kwargs": {"column": "Award Amount", "type_list": ["int64", "float64"]}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Award Amount"}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "Start Date"}},
+        {"type": "expect_column_values_to_be_dateutil_parseable", "kwargs": {"column": "Start Date"}},
+        {"type": "expect_column_values_to_be_dateutil_parseable", "kwargs": {"column": "End Date"}},
+        {"type": "expect_column_values_to_be_dateutil_parseable", "kwargs": {"column": "End Date"}}
+      ]
+    },
+    "bronze_usaspending_temporal": {
+      "name": "bronze_usaspending_temporal",
+      "notes": "Temporal checks run after parsing dates; tolerate profiled legacy and future dates up to mostly.",
+      "meta": {"source": "usaspending_contracts", "version": 1},
+      "expectations": [
+        {"type": "expect_table_columns_to_match_ordered_list", "kwargs": {"column_list": ["internal_id", "Award ID", "Recipient Name", "Recipient UEI", "recipient_id", "Start Date", "End Date", "Award Amount", "Awarding Agency", "Awarding Sub Agency", "Contract Award Type", "NAICS", "PSC", "awarding_agency_id", "agency_slug", "generated_internal_id", "_batch_id", "_source", "_source_file", "_loaded_at"]}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "Start Date", "min_value": "1990-01-01T00:00:00", "max_value": "2030-12-31T23:59:59", "mostly": 0.98}},
+        {"type": "expect_column_pair_values_a_to_be_greater_than_b", "kwargs": {"column_A": "End Date", "column_B": "Start Date", "or_equal": true, "ignore_row_if": "either_value_is_missing", "mostly": 0.99}}
+      ]
+    },
+    "bronze_worldbank_lpi": {
+      "name": "bronze_worldbank_lpi",
+      "notes": "Null scores are expected; range checks apply to non-null scores and at least 5 percent must be present.",
+      "meta": {"source": "worldbank_lpi", "version": 1},
+      "expectations": [
+        {"type": "expect_table_columns_to_match_ordered_list", "kwargs": {"column_list": ["indicator", "country", "countryiso3code", "date", "value", "unit", "obs_status", "decimal", "_batch_id", "_source", "_source_file", "_loaded_at"]}},
+        {"type": "expect_table_row_count_to_be_between", "kwargs": {"min_value": 1}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "countryiso3code"}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "value", "min_value": 1, "max_value": 5}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "value", "mostly": 0.05}}
+      ]
+    },
+    "bronze_worldbank_temporal": {
+      "name": "bronze_worldbank_temporal",
+      "notes": "Validate observation year as an integer and compare to the runtime current year.",
+      "meta": {"source": "worldbank_lpi", "version": 1},
+      "expectations": [
+        {"type": "expect_table_columns_to_match_ordered_list", "kwargs": {"column_list": ["indicator", "country", "countryiso3code", "date", "value", "unit", "obs_status", "decimal", "_batch_id", "_source", "_source_file", "_loaded_at"]}},
+        {"type": "expect_column_values_to_not_be_null", "kwargs": {"column": "date"}},
+        {"type": "expect_column_values_to_be_between", "kwargs": {"column": "date", "min_value": 1960, "max_value": {"$PARAMETER": "current_year"}}}
+      ]
+    }
+  }
+}

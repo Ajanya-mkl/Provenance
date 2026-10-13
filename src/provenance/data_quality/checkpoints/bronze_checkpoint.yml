@@ -1,0 +1,24 @@
+version: 1
+context: ephemeral
+datasource: bronze_pandas
+batch_definition: whole_dataframe
+result_format: SUMMARY
+checkpoints:
+  dataco_shipments:
+    - name: bronze_dataco_shipments_checkpoint
+      suite: bronze_dataco_shipments
+      dataframe: source
+  usaspending_contracts:
+    - name: bronze_usaspending_contracts_checkpoint
+      suite: bronze_usaspending_contracts
+      dataframe: source
+    - name: bronze_usaspending_temporal_checkpoint
+      suite: bronze_usaspending_temporal
+      dataframe: temporal
+  worldbank_lpi:
+    - name: bronze_worldbank_lpi_checkpoint
+      suite: bronze_worldbank_lpi
+      dataframe: source
+    - name: bronze_worldbank_temporal_checkpoint
+      suite: bronze_worldbank_temporal
+      dataframe: temporal
