@@ -132,6 +132,8 @@ The paste-ready prompt for this phase is in section 7.
 - dbt tests, including SCD2 invariants (one current row per supplier; `end_date` null exactly when `is_current`)
 - A schema-evolution test: an added upstream column does not break the build
 
+**Decision: supplier history is QUARTERLY, not monthly.** About 50 categories over about three years gives a median of about 134 shipments per category per quarter, but only about 48 per month (40% of category-months are under 30). Monthly late-delivery rates would be too noisy and create false risk changes. Flag category-quarters under 30 shipments, treat 2018Q1 (January only) as partial, and do not read a missing quarter as an attribute change. `Order Country` is in Spanish and needs an ISO3 mapping. Details are in `docs/data_profile.md`.
+
 **Done when:** `dbt build --select silver` is green, and a simulated attribute change creates a new version row and closes the old one.
 
 ### Phase 5 — Gold marts and risk engine

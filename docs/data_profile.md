@@ -162,3 +162,39 @@ broader alternative groupings. No supplier/linkage selection is recorded
 here. If chosen, SCD2 history should be derived from periodic snapshots of
 DataCo order dates, including supplier-proxy metrics and a risk tier per
 period—not from USASpending.
+
+## Supplier history cadence: quarterly
+
+**Decision:** supplier (`Category Name`) history is tracked **quarterly, not
+monthly**. Monthly late-delivery rates would be too noisy and would create
+false risk-tier changes.
+
+Measured on the bronze DataCo batch (180,519 rows, 2026-10-13):
+
+- Order dates run from **2015-01-01 00:00** to **2018-01-31 23:38**, which is
+  **13 calendar quarters** (2015Q1–2018Q1).
+- **50** categories produce **315** observed category-quarters, out of 650
+  possible. Each category is active in a median of **3** quarters (range
+  1–12), and none is active in all 13.
+- Shipments per category-quarter: min **3**, median **134**, max **2,275**
+  (mean 573). **40** category-quarters (12.7%) have fewer than 30 shipments.
+- Shipments per category-month: median **48**, and **39.9%** are under 30.
+  This is why monthly tracking is rejected.
+- **2015Q1 is complete** (orders on all 90 days). **2018Q1 is partial**
+  (January only, 2,123 rows). 2017Q4 covers full calendar dates but has only
+  6,434 rows, against about 15,500 in earlier quarters.
+
+The original estimate was about 300 shipments per category per quarter, with
+every category present each quarter. The measured median is 134, and coverage
+is sparse. Phase 4 must therefore:
+
+- flag category-quarters under 30 shipments as low-volume instead of letting
+  them drive a tier change;
+- flag or exclude partial 2018Q1 and thin 2017Q4;
+- not treat a missing quarter as a change in attributes.
+
+`Order Country` values are in **Spanish** (164 values, for example
+`Estados Unidos`, `Francia`, `México`, `Alemania`, `Brasil`, `Reino Unido`).
+None of the English forms appears. `Customer Country` is also Spanish
+(`EE. UU.`, `Puerto Rico`). Joining to World Bank LPI requires a
+Spanish-name-to-ISO3 mapping.
