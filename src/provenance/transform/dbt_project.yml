@@ -13,8 +13,9 @@ clean-targets: [target, logs]
 vars:
   # Gate statuses (bronze.dq_results.status) that silver may read.
   approved_gate_statuses: ["validated", "passed_with_warnings"]
-  # A supplier-quarter below this many shipments is low_volume.
-  min_quarter_shipments: 30
+  # A supplier-quarter below this many shipments is low_volume and ineligible
+  # for delivery-band changes.
+  min_quarter_shipments: 50
   # A quarter is partial when the data does not cover its whole calendar
   # range, or when fewer than this share of its days have any order.
   partial_quarter_min_day_coverage: 0.9
@@ -24,6 +25,8 @@ vars:
   # about 1.7 noise-SDs either side (near p8 and p92). See docs/data_profile.md.
   delivery_band_low_max: 0.50
   delivery_band_high_min: 0.65
+  # A new delivery band must persist across this many eligible quarters.
+  band_change_confirming_quarters: 2
   # volume_band from the quarterly shipment count: low < 100 <= medium < 1000
   # <= high. Volumes are bimodal; these sit in the gap (p40 = 110, p67 = 1044).
   volume_band_low_max: 100

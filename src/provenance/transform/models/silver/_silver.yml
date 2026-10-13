@@ -57,9 +57,11 @@ models:
   - name: dim_supplier_scd2
     description: >
       Supplier SCD Type 2 built from the quarterly series (gaps-and-islands).
-      Tracked attributes: delivery_band and volume_band. Low-volume and partial
-      quarters carry the previous bands forward and never open a version.
-      effective_to is exclusive (the next version's effective_from).
+      delivery_band is tracked; a change is confirmed by consecutive eligible
+      quarters and effective_from is the first confirming quarter. volume_band
+      is contextual and does not create versions. Low-volume and partial
+      quarters do not confirm changes. effective_to is exclusive (the next
+      version's effective_from).
     tests:
       - unique:
           column_name: "supplier_key || '-' || version_number"

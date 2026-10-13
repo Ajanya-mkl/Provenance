@@ -177,7 +177,8 @@ Measured on the bronze DataCo batch (180,519 rows, 2026-10-13):
   possible. Each category is active in a median of **3** quarters (range
   1–12), and none is active in all 13.
 - Shipments per category-quarter: min **3**, median **134**, max **2,275**
-  (mean 573). **40** category-quarters (12.7%) have fewer than 30 shipments.
+  (mean 573). **96** of the 315 category-quarters have fewer than 50
+  shipments; **40** have fewer than 30.
 - Shipments per category-month: median **48**, and **39.9%** are under 30.
   This is why monthly tracking is rejected.
 - **2015Q1 is complete** (orders on all 90 days). **2018Q1 is partial**
@@ -188,16 +189,17 @@ The original estimate was about 300 shipments per category per quarter, with
 every category present each quarter. The measured median is 134, and coverage
 is sparse. Phase 4 must therefore:
 
-- flag category-quarters under 30 shipments as low-volume instead of letting
+- flag category-quarters under 50 shipments as low-volume instead of letting
   them drive a tier change;
-- flag or exclude partial 2018Q1 and thin 2017Q4;
+- exclude partial 2018Q1 and treat thin supplier-quarters in 2017Q4 as
+  low-volume;
 - not treat a missing quarter as a change in attributes.
 
 ### Phase 4 band thresholds
 
 These were measured on `silver.int_supplier_quarter_metrics` on 2026-10-13.
-There are 315 supplier-quarters: 40 low-volume and 10 in the partial
-2018-Q1, leaving 266 rated.
+There are 315 supplier-quarters: 96 below the low-volume threshold of 50,
+10 in partial 2018-Q1, and 2 that are both; 211 are eligible for rating.
 
 | Late rate of rated quarters | p5 | p10 | p25 | p50 | p75 | p90 | p95 |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -218,16 +220,28 @@ change version on noise (3.6 versions per supplier). The chosen dbt vars are:
 - `volume_band`: low < **100** ≤ medium < **1,000** ≤ high. Volume is bimodal
   (p40 = 110, p67 = 1,044).
 
-Result: **119 versions for 50 suppliers (2.38 per supplier)**. 29 suppliers
-never change. 11 suppliers have 6–8 versions; most are small categories that
-ship about 80–120 a quarter, right on the volume cut-off, with noisy late rates
-(for example `cat_golf_gloves`). A hysteresis rule would remove that churn, for
-example requiring two consecutive quarters, or a margin, before changing band.
+Risk history tracks **delivery performance**: only `delivery_band` is included
+in the SCD2 row hash. `volume_band` remains in the dimension as context, but a
+volume change alone does not create a version. Low-volume supplier-quarters
+have fewer than `min_quarter_shipments` (default **50**) shipments. Delivery
+band changes require `band_change_confirming_quarters` (default **2**)
+consecutive eligible quarters; low-volume and partial quarters do not confirm a
+change, and `effective_from` is the first confirming quarter.
+
+Before this follow-up, the model produced **119 versions across 50 suppliers**
+(2.38 per supplier; maximum 8). There were 69 band-change transitions: 54
+included a delivery-band change and 15 were volume-band-only. Eleven suppliers
+had at least 4 versions. After applying delivery-only tracking and
+two-quarter confirmation, the model produces **56 versions across 50
+suppliers** (1.12 per supplier; maximum 2), with no supplier at 4 or more
+versions. **20** versions started on 2017-10-01 before the change; the new
+history has 18 starts on that date.
 
 2017-Q4 is not flagged partial: every day has orders. Volume fell to about
 2,100 orders a month from October 2017 and stayed there in January 2018, so it
 is a level shift. For example, `cat_cleats` drops from about 2,200 shipments a
-quarter to 37 and changes to low/low in 2017-Q4.
+quarter to 37; this is below the 50-shipment threshold, so it cannot confirm a
+delivery-band change.
 
 ### Country mapping (seed `country_iso3_map`)
 

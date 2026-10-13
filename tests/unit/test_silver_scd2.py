@@ -22,12 +22,13 @@ APPROVED_BATCH = "fixture-approved"
 QUARANTINED_BATCH = "fixture-quarantined"
 EXTRA_COLUMN = "Unexpected Upstream Column"
 # Small-fixture settings: 5 shipments make a full-volume quarter, partial
-# quarters come only from the data boundary, and volume never changes band.
+# quarters come only from the data boundary, and volume changes are contextual.
 FIXTURE_VARS = {
     "min_quarter_shipments": 5,
     "partial_quarter_min_day_coverage": 0,
-    "volume_band_low_max": 1,
+    "volume_band_low_max": 8,
     "volume_band_high_min": 1_000_000,
+    "band_change_confirming_quarters": 2,
 }
 QUARTERS = [date(2015, 1, 1), date(2015, 4, 1), date(2015, 7, 1), date(2015, 10, 1)]
 PARTIAL_QUARTER = date(2016, 1, 1)  # data stops on 2016-01-15
@@ -71,6 +72,14 @@ def _fixture_frame() -> pd.DataFrame:
         rows += _rows("Jump", quarter, shipments=10, late=6)
     for quarter in QUARTERS[2:]:
         rows += _rows("Jump", quarter, shipments=10, late=9)
+    for quarter in QUARTERS[:2]:
+        rows += _rows("ShortFlip", quarter, shipments=10, late=6)
+    rows += _rows("ShortFlip", QUARTERS[2], shipments=10, late=9)
+    rows += _rows("ShortFlip", QUARTERS[3], shipments=10, late=6)
+    rows += _rows("VolumeOnly", QUARTERS[0], shipments=10, late=6)
+    rows += _rows("VolumeOnly", QUARTERS[1], shipments=6, late=3)
+    for quarter in QUARTERS[2:]:
+        rows += _rows("VolumeOnly", quarter, shipments=10, late=6)
     rows += _rows("LowVol", QUARTERS[0], shipments=10, late=6)
     rows += _rows("LowVol", QUARTERS[1], shipments=3, late=3)
     rows += _rows("LowVol", QUARTERS[2], shipments=10, late=6)
@@ -192,11 +201,51 @@ def test_extra_upstream_column_does_not_break_silver(silver_db: Path) -> None:
     assert not any("unexpected" in column.lower() for column in columns)
 
 
-def test_late_rate_jump_opens_new_version_and_closes_old(silver_db: Path) -> None:
+def test_change_confirmed_by_two_eligible_quarters_uses_first_quarter(silver_db: Path) -> None:
     assert _history(silver_db, "cat_jump") == [
         ("medium", date(2015, 1, 1), date(2015, 7, 1), False, 1),
         ("high", date(2015, 7, 1), None, True, 2),
     ]
+
+
+def test_single_quarter_band_flip_does_not_create_version(silver_db: Path) -> None:
+    assert _history(silver_db, "cat_shortflip") == [
+        ("medium", date(2015, 1, 1), None, True, 1),
+    ]
+
+
+def test_volume_only_change_does_not_create_version(silver_db: Path) -> None:
+    assert _history(silver_db, "cat_volumeonly") == [
+        ("medium", date(2015, 1, 1), None, True, 1),
+    ]
+    assert _query(
+        silver_db,
+        """
+            SELECT
+                quarter_start,
+                shipment_count,
+                CASE
+                    WHEN shipment_count < 8 THEN 'low'
+                    WHEN shipment_count >= 1_000_000 THEN 'high'
+                    ELSE 'medium'
+                END AS volume_band
+            FROM silver.int_supplier_quarter_metrics
+            WHERE supplier_key = 'cat_volumeonly'
+                AND quarter_start IN (DATE '2015-01-01', DATE '2015-04-01')
+            ORDER BY quarter_start
+        """,
+        ) == [
+            (date(2015, 1, 1), 10, "medium"),
+            (date(2015, 4, 1), 6, "low"),
+        ]
+    assert _query(
+        silver_db,
+        """
+        SELECT row_hash = md5('medium')
+        FROM silver.dim_supplier_scd2
+        WHERE supplier_key = 'cat_volumeonly'
+        """,
+    ) == [(True,)]
 
 
 def test_steady_supplier_keeps_one_version(silver_db: Path) -> None:
