@@ -1,5 +1,6 @@
 -- One row per USASpending award (key: generated_internal_id; Award ID is not
--- unique). Rows with impossible dates are kept and flagged, never dropped.
+-- unique). Monthly batches overlap, so the most recently loaded approved batch
+-- wins. Rows with impossible dates are kept and flagged, never dropped.
 with approved_batches as (
     select batch_id
     from {{ source('bronze', 'dq_results') }}
@@ -30,6 +31,10 @@ typed as (
         _loaded_at                          as loaded_at
     from {{ source('bronze', 'usaspending_contracts') }}
     where _batch_id in (select batch_id from approved_batches)
+    qualify row_number() over (
+        partition by generated_internal_id
+        order by _loaded_at desc, _batch_id desc
+    ) = 1
 )
 
 select

@@ -1,0 +1,9 @@
+run_coordinator:
+  module: dagster._core.run_coordinator
+  class: QueuedRunCoordinator
+  config:
+    max_concurrent_runs: 4
+    tag_concurrency_limits:
+      - key: dagster/concurrency_key
+        value: duckdb_writer
+        limit: 1

@@ -328,7 +328,7 @@ def test_dagster_phase5_job_chains_gold_mart_to_scorer() -> None:
     score_asset = asset_graph.get(AssetKey("supplier_risk_scoring"))
     assert score_asset.parent_keys == {AssetKey(["gold", "mart_supplier_risk"])}
 
-    job = defs.resolve_job_def("phase5_risk_pipeline")
+    job = defs.resolve_job_def("provenance_full_pipeline")
     selected_keys = job.asset_layer.selected_asset_keys
     assert {
         AssetKey("gate_dataco_shipments"),

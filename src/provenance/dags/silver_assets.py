@@ -53,7 +53,16 @@ class GatedSilverTranslator(DagsterDbtTranslator):
     dagster_dbt_translator=GatedSilverTranslator(),
 )
 def silver_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iterator[Any]:
-    yield from dbt.cli(["build"], context=context).stream()
+    yield from dbt.cli(
+        [
+            "build",
+            "--project-dir",
+            str(TRANSFORM_DIR),
+            "--profiles-dir",
+            str(TRANSFORM_DIR),
+        ],
+        context=context,
+    ).stream()
 
 
 dbt_resource = DbtCliResource(project_dir=dbt_project)

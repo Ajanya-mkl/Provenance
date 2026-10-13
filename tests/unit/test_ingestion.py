@@ -163,15 +163,18 @@ def test_usaspending_uses_cached_response_when_unreachable(
 
     monkeypatch.setattr(common, "fetch_json", unavailable)
     database = tmp_path / "provenance.duckdb"
+    fallbacks: list[tuple[str, str]] = []
     count = usaspending_contracts.load_usaspending_contracts(
         db_path=database,
         bronze_root=tmp_path / "bronze",
         cache_path=cache_path,
         today=date(2026, 10, 10),
+        on_cached_fallback=lambda source, reason: fallbacks.append((source, reason)),
     )
 
     assert count == 1
     assert _read_table(database, "usaspending_contracts")["Award ID"].tolist() == ["cached"]
+    assert fallbacks == [(str(cache_path), "<urlopen error offline>")]
 
 
 def test_worldbank_loader_reads_json_array_and_paginates(
@@ -223,3 +226,48 @@ def test_worldbank_loader_reads_json_array_and_paginates(
     assert urls[1].endswith("?format=json&per_page=1000&page=2")
     assert table["countryiso3code"].tolist() == ["ABW", "AFG"]
     assert table["_source_file"].tolist() == [worldbank_lpi.API_URL] * 2
+
+
+def test_worldbank_reuses_latest_bronze_batch_after_api_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    bronze = tmp_path / "bronze"
+    database = tmp_path / "provenance.duckdb"
+    sample = pd.DataFrame(
+        [
+            {
+                "countryiso3code": "ABW",
+                "date": "2023",
+                "value": 3.7,
+            }
+        ]
+    )
+    common.write_bronze_dataframe(
+        sample,
+        source="worldbank_lpi",
+        batch_id="cached-lpi",
+        source_file=worldbank_lpi.API_URL,
+        db_path=database,
+        bronze_root=bronze,
+    )
+    def unavailable(*_args: object, **_kwargs: object) -> None:
+        raise URLError("offline")
+
+    monkeypatch.setattr(common, "fetch_json", unavailable)
+    fallbacks: list[tuple[str, str]] = []
+
+    count = worldbank_lpi.load_worldbank_lpi(
+        db_path=database,
+        bronze_root=bronze,
+        on_cached_fallback=lambda source, reason: fallbacks.append((source, reason)),
+    )
+
+    assert count == 1
+    assert _read_table(database, "worldbank_lpi")["countryiso3code"].tolist() == ["ABW"]
+    assert fallbacks == [
+        (
+            str(bronze / "worldbank_lpi" / "batch_id=cached-lpi" / "part-0.parquet"),
+            "<urlopen error offline>",
+        )
+    ]

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -65,6 +66,8 @@ def load_usaspending_contracts(
     bronze_root: str | Path = common.DEFAULT_BRONZE_ROOT,
     cache_path: str | Path = DEFAULT_CACHE_PATH,
     today: date | None = None,
+    allow_cached_fallback: bool = True,
+    on_cached_fallback: Callable[[str, str], None] | None = None,
 ) -> int:
     """Fetch and paginate a month's contract awards, falling back to a cached API page."""
     start_date, end_date = _last_completed_month(today)
@@ -98,7 +101,7 @@ def load_usaspending_contracts(
                 break
             payload = _request_payload(metadata["page"] + 1, start_date, end_date)
     except (URLError, TimeoutError) as error:
-        if not cache_file.exists():
+        if not allow_cached_fallback or not cache_file.exists():
             raise
         LOGGER.warning(
             "USAspending is unavailable (%s); loading the cached successful sample at %s",
@@ -112,6 +115,8 @@ def load_usaspending_contracts(
         batch_id = common.payload_sha256(
             {"request": cached_request, "response": cached_response}
         )
+        if on_cached_fallback is not None:
+            on_cached_fallback(str(cache_file), str(error))
     else:
         batch_id = common.payload_sha256(
             {"request": first_payload, "responses": responses}

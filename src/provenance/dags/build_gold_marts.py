@@ -5,7 +5,7 @@ from typing import Any
 from dagster import AssetExecutionContext
 from dagster_dbt import DagsterDbtTranslator, DbtCliResource, dbt_assets
 
-from provenance.dags.silver_assets import dbt_project
+from provenance.dags.silver_assets import TRANSFORM_DIR, dbt_project
 from provenance.risk_engine.scorer import load_rules
 
 
@@ -29,4 +29,15 @@ def gold_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iter
             ]
         }
     )
-    yield from dbt.cli(["build", "--vars", dbt_vars], context=context).stream()
+    yield from dbt.cli(
+        [
+            "build",
+            "--project-dir",
+            str(TRANSFORM_DIR),
+            "--profiles-dir",
+            str(TRANSFORM_DIR),
+            "--vars",
+            dbt_vars,
+        ],
+        context=context,
+    ).stream()

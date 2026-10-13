@@ -289,7 +289,9 @@ def ensure_agent_events_table(connection: duckdb.DuckDBPyConnection) -> None:
             created_at TIMESTAMPTZ NOT NULL,
             payload JSON NOT NULL,
             resolved_at TIMESTAMPTZ,
-            resolution VARCHAR
+            resolution VARCHAR,
+            investigation_status VARCHAR NOT NULL DEFAULT 'open'
+                CHECK (investigation_status IN ('open', 'queued', 'investigated'))
         )
         """
     )
@@ -298,6 +300,17 @@ def ensure_agent_events_table(connection: duckdb.DuckDBPyConnection) -> None:
     )
     connection.execute(
         "ALTER TABLE agent.events ADD COLUMN IF NOT EXISTS resolution VARCHAR"
+    )
+    connection.execute(
+        """
+        ALTER TABLE agent.events
+        ADD COLUMN IF NOT EXISTS investigation_status VARCHAR DEFAULT 'open'
+        """
+    )
+    # Tables created before Phase 6 gain the column; backfill rows it left null.
+    connection.execute(
+        "UPDATE agent.events SET investigation_status = 'open' "
+        "WHERE investigation_status IS NULL"
     )
 
 
@@ -372,7 +385,13 @@ def _record_result(
                     created_at = excluded.created_at,
                     payload = excluded.payload,
                     resolved_at = NULL,
-                    resolution = NULL
+                    resolution = NULL,
+                    -- A repeat failure reopens a resolved event, but does not
+                    -- requeue one the agent already has.
+                    investigation_status = CASE
+                        WHEN resolved_at IS NOT NULL THEN 'open'
+                        ELSE investigation_status
+                    END
                 """,
                 [
                     f"dq_failure:{result.source}:{result.batch_id}",
