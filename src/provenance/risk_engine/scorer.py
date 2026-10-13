@@ -59,6 +59,22 @@ def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> dict[str, Any]:
     if not 0 <= medium_min < high_min <= 1:
         raise ValueError("Tier thresholds must satisfy 0 <= medium_min < high_min <= 1.")
 
+    as_of_quarter = rules.get("as_of_quarter", "latest_complete")
+    if not isinstance(as_of_quarter, str) or not as_of_quarter:
+        raise ValueError("as_of_quarter must be latest_complete or an ISO quarter-start date.")
+    if as_of_quarter != "latest_complete":
+        try:
+            parsed_quarter = date.fromisoformat(as_of_quarter)
+        except ValueError as error:
+            raise ValueError(
+                "as_of_quarter must be latest_complete or an ISO quarter-start date."
+            ) from error
+        if (
+            parsed_quarter.day != 1
+            or parsed_quarter.month not in {1, 4, 7, 10}
+        ):
+            raise ValueError("An explicit as_of_quarter must be the first day of a quarter.")
+
     tier_order = rules.get("tier_order")
     if not isinstance(tier_order, list) or len(tier_order) != 3:
         raise ValueError("Risk rules must define an ordered list of three tiers.")
@@ -123,6 +139,7 @@ def score_row(
         "contributing_factors": factors,
         "confidence": "low" if low_confidence else "full",
         "rules_version": str(rules["rules_version"]),
+        "eligible_quarters_to_date": int(row["eligible_quarters_to_date"]),
     }
 
 
@@ -218,69 +235,21 @@ def _insert_or_update_scores(
     )
 
 
-def _latest_previous_tiers(
-    connection: duckdb.DuckDBPyConnection,
-    scores: Sequence[Mapping[str, Any]],
-    current_quarter: date,
-) -> dict[str, str]:
-    stored_current = {
-        supplier_key: tier
-        for supplier_key, tier in connection.execute(
-            """
-            SELECT supplier_key, tier
-            FROM gold.supplier_risk_score
-            WHERE quarter = ?
-            """,
-            [current_quarter],
-        ).fetchall()
-    }
-    if stored_current:
-        return stored_current
-
-    stored_prior = connection.execute(
-        """
-        SELECT supplier_key, tier
-        FROM gold.supplier_risk_score
-        WHERE quarter = (
-            SELECT max(quarter)
-            FROM gold.supplier_risk_score
-            WHERE quarter < ?
-        )
-        """,
-        [current_quarter],
-    ).fetchall()
-    if stored_prior:
-        return dict(stored_prior)
-
-    prior_quarters = [score["quarter"] for score in scores if score["quarter"] < current_quarter]
-    if not prior_quarters:
-        return {}
-    previous_quarter = max(prior_quarters)
-    return {
-        score["supplier_key"]: score["tier"]
-        for score in scores
-        if score["quarter"] == previous_quarter
-    }
-
-
-def _new_tier_flags(
+def _historical_tier_flags(
     scores: Sequence[Mapping[str, Any]],
     rules: Mapping[str, Any],
-    old_tiers: Mapping[str, str],
-    current_quarter: date,
 ) -> list[dict[str, Any]]:
     ranks = {tier: rank for rank, tier in enumerate(rules["tier_order"])}
-    flags = []
-    for score in scores:
-        if score["quarter"] != current_quarter:
-            continue
-        old_tier = old_tiers.get(score["supplier_key"])
-        enters_high = score["tier"] == rules["tier_order"][-1] and old_tier != score["tier"]
-        rises = (
-            old_tier in ranks
-            and ranks[score["tier"]] > ranks[old_tier]
-        )
-        if enters_high or rises:
+    previous_tiers: dict[str, str] = {}
+    flags: list[dict[str, Any]] = []
+    ordered_scores = sorted(
+        scores,
+        key=lambda score: (score["quarter"], score["supplier_key"]),
+    )
+    for score in ordered_scores:
+        supplier_key = str(score["supplier_key"])
+        old_tier = previous_tiers.get(supplier_key)
+        if old_tier is not None and ranks[score["tier"]] > ranks[old_tier]:
             top_factor_name, top_factor = max(
                 score["contributing_factors"].items(),
                 key=lambda item: item[1]["weighted_contribution"],
@@ -293,9 +262,48 @@ def _new_tier_flags(
                         "name": top_factor_name,
                         **top_factor,
                     },
+                    "prior_eligible_quarters": (
+                        int(score["eligible_quarters_to_date"]) - 1
+                    ),
                 }
             )
+        previous_tiers[supplier_key] = str(score["tier"])
     return flags
+
+
+def _supersede_first_quarter_flags(
+    connection: duckdb.DuckDBPyConnection,
+) -> None:
+    obsolete_events = connection.execute(
+        """
+        SELECT
+            event_id,
+            json_extract_string(payload, '$.supplier_key') AS supplier_key,
+            try_cast(json_extract_string(payload, '$.quarter') AS DATE) AS quarter
+        FROM agent.events
+        WHERE event_type = 'risk_flag'
+          AND source = 'risk_engine'
+          AND resolved_at IS NULL
+          AND json_extract_string(payload, '$.old_tier') IS NULL
+        """
+    ).fetchall()
+    for event_id, supplier_key, quarter in obsolete_events:
+        connection.execute(
+            """
+            UPDATE agent.events
+            SET resolved_at = current_timestamp,
+                resolution = 'superseded by historical replay'
+            WHERE event_id = ?
+            """,
+            [event_id],
+        )
+        connection.execute(
+            """
+            DELETE FROM gold.supplier_risk_flags
+            WHERE supplier_key = ? AND quarter = ?
+            """,
+            [supplier_key, quarter],
+        )
 
 
 def _write_flags_and_events(
@@ -345,6 +353,7 @@ def _write_flags_and_events(
             "score": flag["score"],
             "top_contributing_factor": flag["top_factor"],
             "confidence": flag["confidence"],
+            "prior_eligible_quarters": flag["prior_eligible_quarters"],
         }
         result = connection.execute(
             """
@@ -382,9 +391,19 @@ def score_supplier_risk(
         if not source_rows:
             raise ValueError("gold.mart_supplier_risk has no eligible supplier-quarter rows.")
         scores = score_rows(source_rows, rules)
-        current_quarter = max(score["quarter"] for score in scores)
-        old_tiers = _latest_previous_tiers(connection, scores, current_quarter)
-        flags = _new_tier_flags(scores, rules, old_tiers, current_quarter)
+        as_of_quarter = rules.get("as_of_quarter", "latest_complete")
+        current_quarter = (
+            max(score["quarter"] for score in scores)
+            if as_of_quarter == "latest_complete"
+            else date.fromisoformat(str(as_of_quarter))
+        )
+        if not any(score["quarter"] == current_quarter for score in scores):
+            raise ValueError(
+                f"as_of_quarter {current_quarter.isoformat()} has no eligible "
+                "supplier-quarter rows."
+            )
+        _supersede_first_quarter_flags(connection)
+        flags = _historical_tier_flags(scores, rules)
         _insert_or_update_scores(connection, scores)
         flags_added, events_added = _write_flags_and_events(connection, flags)
 

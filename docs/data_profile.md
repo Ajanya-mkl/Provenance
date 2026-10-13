@@ -288,14 +288,48 @@ later than that quarter. Destinations with no such score are imputed with the
 median available LPI for that quarter, and `country_coverage` reports the
 shipment share with an observed LPI score.
 
-The scorer configuration is kept in `src/provenance/risk_engine/rules.yaml`.
-For 2017-Q4, late rate has a narrow distribution (mean **0.572**, SD **0.031**),
-while country risk has the greatest relative spread (mean **0.348**, SD
-**0.050**). The configured weights are 0.25 for late rate, 0.20 for delay
-standard deviation, and 0.55 for country risk; inputs are clipped and
-normalized over late rate **0.50–0.65**, delay standard deviation **1.30–1.70**,
-and country risk **0.20–0.50**. Tier boundaries are low below **0.42**, medium
-from **0.42** to below **0.58**, and high from **0.58**. This yields 4 high
-suppliers among the 18 eligible suppliers in 2017-Q4. Full confidence requires
-at least **3** eligible quarters to date and **95%** destination-country LPI
-coverage.
+### October 2017 catalogue change
+
+The supplier key is a DataCo product-category proxy, not a verified supplier
+identity. Of the **32** categories with shipments before 2017-Q4, **13** also
+have shipments in Q4 and **19** do not. Q4 has **31** categories in total:
+**18** appear for the first time. Only **27** of the 32 earlier categories had
+at least one eligible quarter before Q4, and **12** of those 27 have any Q4
+shipments. Shipment volume falls from **15,812** in Q3 to **6,434** in Q4.
+Together, the turnover and volume drop support treating October 2017 as an
+effective replacement of the product-category catalogue, not continuous
+supplier history. These are product categories and should not be interpreted
+as true suppliers.
+
+Categories launched in 2017-Q4 have only **one eligible quarter of evidence**.
+They therefore remain low confidence under the minimum-three-quarter rule;
+2018-Q1 is partial and is not used as a complete-quarter observation.
+
+### Historical risk scoring and calibration
+
+The scorer writes one score for **every eligible supplier-quarter** in
+`gold.supplier_risk_score`. The rules in
+`src/provenance/risk_engine/rules.yaml` use `as_of_quarter: latest_complete`
+for the current view; in this data that resolves to 2017-Q4. A quarter-start
+ISO date can be configured to select another available quarter for that view.
+Historical replay compares each eligible quarter with that category's
+previous eligible quarter; first-ever quarters do not create risk flags.
+
+Calibration uses all **211 eligible supplier-quarters** across **45**
+categories, rather than only the 18 rows in 2017-Q4:
+
+| Input | p5 | p10 | median | p90 | p95 | SD |
+|---|---:|---:|---:|---:|---:|---:|
+| Late rate | 0.504 | 0.529 | 0.573 | 0.617 | 0.633 | 0.0394 |
+| Delay standard deviation | 1.379 | 1.428 | 1.495 | 1.608 | 1.644 | 0.0758 |
+| Country risk | 0.253 | 0.254 | 0.390 | 0.535 | 0.540 | 0.1061 |
+
+The applied p5-p95 bounds are rounded to late rate **0.50–0.64**, delay
+standard deviation **1.38–1.65**, and country risk **0.25–0.54**; values
+outside these bounds are clipped. Late rate has a p10-p90 spread of **0.089**
+and SD **0.0394**, materially narrower than the other inputs. Its weight is
+therefore **0.20**, compared with **0.30** for delay standard deviation and
+**0.50** for country risk. With medium and high thresholds **0.35** and
+**0.68**, respectively, the full-history distribution is **57 low, 108
+medium, and 46 high** (21.8% high). Full confidence still requires at least
+**3** eligible quarters to date and **95%** destination-country LPI coverage.

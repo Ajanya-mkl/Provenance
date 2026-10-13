@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import copy
-import json
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -43,7 +42,6 @@ def _risk_row(
 def _scoring_database(
     db_path: Path,
     mart_rows: list[tuple[Any, ...]],
-    prior_score: tuple[Any, ...] | None = None,
 ) -> None:
     with duckdb.connect(str(db_path)) as connection:
         connection.execute("CREATE SCHEMA gold")
@@ -64,25 +62,34 @@ def _scoring_database(
             "INSERT INTO gold.mart_supplier_risk VALUES (?, ?, ?, ?, ?, ?, ?)",
             mart_rows,
         )
-        if prior_score is not None:
-            connection.execute(
-                """
-                CREATE TABLE gold.supplier_risk_score (
-                    supplier_key VARCHAR NOT NULL,
-                    quarter DATE NOT NULL,
-                    score DOUBLE NOT NULL,
-                    tier VARCHAR NOT NULL,
-                    contributing_factors JSON NOT NULL,
-                    confidence VARCHAR NOT NULL,
-                    rules_version VARCHAR NOT NULL,
-                    PRIMARY KEY (supplier_key, quarter)
-                )
-                """
-            )
-            connection.execute(
-                "INSERT INTO gold.supplier_risk_score VALUES (?, ?, ?, ?, ?::JSON, ?, ?)",
-                prior_score,
-            )
+
+
+def _replay_rules(path: Path) -> Path:
+    rules = copy.deepcopy(load_rules())
+    rules["weights"] = {
+        "late_rate": 1.0,
+        "delay_stddev": 0.0,
+        "country_risk": 0.0,
+    }
+    rules["normalization_bounds"] = {
+        name: {"min": 0.0, "max": 1.0} for name in rules["weights"]
+    }
+    rules["tier_thresholds"] = {"medium_min": 0.25, "high_min": 0.75}
+    rules["as_of_quarter"] = "latest_complete"
+    path.write_text(yaml.safe_dump(rules), encoding="utf-8")
+    return path
+
+
+def _mart_row(quarter: date, late_rate: float, eligible_count: int) -> tuple[Any, ...]:
+    return (
+        "cat_test",
+        quarter,
+        late_rate,
+        1.5,
+        0.4,
+        eligible_count,
+        1.0,
+    )
 
 
 def test_contributing_factors_sum_to_score() -> None:
@@ -155,67 +162,134 @@ def test_scoring_reads_changed_weights_from_rules_file(tmp_path: Path) -> None:
     assert unchanged["tier"] != changed["tier"]
 
 
-def test_risk_flag_is_emitted_once_and_rerun_is_idempotent(tmp_path: Path) -> None:
+def test_historical_replay_flags_only_tier_rises_and_is_idempotent(
+    tmp_path: Path,
+) -> None:
     db_path = tmp_path / "risk.duckdb"
     _scoring_database(
         db_path,
-        [("cat_test", CURRENT_QUARTER, 0.65, 1.70, 0.50, 3, 1.0)],
-        (
-            "cat_test",
-            CURRENT_QUARTER,
-            0.1,
-            "low",
-            "{}",
-            "full",
-            "0.9",
-        ),
+        [
+            _mart_row(date(2016, 1, 1), 0.9, 1),
+            _mart_row(date(2016, 4, 1), 0.1, 2),
+            _mart_row(date(2016, 7, 1), 0.5, 3),
+            _mart_row(date(2016, 10, 1), 0.5, 4),
+            _mart_row(date(2017, 1, 1), 0.9, 5),
+            _mart_row(date(2017, 4, 1), 0.1, 6),
+        ],
     )
+    rules_path = _replay_rules(tmp_path / "rules.yaml")
 
-    first = score_supplier_risk(db_path, RULES_PATH)
-    second = score_supplier_risk(db_path, RULES_PATH)
+    first = score_supplier_risk(db_path, rules_path)
+    second = score_supplier_risk(db_path, rules_path)
 
-    assert first.flags_emitted == 1
-    assert first.events_emitted == 1
+    assert first.flags_emitted == 2
+    assert first.events_emitted == 2
     assert second.flags_emitted == 0
     assert second.events_emitted == 0
     with duckdb.connect(str(db_path), read_only=True) as connection:
-        flag_count = connection.execute(
-            "SELECT count(*) FROM gold.supplier_risk_flags"
-        ).fetchone()[0]
-        assert flag_count == 1
-        assert connection.execute(
+        flags = connection.execute(
+            """
+            SELECT quarter, old_tier, new_tier
+            FROM gold.supplier_risk_flags
+            ORDER BY quarter
+            """
+        ).fetchall()
+        event_count = connection.execute(
             "SELECT count(*) FROM agent.events WHERE event_type = 'risk_flag'"
-        ).fetchone()[0] == 1
-        event = connection.execute(
-            "SELECT payload FROM agent.events WHERE event_type = 'risk_flag'"
         ).fetchone()[0]
-    assert json.loads(event)["new_tier"] == "high"
+    assert flags == [
+        (date(2016, 7, 1), "low", "medium"),
+        (date(2017, 1, 1), "medium", "high"),
+    ]
+    assert event_count == 2
 
 
-def test_rising_tier_emits_a_flag(tmp_path: Path) -> None:
+def test_first_eligible_quarter_does_not_emit_a_flag(tmp_path: Path) -> None:
     db_path = tmp_path / "risk.duckdb"
     _scoring_database(
         db_path,
-        [("cat_test", CURRENT_QUARTER, 0.575, 1.50, 0.35, 3, 1.0)],
-        (
-            "cat_test",
-            CURRENT_QUARTER,
-            0.1,
-            "low",
-            "{}",
-            "full",
-            "0.9",
-        ),
+        [_mart_row(CURRENT_QUARTER, 0.9, 1)],
     )
+    result = score_supplier_risk(db_path, _replay_rules(tmp_path / "rules.yaml"))
 
-    result = score_supplier_risk(db_path, RULES_PATH)
-
-    assert result.flags_emitted == 1
+    assert result.flags_emitted == 0
+    assert result.events_emitted == 0
     with duckdb.connect(str(db_path), read_only=True) as connection:
-        old_tier, new_tier = connection.execute(
-            "SELECT old_tier, new_tier FROM gold.supplier_risk_flags"
+        assert connection.execute(
+            "SELECT count(*) FROM gold.supplier_risk_flags"
+        ).fetchone()[0] == 0
+
+
+def test_superseded_events_are_kept_and_resolved(tmp_path: Path) -> None:
+    db_path = tmp_path / "risk.duckdb"
+    _scoring_database(
+        db_path,
+        [_mart_row(CURRENT_QUARTER, 0.9, 1)],
+    )
+    with duckdb.connect(str(db_path)) as connection:
+        connection.execute("CREATE SCHEMA agent")
+        connection.execute(
+            """
+            CREATE TABLE agent.events (
+                event_id VARCHAR PRIMARY KEY,
+                event_type VARCHAR NOT NULL,
+                source VARCHAR NOT NULL,
+                batch_id VARCHAR NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL,
+                payload JSON NOT NULL,
+                resolved_at TIMESTAMPTZ,
+                resolution VARCHAR
+            )
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO agent.events VALUES (
+                'risk_flag:2017-10-01:cat_test', 'risk_flag', 'risk_engine',
+                '2017-10-01', current_timestamp,
+                '{"supplier_key":"cat_test","quarter":"2017-10-01","old_tier":null,"new_tier":"high"}'::JSON,
+                NULL, NULL
+            )
+            """
+        )
+        connection.execute(
+            """
+            CREATE TABLE gold.supplier_risk_flags (
+                supplier_key VARCHAR NOT NULL,
+                quarter DATE NOT NULL,
+                old_tier VARCHAR,
+                new_tier VARCHAR NOT NULL,
+                score DOUBLE NOT NULL,
+                top_contributing_factor JSON NOT NULL,
+                confidence VARCHAR NOT NULL,
+                PRIMARY KEY (supplier_key, quarter)
+            )
+            """
+        )
+        connection.execute(
+            """
+            INSERT INTO gold.supplier_risk_flags VALUES (
+                'cat_test', DATE '2017-10-01', NULL, 'high', 0.9, '{}'::JSON, 'low'
+            )
+            """
+        )
+
+    score_supplier_risk(db_path, _replay_rules(tmp_path / "rules.yaml"))
+
+    with duckdb.connect(str(db_path), read_only=True) as connection:
+        count, resolved_at, resolution = connection.execute(
+            """
+            SELECT count(*), max(resolved_at), max(resolution)
+            FROM agent.events WHERE event_type = 'risk_flag'
+            """
         ).fetchone()
-    assert (old_tier, new_tier) == ("low", "medium")
+        remaining_flags = connection.execute(
+            "SELECT count(*) FROM gold.supplier_risk_flags"
+        ).fetchone()[0]
+    assert count == 1
+    assert resolved_at is not None
+    assert resolution == "superseded by historical replay"
+    assert remaining_flags == 0
 
 
 def test_dagster_phase5_job_chains_gold_mart_to_scorer() -> None:

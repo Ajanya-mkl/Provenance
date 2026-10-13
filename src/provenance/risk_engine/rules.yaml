@@ -1,24 +1,26 @@
-rules_version: "1.0"
+rules_version: "1.1"
+
+as_of_quarter: latest_complete
 
 weights:
-  late_rate: 0.25
-  delay_stddev: 0.20
-  country_risk: 0.55
+  late_rate: 0.20
+  delay_stddev: 0.30
+  country_risk: 0.50
 
 normalization_bounds:
   late_rate:
     min: 0.50
-    max: 0.65
+    max: 0.64
   delay_stddev:
-    min: 1.30
-    max: 1.70
+    min: 1.38
+    max: 1.65
   country_risk:
-    min: 0.20
-    max: 0.50
+    min: 0.25
+    max: 0.54
 
 tier_thresholds:
-  medium_min: 0.42
-  high_min: 0.58
+  medium_min: 0.35
+  high_min: 0.68
 
 confidence:
   minimum_eligible_quarters: 3
