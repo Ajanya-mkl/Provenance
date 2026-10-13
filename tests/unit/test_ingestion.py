@@ -271,3 +271,113 @@ def test_worldbank_reuses_latest_bronze_batch_after_api_failure(
             "<urlopen error offline>",
         )
     ]
+
+
+def _write_cached_sample(tmp_path: Path) -> Path:
+    cache_path = tmp_path / "raw" / "usaspending_sample.json"
+    cache_path.parent.mkdir(parents=True)
+    cache_path.write_text(
+        json.dumps(
+            {
+                "request": {"filters": {"award_type_codes": ["A"]}},
+                "response": {
+                    "results": [
+                        {"Award ID": "pinned-1", "Recipient Name": "Vendor A"},
+                        {"Award ID": "pinned-2", "Recipient Name": "Vendor B"},
+                    ],
+                    "page_metadata": {"page": 1, "hasNext": True},
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return cache_path
+
+
+def test_usaspending_offline_mode_is_reproducible_and_never_calls_the_api(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    cache_path = _write_cached_sample(tmp_path)
+    cached_bytes = cache_path.read_bytes()
+
+    def no_network(*_args: object, **_kwargs: object) -> None:
+        raise AssertionError("offline mode must not call the API")
+
+    monkeypatch.setattr(common, "fetch_json", no_network)
+    database = tmp_path / "provenance.duckdb"
+    bronze = tmp_path / "bronze"
+    counts = [
+        usaspending_contracts.load_usaspending_contracts(
+            db_path=database, bronze_root=bronze, cache_path=cache_path, offline=True
+        )
+        for _run in range(2)
+    ]
+
+    assert counts == [2, 2]
+    batches = list((bronze / "usaspending_contracts").iterdir())
+    assert len(batches) == 1
+    assert _read_table(database, "usaspending_contracts")["Award ID"].tolist() == [
+        "pinned-1",
+        "pinned-2",
+    ]
+    assert cache_path.read_bytes() == cached_bytes
+
+
+def test_usaspending_offline_mode_fails_visibly_without_a_cached_sample(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(FileNotFoundError, match="offline mode"):
+        usaspending_contracts.load_usaspending_contracts(
+            db_path=tmp_path / "provenance.duckdb",
+            bronze_root=tmp_path / "bronze",
+            cache_path=tmp_path / "missing.json",
+            offline=True,
+        )
+
+
+def test_usaspending_offline_setting_defaults_off_and_env_overrides(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from provenance import settings
+
+    monkeypatch.delenv("PROVENANCE_USASPENDING_OFFLINE", raising=False)
+    assert settings.usaspending_offline() is False
+
+    config = tmp_path / "config.yaml"
+    config.write_text("ingestion:\n  usaspending_offline: true\n", encoding="utf-8")
+    assert settings.usaspending_offline(config) is True
+
+    monkeypatch.setenv("PROVENANCE_USASPENDING_OFFLINE", "false")
+    assert settings.usaspending_offline(config) is False
+    monkeypatch.setenv("PROVENANCE_USASPENDING_OFFLINE", "TRUE")
+    assert settings.usaspending_offline() is True
+    monkeypatch.setenv("PROVENANCE_USASPENDING_OFFLINE", "maybe")
+    with pytest.raises(ValueError, match="PROVENANCE_USASPENDING_OFFLINE"):
+        settings.usaspending_offline()
+
+
+def test_usaspending_asset_passes_offline_setting_and_records_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from dagster import materialize
+
+    from provenance.dags import ingestion_assets
+
+    calls: list[dict[str, object]] = []
+
+    def fake_loader(**kwargs: object) -> int:
+        calls.append(kwargs)
+        return 2
+
+    monkeypatch.setattr(ingestion_assets, "load_usaspending_contracts", fake_loader)
+    monkeypatch.setenv("PROVENANCE_USASPENDING_OFFLINE", "true")
+
+    result = materialize([ingestion_assets.usaspending_contracts])
+
+    assert result.success
+    assert calls[0]["offline"] is True
+    assert calls[0]["cache_path"] == ingestion_assets.USASPENDING_CACHE_PATH
+    metadata = result.asset_materializations_for_node("usaspending_contracts")[0].metadata
+    assert metadata["usaspending_mode"].value == "offline"

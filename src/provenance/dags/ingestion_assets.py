@@ -17,9 +17,11 @@ from provenance.data_quality.gate import validate_source_batches
 from provenance.ingestion.sources.dataco_shipments import load_dataco_shipments
 from provenance.ingestion.sources.usaspending_contracts import load_usaspending_contracts
 from provenance.ingestion.sources.worldbank_lpi import load_worldbank_lpi
+from provenance.settings import usaspending_offline
 
 API_MAX_RETRIES = 3
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+USASPENDING_CACHE_PATH = PROJECT_ROOT / "data" / "raw" / "usaspending_sample.json"
 API_RETRY_POLICY = RetryPolicy(
     max_retries=API_MAX_RETRIES,
     delay=1,
@@ -143,16 +145,20 @@ def _record_fallback(fallbacks: list[dict[str, str]]) -> Callable[[str, str], No
 )
 def usaspending_contracts(context: AssetExecutionContext) -> MaterializeResult:
     database, bronze, _quarantine = _pipeline_paths()
+    offline = usaspending_offline()
     fallbacks: list[dict[str, str]] = []
     row_count = load_usaspending_contracts(
         db_path=database,
         bronze_root=bronze,
+        cache_path=USASPENDING_CACHE_PATH,
         allow_cached_fallback=context.retry_number >= API_MAX_RETRIES,
         on_cached_fallback=_record_fallback(fallbacks),
+        offline=offline,
     )
     return MaterializeResult(
         metadata={
             "row_count": MetadataValue.int(row_count),
+            "usaspending_mode": MetadataValue.text("offline" if offline else "live"),
             **_fallback_metadata(fallbacks),
         }
     )

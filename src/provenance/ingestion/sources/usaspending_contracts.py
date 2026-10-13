@@ -60,6 +60,27 @@ def _read_cached_page(cache_path: Path) -> tuple[dict[str, Any], dict[str, Any]]
     return cached["request"], cached["response"]
 
 
+def _load_cached_sample(cache_file: Path) -> tuple[list[dict[str, Any]], str]:
+    """Return the cached page's rows and its content-hash batch id."""
+    cached_request, cached_response = _read_cached_page(cache_file)
+    if not isinstance(cached_response.get("results"), list):
+        raise ValueError("Cached USAspending response is missing its results array")
+    batch_id = common.payload_sha256({"request": cached_request, "response": cached_response})
+    return cached_response["results"], batch_id
+
+
+def _write_batch(
+    rows: list[dict[str, Any]], batch_id: str, db_path: str | Path, bronze_root: str | Path
+) -> int:
+    return common.write_bronze_dataframe(
+        pd.DataFrame.from_records(rows),
+        source=SOURCE,
+        batch_id=batch_id,
+        db_path=db_path,
+        bronze_root=bronze_root,
+    )
+
+
 def load_usaspending_contracts(
     *,
     db_path: str | Path = common.DEFAULT_DB_PATH,
@@ -68,10 +89,24 @@ def load_usaspending_contracts(
     today: date | None = None,
     allow_cached_fallback: bool = True,
     on_cached_fallback: Callable[[str, str], None] | None = None,
+    offline: bool = False,
 ) -> int:
-    """Fetch and paginate a month's contract awards, falling back to a cached API page."""
-    start_date, end_date = _last_completed_month(today)
+    """Fetch and paginate a month's contract awards, falling back to a cached API page.
+
+    With offline=True the API is not called: the cached sample is loaded as is,
+    so every offline run writes the same batch.
+    """
     cache_file = Path(cache_path)
+    if offline:
+        if not cache_file.exists():
+            raise FileNotFoundError(
+                f"USAspending offline mode needs the cached sample {cache_file}"
+            )
+        LOGGER.info("USAspending offline mode: loading the cached sample at %s", cache_file)
+        rows, batch_id = _load_cached_sample(cache_file)
+        return _write_batch(rows, batch_id, db_path, bronze_root)
+
+    start_date, end_date = _last_completed_month(today)
     first_payload = _request_payload(1, start_date, end_date)
 
     responses: list[dict[str, Any]] = []
@@ -108,13 +143,7 @@ def load_usaspending_contracts(
             error,
             cache_file,
         )
-        cached_request, cached_response = _read_cached_page(cache_file)
-        if not isinstance(cached_response.get("results"), list):
-            raise ValueError("Cached USAspending response is missing its results array")
-        rows = cached_response["results"]
-        batch_id = common.payload_sha256(
-            {"request": cached_request, "response": cached_response}
-        )
+        rows, batch_id = _load_cached_sample(cache_file)
         if on_cached_fallback is not None:
             on_cached_fallback(str(cache_file), str(error))
     else:
@@ -122,10 +151,4 @@ def load_usaspending_contracts(
             {"request": first_payload, "responses": responses}
         )
 
-    return common.write_bronze_dataframe(
-        pd.DataFrame.from_records(rows),
-        source=SOURCE,
-        batch_id=batch_id,
-        db_path=db_path,
-        bronze_root=bronze_root,
-    )
+    return _write_batch(rows, batch_id, db_path, bronze_root)

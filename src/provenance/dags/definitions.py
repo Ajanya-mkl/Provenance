@@ -1,6 +1,3 @@
-from pathlib import Path
-
-import yaml
 from dagster import (
     AssetSelection,
     DefaultScheduleStatus,
@@ -25,8 +22,8 @@ from provenance.dags.trigger_agent_investigation import (
     agent_investigation_job,
     agent_investigation_sensor,
 )
+from provenance.settings import load_project_config
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DUCKDB_WRITER_TAGS = {"dagster/concurrency_key": "duckdb_writer"}
 
 ingest_all_sources = define_asset_job(
@@ -75,9 +72,7 @@ implicit_global_asset_job = define_asset_job(
     tags=DUCKDB_WRITER_TAGS,
 )
 
-with (PROJECT_ROOT / "config" / "config.example.yaml").open(encoding="utf-8") as config_file:
-    _project_config = yaml.safe_load(config_file)
-WEEKLY_PIPELINE_CRON = _project_config["orchestration"]["weekly_pipeline_cron"]
+WEEKLY_PIPELINE_CRON = load_project_config()["orchestration"]["weekly_pipeline_cron"]
 
 provenance_full_pipeline_schedule = ScheduleDefinition(
     name="provenance_full_pipeline_weekly",

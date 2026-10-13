@@ -16,3 +16,9 @@ storage:
 
 orchestration:
   weekly_pipeline_cron: "0 2 * * 1"
+
+ingestion:
+  # true: load the cached sample (data/raw/usaspending_sample.json) instead of
+  # calling the USASpending API, so demo and CI runs are reproducible. The
+  # env var PROVENANCE_USASPENDING_OFFLINE=true|false overrides this.
+  usaspending_offline: false

@@ -125,6 +125,13 @@ overlapping monthly batches accumulate in bronze. `stg_usaspending_awards`
 keeps one row per `generated_internal_id`, taken from the most recently loaded
 approved batch. No silver, gold or SCD2 model reads USASpending.
 
+For reproducible runs, `ingestion.usaspending_offline` (config, default
+`false`; the env var `PROVENANCE_USASPENDING_OFFLINE` overrides it) skips the
+API and loads the cached sample directly. The sample's content hash is its
+batch id, so every offline run rewrites one identical 100-award batch, and
+the cache file is not refreshed. A missing sample fails the run instead of
+falling back to the live API. World Bank LPI and DataCo are unaffected.
+
 ### Reruns
 
 Every stage is idempotent: bronze batch ids are content hashes, so an

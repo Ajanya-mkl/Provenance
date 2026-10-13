@@ -128,6 +128,22 @@ outcome. It exits `0` on success, `1` if the run fails, and `2` if another
 DuckDB writer run is queued or in progress in the `DAGSTER_HOME` instance. With
 `DAGSTER_HOME` set, its runs also appear in the Dagster UI.
 
+**Offline (pinned) USASpending.** For reproducible demo and CI runs, load the
+cached sample `data/raw/usaspending_sample.json` instead of calling the live
+API. Either set `ingestion.usaspending_offline: true` in
+`config/config.example.yaml` (default `false`), or override it for one shell:
+
+```powershell
+$env:PROVENANCE_USASPENDING_OFFLINE = "true"
+python -m provenance.run_pipeline
+Remove-Item Env:PROVENANCE_USASPENDING_OFFLINE
+```
+
+Every offline run writes the same bronze batch; the run metadata shows
+`usaspending_mode: offline`. The sample is written by the last successful live
+run and is git-ignored, so offline mode fails visibly on a machine that has
+never fetched it.
+
 ### Single writer
 
 DuckDB allows one writer. Runs launched from the UI, the schedule or the
