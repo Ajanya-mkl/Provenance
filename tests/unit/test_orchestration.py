@@ -290,6 +290,11 @@ def test_runner_returns_nonzero_when_pipeline_fails(
     from provenance.run_pipeline import main
 
     class FailedJob:
+        nodes_in_topological_order = [
+            SimpleNamespace(name="gate_dataco_shipments"),
+            SimpleNamespace(name="silver_dbt_assets"),
+        ]
+
         @staticmethod
         def execute_in_process(*, raise_on_error: bool, **_kwargs: object):
             assert raise_on_error is False
@@ -302,7 +307,9 @@ def test_runner_returns_nonzero_when_pipeline_fails(
     )
     monkeypatch.delenv("DAGSTER_HOME", raising=False)
     assert main() == 1
-    assert "Pipeline FAILED" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "Pipeline FAILED" in output
+    assert "silver_dbt_assets: skipped" in output
 
 
 def test_runner_refuses_while_a_writer_run_is_active(

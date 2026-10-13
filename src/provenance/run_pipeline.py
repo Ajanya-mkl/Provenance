@@ -41,8 +41,9 @@ def _active_writer_runs(instance: DagsterInstance) -> list[str]:
     return [run.run_id for run in runs]
 
 
-def _step_states(events: list[Any]) -> OrderedDict[str, str]:
-    states: OrderedDict[str, str] = OrderedDict()
+def _step_states(step_keys: list[str], events: list[Any]) -> OrderedDict[str, str]:
+    # Steps downstream of a failure emit no event, so list every step up front.
+    states: OrderedDict[str, str] = OrderedDict((key, "skipped") for key in step_keys)
     for event in events:
         if (
             isinstance(event, DagsterEvent)
@@ -71,7 +72,8 @@ def main() -> int:
         result = job.execute_in_process(raise_on_error=False, instance=instance)
 
     print("Step summary:")
-    for step_key, state in _step_states(result.all_events).items():
+    step_keys = [node.name for node in job.nodes_in_topological_order]
+    for step_key, state in _step_states(step_keys, result.all_events).items():
         print(f"  {step_key}: {state}")
     print(f"Pipeline {'SUCCEEDED' if result.success else 'FAILED'}")
     return 0 if result.success else 1
