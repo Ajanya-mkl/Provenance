@@ -1,0 +1,128 @@
+{
+  "key": "24f983e72612d706138960d18a35269b7a618018e6d7e6dd4130d277d51e6c7b",
+  "case_id": "baseball_softball_2017q1",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:13:44.551623+00:00",
+  "latency_s": 38.19,
+  "result": {
+    "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+    "report": {
+      "summary": "In 2017-Q1 cat_baseball_softball moved from low to medium tier with a score of 0.58. The primary contributor was the late_rate factor, which had a weighted contribution of 0.25. No earlier investigations exist for this supplier.",
+      "top_factor": "late_rate",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "event_id=risk_flag:1.2:2017-01-01:cat_baseball_softball"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "count=0"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.58"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-01-01:cat_baseball_softball\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+          "investigation_status": "queued",
+          "supplier_key": "cat_baseball_softball",
+          "quarter": "2017-Q1",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.58,
+          "confidence": "full",
+          "top_factor": {
+            "name": "late_rate",
+            "raw_value": 0.672,
+            "normalized_value": 1.0,
+            "weight": 0.25,
+            "weighted_contribution": 0.25,
+            "weighted_contribution_change": 0.151
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_baseball_softball\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_baseball_softball",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q1\",\"supplier_key\":\"cat_baseball_softball\"}",
+        "result": {
+          "supplier_key": "cat_baseball_softball",
+          "quarter": "2017-Q1",
+          "score": 0.58,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "late_rate",
+              "raw_value": 0.672,
+              "normalized_value": 1.0,
+              "weight": 0.25,
+              "weighted_contribution": 0.25,
+              "previous_raw_value": 0.556
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.424,
+              "normalized_value": 0.494,
+              "weight": 0.4,
+              "weighted_contribution": 0.198,
+              "previous_raw_value": 0.379
+            },
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.482,
+              "normalized_value": 0.379,
+              "weight": 0.35,
+              "weighted_contribution": 0.133,
+              "previous_raw_value": 1.311
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2016-Q4",
+            "score": 0.212,
+            "tier": "low"
+          },
+          "quarter_metrics": {
+            "shipment_count": 69,
+            "late_rate": 0.672,
+            "avg_delay_days": 0.881,
+            "delay_stddev": 1.482,
+            "eligible_quarters_to_date": 9,
+            "country_coverage": 0.996
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2631,
+    "completion_tokens": 781
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 9,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

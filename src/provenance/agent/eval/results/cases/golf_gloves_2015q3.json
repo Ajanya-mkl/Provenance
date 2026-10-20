@@ -1,0 +1,140 @@
+{
+  "key": "2f23bab3cb32be01791ebdc8835ff3f24e5dc155e3adb0b3f920d36c5eae6186",
+  "case_id": "golf_gloves_2015q3",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:09:43.358979+00:00",
+  "latency_s": 3.43,
+  "result": {
+    "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+    "report": {
+      "summary": "The risk flag for cat_golf_gloves in 2015-Q3 raised the tier from medium to high with a score of 0.795. The top contributing factor is delay_stddev, which has a weighted contribution of 0.344. No prior investigations were found for this supplier. Full confidence data supports a request for review.",
+      "top_factor": "delay_stddev",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "event_id=risk_flag:1.2:2015-07-01:cat_golf_gloves"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "count=0"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=high"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.795"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "top_factor=delay_stddev"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "weighted_contribution=0.344"
+        }
+      ],
+      "proposed_action": "request_review",
+      "confidence": "high"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2015-07-01:cat_golf_gloves\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+          "investigation_status": "queued",
+          "supplier_key": "cat_golf_gloves",
+          "quarter": "2015-Q3",
+          "old_tier": "medium",
+          "new_tier": "high",
+          "score": 0.795,
+          "confidence": "full",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.645,
+            "normalized_value": 0.983,
+            "weight": 0.35,
+            "weighted_contribution": 0.344,
+            "weighted_contribution_change": 0.216
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_golf_gloves\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_golf_gloves",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2015-Q3\",\"supplier_key\":\"cat_golf_gloves\"}",
+        "result": {
+          "supplier_key": "cat_golf_gloves",
+          "quarter": "2015-Q3",
+          "score": 0.795,
+          "tier": "high",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.645,
+              "normalized_value": 0.983,
+              "weight": 0.35,
+              "weighted_contribution": 0.344,
+              "previous_raw_value": 1.479
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.671,
+              "normalized_value": 1.0,
+              "weight": 0.25,
+              "weighted_contribution": 0.25,
+              "previous_raw_value": 0.562
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.425,
+              "normalized_value": 0.501,
+              "weight": 0.4,
+              "weighted_contribution": 0.2,
+              "previous_raw_value": 0.49
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2015-Q2",
+            "score": 0.565,
+            "tier": "medium"
+          },
+          "quarter_metrics": {
+            "shipment_count": 81,
+            "late_rate": 0.671,
+            "avg_delay_days": 0.899,
+            "delay_stddev": 1.645,
+            "eligible_quarters_to_date": 3,
+            "country_coverage": 0.989
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2633,
+    "completion_tokens": 701
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 10,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

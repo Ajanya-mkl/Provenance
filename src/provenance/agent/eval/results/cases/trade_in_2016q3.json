@@ -1,0 +1,167 @@
+{
+  "key": "4d9c182609d65ffad93c641407e13901c107307ad097792b6a759ac4ca2b4f4b",
+  "case_id": "trade_in_2016q3",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:11:20.406339+00:00",
+  "latency_s": 21.03,
+  "result": {
+    "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+    "report": {
+      "summary": "In 2016-Q3 the supplier cat_trade_in moved from low to medium tier with a score of 0.465 (previous quarter score 0.215). The top contributing factor was delay_stddev with a raw value of 1.555 and a weighted contribution of 0.227, increasing by 0.155. Confidence is full and no prior investigations exist for this supplier.",
+      "top_factor": "delay_stddev",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "quarter=2016-Q3"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.465"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=medium"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "top_factor.name=delay_stddev"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "delay_stddev.raw_value=1.555"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "delay_stddev.weighted_contribution=0.227"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "delay_stddev.weighted_contribution_change=0.155"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 3,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2016-07-01:cat_trade_in\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+          "investigation_status": "queued",
+          "supplier_key": "cat_trade_in",
+          "quarter": "2016-Q3",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.465,
+          "confidence": "full",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.555,
+            "normalized_value": 0.65,
+            "weight": 0.35,
+            "weighted_contribution": 0.227,
+            "weighted_contribution_change": 0.155
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_trade_in\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_trade_in",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_flag",
+        "arguments": "{\"event_id\":\"risk_flag:1.2:2016-07-01:cat_trade_in\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+          "investigation_status": "queued",
+          "supplier_key": "cat_trade_in",
+          "quarter": "2016-Q3",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.465,
+          "confidence": "full",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.555,
+            "normalized_value": 0.65,
+            "weight": 0.35,
+            "weighted_contribution": 0.227,
+            "weighted_contribution_change": 0.155
+          }
+        }
+      },
+      {
+        "step": 2,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2016-Q3\",\"supplier_key\":\"cat_trade_in\"}",
+        "result": {
+          "supplier_key": "cat_trade_in",
+          "quarter": "2016-Q3",
+          "score": 0.465,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.555,
+              "normalized_value": 0.65,
+              "weight": 0.35,
+              "weighted_contribution": 0.227,
+              "previous_raw_value": 1.436
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.608,
+              "normalized_value": 0.77,
+              "weight": 0.25,
+              "weighted_contribution": 0.193,
+              "previous_raw_value": 0.575
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.344,
+              "normalized_value": 0.113,
+              "weight": 0.4,
+              "weighted_contribution": 0.045,
+              "previous_raw_value": 0.325
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2016-Q2",
+            "score": 0.215,
+            "tier": "low"
+          },
+          "quarter_metrics": {
+            "shipment_count": 108,
+            "late_rate": 0.608,
+            "avg_delay_days": 0.765,
+            "delay_stddev": 1.555,
+            "eligible_quarters_to_date": 7,
+            "country_coverage": 1.0
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 4072,
+    "completion_tokens": 747
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 11,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

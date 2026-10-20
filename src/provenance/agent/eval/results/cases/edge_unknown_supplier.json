@@ -1,0 +1,74 @@
+{
+  "key": "9ce4d6d9139535c50938984f819a6950b39aeade1829c74b3c5aeabd7f5a9632",
+  "case_id": "edge_unknown_supplier",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:16:31.972623+00:00",
+  "latency_s": 3.29,
+  "result": {
+    "event_id": "eval:edge:unknown_supplier",
+    "report": {
+      "summary": "insufficient data",
+      "top_factor": "",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "event_id=eval:edge:unknown_supplier"
+        }
+      ],
+      "proposed_action": "no_action",
+      "confidence": "low"
+    },
+    "steps": 3,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"eval:edge:unknown_supplier\"}",
+        "result": {
+          "event_id": "eval:edge:unknown_supplier",
+          "investigation_status": "queued",
+          "supplier_key": "cat_unknown_supplier",
+          "quarter": "2017-Q1",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.437,
+          "confidence": "full",
+          "top_factor": {
+            "name": "country_risk",
+            "raw_value": 0.384,
+            "normalized_value": 0.307,
+            "weight": 0.4,
+            "weighted_contribution": 0.123,
+            "weighted_contribution_change": 0.075
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_unknown_supplier\", \"limit\": 3}",
+        "result": {
+          "error": "unknown supplier 'cat_unknown_supplier'"
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q1\",\"supplier_key\":\"cat_unknown_supplier\"}",
+        "result": {
+          "error": "unknown supplier 'cat_unknown_supplier'"
+        }
+      }
+    ],
+    "prompt_tokens": 3551,
+    "completion_tokens": 654
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 0,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

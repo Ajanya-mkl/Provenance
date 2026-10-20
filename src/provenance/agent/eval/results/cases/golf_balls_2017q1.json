@@ -1,0 +1,136 @@
+{
+  "key": "dcab4c7c8c1406b18ed5fe67a080b3f2a6e3e4de90a3283322af30211b76e6f9",
+  "case_id": "golf_balls_2017q1",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:10:01.590836+00:00",
+  "latency_s": 3.03,
+  "result": {
+    "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+    "report": {
+      "summary": "The risk flag for cat_golf_balls in 2017-Q1 raised the tier from medium to high with a score of 0.735 (confidence full). The primary contributor was delay_stddev, which had a weighted contribution of 0.304. No prior investigations were found for this supplier.",
+      "top_factor": "delay_stddev",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "new_tier=high"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "count=0"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=high"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.735"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "weighted_contribution=0.304"
+        }
+      ],
+      "proposed_action": "request_review",
+      "confidence": "high"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-01-01:cat_golf_balls\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+          "investigation_status": "queued",
+          "supplier_key": "cat_golf_balls",
+          "quarter": "2017-Q1",
+          "old_tier": "medium",
+          "new_tier": "high",
+          "score": 0.735,
+          "confidence": "full",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.615,
+            "normalized_value": 0.87,
+            "weight": 0.35,
+            "weighted_contribution": 0.304,
+            "weighted_contribution_change": 0.22
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_golf_balls\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_golf_balls",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q1\",\"supplier_key\":\"cat_golf_balls\"}",
+        "result": {
+          "supplier_key": "cat_golf_balls",
+          "quarter": "2017-Q1",
+          "score": 0.735,
+          "tier": "high",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.615,
+              "normalized_value": 0.87,
+              "weight": 0.35,
+              "weighted_contribution": 0.304,
+              "previous_raw_value": 1.445
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.631,
+              "normalized_value": 0.937,
+              "weight": 0.25,
+              "weighted_contribution": 0.234,
+              "previous_raw_value": 0.597
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.423,
+              "normalized_value": 0.491,
+              "weight": 0.4,
+              "weighted_contribution": 0.196,
+              "previous_raw_value": 0.39
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2016-Q4",
+            "score": 0.391,
+            "tier": "medium"
+          },
+          "quarter_metrics": {
+            "shipment_count": 148,
+            "late_rate": 0.631,
+            "avg_delay_days": 0.709,
+            "delay_stddev": 1.615,
+            "eligible_quarters_to_date": 9,
+            "country_coverage": 1.0
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2633,
+    "completion_tokens": 813
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 6,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

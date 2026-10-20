@@ -1,0 +1,121 @@
+{
+  "key": "5fa9d83ca15eb25c71857c4fd8cee5ab1235f25f89e6a0f4ebbc1703232eab52",
+  "case_id": "women_s_golf_clubs_2017q2",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:19:41.089238+00:00",
+  "latency_s": 2.8,
+  "result": {
+    "event_id": "eval:risk_flag:1.2:2017-04-01:cat_women_s_golf_clubs",
+    "report": {
+      "summary": "The risk flag for cat_women_s_golf_clubs in 2017-Q2 shows a score of 0.866 and a tier of high, but the confidence is low, resulting in insufficient data to act. No prior investigations exist for this supplier.",
+      "top_factor": "delay_stddev",
+      "evidence": [
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.866"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=high"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "past_investigations=[]"
+        }
+      ],
+      "proposed_action": "no_action",
+      "confidence": "low"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"eval:risk_flag:1.2:2017-04-01:cat_women_s_golf_clubs\"}",
+        "result": {
+          "event_id": "eval:risk_flag:1.2:2017-04-01:cat_women_s_golf_clubs",
+          "investigation_status": "queued",
+          "supplier_key": "cat_women_s_golf_clubs",
+          "quarter": "2017-Q2",
+          "old_tier": null,
+          "new_tier": "high",
+          "score": 0.866,
+          "confidence": "low",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.667,
+            "normalized_value": 1.0,
+            "weight": 0.35,
+            "weighted_contribution": 0.35,
+            "weighted_contribution_change": null
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_women_s_golf_clubs\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_women_s_golf_clubs",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q2\",\"supplier_key\":\"cat_women_s_golf_clubs\"}",
+        "result": {
+          "supplier_key": "cat_women_s_golf_clubs",
+          "quarter": "2017-Q2",
+          "score": 0.866,
+          "tier": "high",
+          "confidence": "low",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.667,
+              "normalized_value": 1.0,
+              "weight": 0.35,
+              "weighted_contribution": 0.35
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.491,
+              "normalized_value": 0.813,
+              "weight": 0.4,
+              "weighted_contribution": 0.325
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.607,
+              "normalized_value": 0.765,
+              "weight": 0.25,
+              "weighted_contribution": 0.191
+            }
+          ],
+          "previous_scored_quarter": null,
+          "quarter_metrics": {
+            "shipment_count": 87,
+            "late_rate": 0.607,
+            "avg_delay_days": 0.774,
+            "delay_stddev": 1.667,
+            "eligible_quarters_to_date": 1,
+            "country_coverage": 0.989
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2643,
+    "completion_tokens": 587
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 3,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

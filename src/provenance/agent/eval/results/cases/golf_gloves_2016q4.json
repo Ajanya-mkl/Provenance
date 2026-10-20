@@ -1,0 +1,155 @@
+{
+  "key": "c1e1b13f060f7f05a99ec331e8716ef09c3fdc12f3b170313e6462e0f067d4c7",
+  "case_id": "golf_gloves_2016q4",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:12:51.171571+00:00",
+  "latency_s": 12.51,
+  "result": {
+    "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+    "report": {
+      "summary": "The 2016-Q4 flag for cat_golf_gloves raised the tier from low to medium with a score of 0.492 and full confidence. The top contributing factor was late_rate with a weighted contribution of 0.25. A prior investigation in 2015-Q3 involved a tier change from medium to high and a different top factor (delay_stddev), so this case does not match the earlier one.",
+      "top_factor": "late_rate",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "event_id=risk_flag:1.2:2016-10-01:cat_golf_gloves"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "past_investigations[0].quarter=2015-Q3"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "past_investigations[0].top_factor=delay_stddev"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.492"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=medium"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "factors[0].factor=late_rate"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "factors[0].weighted_contribution=0.25"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2016-10-01:cat_golf_gloves\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+          "investigation_status": "queued",
+          "supplier_key": "cat_golf_gloves",
+          "quarter": "2016-Q4",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.492,
+          "confidence": "full",
+          "top_factor": {
+            "name": "late_rate",
+            "raw_value": 0.689,
+            "normalized_value": 1.0,
+            "weight": 0.25,
+            "weighted_contribution": 0.25,
+            "weighted_contribution_change": 0.207
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_golf_gloves\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_golf_gloves",
+          "count": 1,
+          "past_investigations": [
+            {
+              "quarter": "2015-Q3",
+              "old_tier": "medium",
+              "new_tier": "high",
+              "score": 0.795,
+              "top_factor": "delay_stddev",
+              "proposed_action": "request_review",
+              "human_decision": null,
+              "decision_reason": null
+            }
+          ]
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2016-Q4\",\"supplier_key\":\"cat_golf_gloves\"}",
+        "result": {
+          "supplier_key": "cat_golf_gloves",
+          "quarter": "2016-Q4",
+          "score": 0.492,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "late_rate",
+              "raw_value": 0.689,
+              "normalized_value": 1.0,
+              "weight": 0.25,
+              "weighted_contribution": 0.25,
+              "previous_raw_value": 0.524
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.385,
+              "normalized_value": 0.309,
+              "weight": 0.4,
+              "weighted_contribution": 0.124,
+              "previous_raw_value": 0.338
+            },
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.472,
+              "normalized_value": 0.339,
+              "weight": 0.35,
+              "weighted_contribution": 0.119,
+              "previous_raw_value": 1.428
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2016-Q3",
+            "score": 0.14,
+            "tier": "low"
+          },
+          "quarter_metrics": {
+            "shipment_count": 109,
+            "late_rate": 0.689,
+            "avg_delay_days": 0.925,
+            "delay_stddev": 1.472,
+            "eligible_quarters_to_date": 8,
+            "country_coverage": 0.997
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2733,
+    "completion_tokens": 833
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 15,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

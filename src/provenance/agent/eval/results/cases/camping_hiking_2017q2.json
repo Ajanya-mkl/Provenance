@@ -1,0 +1,159 @@
+{
+  "key": "ca7300802adee8734464d67e4ef408bf0a02fff4bf726f08b09f190207b4ea74",
+  "case_id": "camping_hiking_2017q2",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:14:42.891146+00:00",
+  "latency_s": 5.86,
+  "result": {
+    "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+    "report": {
+      "summary": "The supplier cat_camping_hiking moved from low to medium tier in 2017-Q2, with a score of 0.575. The primary contributor was country_risk, which had a weighted contribution of 0.308. There are no earlier investigations for this supplier. With a medium tier increase and full confidence, the case is placed on the watchlist.",
+      "top_factor": "country_risk",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "new_tier=medium"
+        },
+        {
+          "tool_name": "get_flag",
+          "value": "score=0.575"
+        },
+        {
+          "tool_name": "get_flag",
+          "value": "top_factor.name=country_risk"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=medium"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "country_risk.weighted_contribution=0.308"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 3,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-04-01:cat_camping_hiking\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+          "investigation_status": "queued",
+          "supplier_key": "cat_camping_hiking",
+          "quarter": "2017-Q2",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.575,
+          "confidence": "full",
+          "top_factor": {
+            "name": "country_risk",
+            "raw_value": 0.42,
+            "normalized_value": 0.475,
+            "weight": 0.4,
+            "weighted_contribution": 0.19,
+            "weighted_contribution_change": 0.071
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_camping_hiking\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_camping_hiking",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_flag",
+        "arguments": "{\"event_id\":\"risk_flag:1.2:2017-04-01:cat_camping_hiking\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+          "investigation_status": "queued",
+          "supplier_key": "cat_camping_hiking",
+          "quarter": "2017-Q2",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.575,
+          "confidence": "full",
+          "top_factor": {
+            "name": "country_risk",
+            "raw_value": 0.42,
+            "normalized_value": 0.475,
+            "weight": 0.4,
+            "weighted_contribution": 0.19,
+            "weighted_contribution_change": 0.071
+          }
+        }
+      },
+      {
+        "step": 2,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q2\",\"supplier_key\":\"cat_camping_hiking\"}",
+        "result": {
+          "supplier_key": "cat_camping_hiking",
+          "quarter": "2017-Q2",
+          "score": 0.575,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "country_risk",
+              "raw_value": 0.482,
+              "normalized_value": 0.771,
+              "weight": 0.4,
+              "weighted_contribution": 0.308,
+              "previous_raw_value": 0.42
+            },
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.486,
+              "normalized_value": 0.393,
+              "weight": 0.35,
+              "weighted_contribution": 0.138,
+              "previous_raw_value": 1.459
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.572,
+              "normalized_value": 0.518,
+              "weight": 0.25,
+              "weighted_contribution": 0.129,
+              "previous_raw_value": 0.585
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2017-Q1",
+            "score": 0.444,
+            "tier": "medium"
+          },
+          "quarter_metrics": {
+            "shipment_count": 1297,
+            "late_rate": 0.572,
+            "avg_delay_days": 0.585,
+            "delay_stddev": 1.486,
+            "eligible_quarters_to_date": 10,
+            "country_coverage": 0.997
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 4125,
+    "completion_tokens": 983
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 5,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

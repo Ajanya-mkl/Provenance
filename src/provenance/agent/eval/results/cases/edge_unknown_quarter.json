@@ -1,0 +1,97 @@
+{
+  "key": "3510e7a78ebfa5afca94dc94aa0ae59eb47c2774df26ee730eae229143fa028f",
+  "case_id": "edge_unknown_quarter",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:16:50.184474+00:00",
+  "latency_s": 2.99,
+  "result": {
+    "event_id": "eval:edge:unknown_quarter",
+    "report": {
+      "summary": "insufficient data",
+      "top_factor": "",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "event_id=eval:edge:unknown_quarter"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "count=1"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "error=no score for cat_golf_balls in 2019-Q1"
+        }
+      ],
+      "proposed_action": "no_action",
+      "confidence": "low"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"eval:edge:unknown_quarter\"}",
+        "result": {
+          "event_id": "eval:edge:unknown_quarter",
+          "investigation_status": "queued",
+          "supplier_key": "cat_golf_balls",
+          "quarter": "2019-Q1",
+          "old_tier": "medium",
+          "new_tier": "high",
+          "score": 0.735,
+          "confidence": "full",
+          "top_factor": {
+            "name": "delay_stddev",
+            "raw_value": 1.615,
+            "normalized_value": 0.87,
+            "weight": 0.35,
+            "weighted_contribution": 0.304,
+            "weighted_contribution_change": 0.22
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_golf_balls\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_golf_balls",
+          "count": 1,
+          "past_investigations": [
+            {
+              "quarter": "2017-Q1",
+              "old_tier": "medium",
+              "new_tier": "high",
+              "score": 0.735,
+              "top_factor": "delay_stddev",
+              "proposed_action": "request_review",
+              "human_decision": null,
+              "decision_reason": null
+            }
+          ]
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2019-Q1\",\"supplier_key\":\"cat_golf_balls\"}",
+        "result": {
+          "error": "no score for cat_golf_balls in 2019-Q1"
+        }
+      }
+    ],
+    "prompt_tokens": 2442,
+    "completion_tokens": 618
+  },
+  "grounding": {
+    "grounded": false,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 2,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": [
+      "get_score_breakdown"
+    ]
+  }
+}

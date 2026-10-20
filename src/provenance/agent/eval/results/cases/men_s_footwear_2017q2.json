@@ -1,0 +1,132 @@
+{
+  "key": "d0404b60a6af9400996836ff15460b9b98dfd3f3ed1abf2619fce7840b15b93e",
+  "case_id": "men_s_footwear_2017q2",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:15:02.070642+00:00",
+  "latency_s": 3.98,
+  "result": {
+    "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+    "report": {
+      "summary": "The supplier cat_men_s_footwear moved to tier medium in 2017-Q2 with a score of 0.536. The highest weighted contribution came from the country_risk factor (0.31). No prior investigations were found for this supplier.",
+      "top_factor": "country_risk",
+      "evidence": [
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "tier=medium"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "score=0.536"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "country_risk_weighted_contribution=0.31"
+        },
+        {
+          "tool_name": "recall_past_investigations",
+          "value": "count=0"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 2,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-04-01:cat_men_s_footwear\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+          "investigation_status": "queued",
+          "supplier_key": "cat_men_s_footwear",
+          "quarter": "2017-Q2",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.536,
+          "confidence": "full",
+          "top_factor": {
+            "name": "country_risk",
+            "raw_value": 0.42,
+            "normalized_value": 0.474,
+            "weight": 0.4,
+            "weighted_contribution": 0.19,
+            "weighted_contribution_change": 0.071
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_men_s_footwear\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_men_s_footwear",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2017-Q2\",\"supplier_key\":\"cat_men_s_footwear\"}",
+        "result": {
+          "supplier_key": "cat_men_s_footwear",
+          "quarter": "2017-Q2",
+          "score": 0.536,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "country_risk",
+              "raw_value": 0.482,
+              "normalized_value": 0.774,
+              "weight": 0.4,
+              "weighted_contribution": 0.31,
+              "previous_raw_value": 0.42
+            },
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.468,
+              "normalized_value": 0.325,
+              "weight": 0.35,
+              "weighted_contribution": 0.114,
+              "previous_raw_value": 1.497
+            },
+            {
+              "factor": "late_rate",
+              "raw_value": 0.563,
+              "normalized_value": 0.453,
+              "weight": 0.25,
+              "weighted_contribution": 0.113,
+              "previous_raw_value": 0.551
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2017-Q1",
+            "score": 0.431,
+            "tier": "medium"
+          },
+          "quarter_metrics": {
+            "shipment_count": 2079,
+            "late_rate": 0.563,
+            "avg_delay_days": 0.566,
+            "delay_stddev": 1.468,
+            "eligible_quarters_to_date": 10,
+            "country_coverage": 0.998
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 2662,
+    "completion_tokens": 664
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 6,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}

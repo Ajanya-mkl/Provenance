@@ -1,0 +1,151 @@
+{
+  "key": "b578e088ce6d1138fc6add927047ba9dd9eebe3aa936a54ed6c0874f8be70cb7",
+  "case_id": "hockey_2016q1",
+  "model": "openai/gpt-oss-120b",
+  "created_at": "2026-10-20T03:12:23.465212+00:00",
+  "latency_s": 13.95,
+  "result": {
+    "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+    "report": {
+      "summary": "The risk flag for cat_hockey in 2016-Q1 raised the tier from low to medium with a full confidence score of 0.495. The top contributing factor was late_rate, which had the highest weighted contribution of 0.25 in the score breakdown. No prior investigations exist for this supplier.",
+      "top_factor": "late_rate",
+      "evidence": [
+        {
+          "tool_name": "get_flag",
+          "value": "new_tier=medium"
+        },
+        {
+          "tool_name": "get_flag",
+          "value": "top_factor.name=late_rate"
+        },
+        {
+          "tool_name": "get_score_breakdown",
+          "value": "weighted_contribution=0.25"
+        }
+      ],
+      "proposed_action": "watchlist",
+      "confidence": "high"
+    },
+    "steps": 3,
+    "stop_reason": "final_answer",
+    "tool_calls": [
+      {
+        "step": 0,
+        "name": "get_flag",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2016-01-01:cat_hockey\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+          "investigation_status": "queued",
+          "supplier_key": "cat_hockey",
+          "quarter": "2016-Q1",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.495,
+          "confidence": "full",
+          "top_factor": {
+            "name": "late_rate",
+            "raw_value": 0.618,
+            "normalized_value": 0.84,
+            "weight": 0.25,
+            "weighted_contribution": 0.21,
+            "weighted_contribution_change": 0.21
+          }
+        }
+      },
+      {
+        "step": 0,
+        "name": "recall_past_investigations",
+        "arguments": "{\"supplier_key\": \"cat_hockey\", \"limit\": 3}",
+        "result": {
+          "supplier_key": "cat_hockey",
+          "count": 0,
+          "past_investigations": []
+        }
+      },
+      {
+        "step": 1,
+        "name": "get_flag",
+        "arguments": "{\"event_id\":\"risk_flag:1.2:2016-01-01:cat_hockey\"}",
+        "result": {
+          "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+          "investigation_status": "queued",
+          "supplier_key": "cat_hockey",
+          "quarter": "2016-Q1",
+          "old_tier": "low",
+          "new_tier": "medium",
+          "score": 0.495,
+          "confidence": "full",
+          "top_factor": {
+            "name": "late_rate",
+            "raw_value": 0.618,
+            "normalized_value": 0.84,
+            "weight": 0.25,
+            "weighted_contribution": 0.21,
+            "weighted_contribution_change": 0.21
+          }
+        }
+      },
+      {
+        "step": 2,
+        "name": "get_score_breakdown",
+        "arguments": "{\"quarter\":\"2016-Q1\",\"supplier_key\":\"cat_hockey\"}",
+        "result": {
+          "supplier_key": "cat_hockey",
+          "quarter": "2016-Q1",
+          "score": 0.495,
+          "tier": "medium",
+          "confidence": "full",
+          "rules_version": "1.2",
+          "factors": [
+            {
+              "factor": "late_rate",
+              "raw_value": 0.714,
+              "normalized_value": 1.0,
+              "weight": 0.25,
+              "weighted_contribution": 0.25,
+              "previous_raw_value": 0.618
+            },
+            {
+              "factor": "delay_stddev",
+              "raw_value": 1.484,
+              "normalized_value": 0.386,
+              "weight": 0.35,
+              "weighted_contribution": 0.135,
+              "previous_raw_value": 1.319
+            },
+            {
+              "factor": "country_risk",
+              "raw_value": 0.377,
+              "normalized_value": 0.273,
+              "weight": 0.4,
+              "weighted_contribution": 0.109,
+              "previous_raw_value": 0.413
+            }
+          ],
+          "previous_scored_quarter": {
+            "quarter": "2015-Q4",
+            "score": 0.386,
+            "tier": "medium"
+          },
+          "quarter_metrics": {
+            "shipment_count": 63,
+            "late_rate": 0.714,
+            "avg_delay_days": 1.079,
+            "delay_stddev": 1.484,
+            "eligible_quarters_to_date": 5,
+            "country_coverage": 0.996
+          }
+        }
+      }
+    ],
+    "prompt_tokens": 4067,
+    "completion_tokens": 708
+  },
+  "grounding": {
+    "grounded": true,
+    "grounded_ratio": 1.0,
+    "numbers_checked": 4,
+    "ungrounded_numbers": [],
+    "unknown_evidence_tools": []
+  }
+}
