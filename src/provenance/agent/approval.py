@@ -21,6 +21,7 @@ import duckdb
 
 from provenance.agent.memory.investigation_memory import record_human_decision
 from provenance.agent.store import ALLOWED_ACTIONS, append_audit, now, table_exists, writer
+from provenance.db import connect_read_only
 from provenance.settings import TRUE_VALUES
 
 LOGGER = logging.getLogger(__name__)
@@ -305,7 +306,7 @@ def reject(db_path: str | Path, action_id: str, decided_by: str, reason: str) ->
 
 
 def list_actions(db_path: str | Path, include_decided: bool = False) -> list[dict[str, Any]]:
-    with duckdb.connect(str(db_path), read_only=True) as connection:
+    with connect_read_only(db_path) as connection:
         if not table_exists(connection, "agent", "actions"):
             return []
         where = "" if include_decided else "WHERE actions.status = 'proposed'"
@@ -336,7 +337,7 @@ def list_actions(db_path: str | Path, include_decided: bool = False) -> list[dic
 
 
 def read_audit_log(db_path: str | Path, limit: int = 20) -> list[dict[str, Any]]:
-    with duckdb.connect(str(db_path), read_only=True) as connection:
+    with connect_read_only(db_path) as connection:
         if not table_exists(connection, "agent", "audit_log"):
             return []
         rows = connection.execute(

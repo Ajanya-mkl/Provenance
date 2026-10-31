@@ -58,3 +58,8 @@ data/*.duckdb
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Console (Phase 7c)
+/web/node_modules
+/web/dist
+.impeccable/

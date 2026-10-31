@@ -1,0 +1,6271 @@
+{
+ "/api/approvals": {
+  "body": {
+   "items": [
+    {
+     "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+        "investigation_id": "06f44a25-6ddd-4ec3-9324-70bfd46b457b"
+       },
+       "event": "action_proposed",
+       "seq": 2,
+       "ts": "2026-10-20T08:50:11.812768+05:30"
+      },
+      {
+       "actor": "AJANYA",
+       "detail": {
+        "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+        "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+        "reason": "Phase 7b demo: country risk rose, keep on watch"
+       },
+       "event": "action_approved",
+       "seq": 3,
+       "ts": "2026-10-20T08:50:37.432027+05:30"
+      },
+      {
+       "actor": "AJANYA",
+       "detail": {
+        "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+        "action_type": "watchlist",
+        "effect": "agent.watchlist"
+       },
+       "event": "action_applied",
+       "seq": 4,
+       "ts": "2026-10-20T08:50:37.432027+05:30"
+      }
+     ],
+     "decided_by": "AJANYA",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T08:50:11.812768+05:30",
+     "quarter": "2017-01-01",
+     "status": "applied",
+     "supplier_key": "cat_cleats"
+    },
+    {
+     "action_id": "ae38af5a-15b5-4a93-ba64-95d2810967f4",
+     "action_type": "request_review",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "ae38af5a-15b5-4a93-ba64-95d2810967f4",
+        "action_type": "request_review",
+        "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+        "investigation_id": "364e9f8c-3438-4a5e-9a82-74a625d2c519"
+       },
+       "event": "action_proposed",
+       "seq": 6,
+       "ts": "2026-10-20T09:17:59.823204+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:17:59.820214+05:30",
+     "quarter": "2015-07-01",
+     "status": "proposed",
+     "supplier_key": "cat_golf_gloves"
+    },
+    {
+     "action_id": "eba594bd-38ac-4adb-b75c-48348b686ba1",
+     "action_type": "request_review",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "eba594bd-38ac-4adb-b75c-48348b686ba1",
+        "action_type": "request_review",
+        "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+        "investigation_id": "47087bd9-1e85-493b-b2c4-1c8ef0fd600a"
+       },
+       "event": "action_proposed",
+       "seq": 8,
+       "ts": "2026-10-20T09:18:00.096189+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:00.093197+05:30",
+     "quarter": "2017-01-01",
+     "status": "proposed",
+     "supplier_key": "cat_golf_balls"
+    },
+    {
+     "action_id": "088e657c-f8e8-46cb-8536-46dabea58b27",
+     "action_type": "request_review",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "088e657c-f8e8-46cb-8536-46dabea58b27",
+        "action_type": "request_review",
+        "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+        "investigation_id": "fa22ac40-0b2e-4f6c-8ba2-e1b7e5c76bbe"
+       },
+       "event": "action_proposed",
+       "seq": 10,
+       "ts": "2026-10-20T09:18:00.318287+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:00.314729+05:30",
+     "quarter": "2016-10-01",
+     "status": "proposed",
+     "supplier_key": "cat_girls_apparel"
+    },
+    {
+     "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+        "investigation_id": "f7e1c9cd-0dcf-41be-9ec4-619427b48494"
+       },
+       "event": "action_proposed",
+       "seq": 12,
+       "ts": "2026-10-20T09:18:00.529744+05:30"
+      },
+      {
+       "actor": "AJANYA",
+       "detail": {
+        "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+        "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+        "reason": "Delay variance is within seasonal range."
+       },
+       "event": "action_rejected",
+       "seq": 13,
+       "ts": "2026-10-20T09:18:00.671605+05:30"
+      }
+     ],
+     "decided_by": "AJANYA",
+     "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:00.527751+05:30",
+     "quarter": "2016-10-01",
+     "status": "rejected",
+     "supplier_key": "cat_accessories"
+    },
+    {
+     "action_id": "32ae4e66-b148-4a9e-8a46-fd65d0022d24",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "32ae4e66-b148-4a9e-8a46-fd65d0022d24",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+        "investigation_id": "478140cb-716b-4fe6-aa9b-a6395947cef6"
+       },
+       "event": "action_proposed",
+       "seq": 16,
+       "ts": "2026-10-20T09:18:00.975232+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:00.972489+05:30",
+     "quarter": "2017-04-01",
+     "status": "proposed",
+     "supplier_key": "cat_women_s_apparel"
+    },
+    {
+     "action_id": "ac1da402-3bfc-491f-9437-cb6af0b502e9",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "ac1da402-3bfc-491f-9437-cb6af0b502e9",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+        "investigation_id": "b5d3c531-06e3-456b-8988-98f69a295bb6"
+       },
+       "event": "action_proposed",
+       "seq": 18,
+       "ts": "2026-10-20T09:18:01.164941+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:01.164941+05:30",
+     "quarter": "2016-01-01",
+     "status": "proposed",
+     "supplier_key": "cat_hockey"
+    },
+    {
+     "action_id": "90bb57ea-15e9-4594-a872-33ac4cc6608f",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "90bb57ea-15e9-4594-a872-33ac4cc6608f",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+        "investigation_id": "fae89651-cad3-4887-bfdd-90e390700ec4"
+       },
+       "event": "action_proposed",
+       "seq": 20,
+       "ts": "2026-10-20T09:18:01.355644+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:01.353650+05:30",
+     "quarter": "2016-10-01",
+     "status": "proposed",
+     "supplier_key": "cat_golf_gloves"
+    },
+    {
+     "action_id": "5970c78d-0ab1-4b3d-bb39-49f7f9178769",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "5970c78d-0ab1-4b3d-bb39-49f7f9178769",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+        "investigation_id": "da713241-bb1f-448e-b96f-5df39271003a"
+       },
+       "event": "action_proposed",
+       "seq": 22,
+       "ts": "2026-10-20T09:18:01.547816+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:01.547816+05:30",
+     "quarter": "2017-01-01",
+     "status": "proposed",
+     "supplier_key": "cat_baseball_softball"
+    },
+    {
+     "action_id": "ed1cef7a-3ddf-4a4f-aa27-7bb01f32dc50",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "ed1cef7a-3ddf-4a4f-aa27-7bb01f32dc50",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+        "investigation_id": "20d09a5f-4145-41b3-a594-6b90e66021ac"
+       },
+       "event": "action_proposed",
+       "seq": 24,
+       "ts": "2026-10-20T09:18:01.747734+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:01.746735+05:30",
+     "quarter": "2017-01-01",
+     "status": "proposed",
+     "supplier_key": "cat_fishing"
+    },
+    {
+     "action_id": "d08aa687-24a8-4974-aab2-cbc6e575940a",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "d08aa687-24a8-4974-aab2-cbc6e575940a",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+        "investigation_id": "ad6a3f57-42fb-48c8-a42f-10a2634e2569"
+       },
+       "event": "action_proposed",
+       "seq": 26,
+       "ts": "2026-10-20T09:18:01.943820+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:01.928154+05:30",
+     "quarter": "2017-04-01",
+     "status": "proposed",
+     "supplier_key": "cat_camping_hiking"
+    },
+    {
+     "action_id": "ef5e86bb-474c-4a87-bca3-99c5045d61d3",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "ef5e86bb-474c-4a87-bca3-99c5045d61d3",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+        "investigation_id": "bb403f1d-ac06-4f74-9903-61797e2a8027"
+       },
+       "event": "action_proposed",
+       "seq": 28,
+       "ts": "2026-10-20T09:18:02.169543+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:02.164997+05:30",
+     "quarter": "2017-04-01",
+     "status": "proposed",
+     "supplier_key": "cat_men_s_footwear"
+    },
+    {
+     "action_id": "4fed00d2-9076-452f-8d1a-9f9b45c17544",
+     "action_type": "no_action",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "4fed00d2-9076-452f-8d1a-9f9b45c17544",
+        "action_type": "no_action",
+        "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+        "investigation_id": "fa97e879-b5f7-47c4-b681-e7a2b824160a"
+       },
+       "event": "action_proposed",
+       "seq": 30,
+       "ts": "2026-10-20T09:18:02.364693+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:02.363338+05:30",
+     "quarter": "2017-07-01",
+     "status": "proposed",
+     "supplier_key": "cat_boxing_mma"
+    },
+    {
+     "action_id": "40b1a4b3-1c69-4554-91e2-be18053eebf7",
+     "action_type": "watchlist",
+     "audit": [
+      {
+       "actor": "agent",
+       "detail": {
+        "action_id": "40b1a4b3-1c69-4554-91e2-be18053eebf7",
+        "action_type": "watchlist",
+        "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+        "investigation_id": "ef646d77-2b5b-4254-b5b8-264ff5d996b8"
+       },
+       "event": "action_proposed",
+       "seq": 32,
+       "ts": "2026-10-20T09:18:02.564045+05:30"
+      }
+     ],
+     "decided_by": null,
+     "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+     "grounded_ratio": 1.0,
+     "proposed_at": "2026-10-20T09:18:02.564045+05:30",
+     "quarter": "2016-07-01",
+     "status": "proposed",
+     "supplier_key": "cat_hockey"
+    }
+   ],
+   "pending": 12
+  },
+  "status": 200
+ },
+ "/api/audit?limit=50": {
+  "body": {
+   "chain": {
+    "broken_seqs": [],
+    "rows_verified": 32,
+    "status": "intact",
+    "verified_at": "2026-10-20T03:48:03+00:00"
+   },
+   "entries": [
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "40b1a4b3-1c69-4554-91e2-be18053eebf7",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+      "investigation_id": "ef646d77-2b5b-4254-b5b8-264ff5d996b8"
+     },
+     "event": "action_proposed",
+     "seq": 32,
+     "ts": "2026-10-20T09:18:02.564045+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+      "grounded_ratio": 1.0,
+      "investigation_id": "ef646d77-2b5b-4254-b5b8-264ff5d996b8",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 31,
+     "ts": "2026-10-20T09:18:02.497005+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "4fed00d2-9076-452f-8d1a-9f9b45c17544",
+      "action_type": "no_action",
+      "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+      "investigation_id": "fa97e879-b5f7-47c4-b681-e7a2b824160a"
+     },
+     "event": "action_proposed",
+     "seq": 30,
+     "ts": "2026-10-20T09:18:02.364693+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+      "grounded_ratio": 1.0,
+      "investigation_id": "fa97e879-b5f7-47c4-b681-e7a2b824160a",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 29,
+     "ts": "2026-10-20T09:18:02.298158+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "ef5e86bb-474c-4a87-bca3-99c5045d61d3",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+      "investigation_id": "bb403f1d-ac06-4f74-9903-61797e2a8027"
+     },
+     "event": "action_proposed",
+     "seq": 28,
+     "ts": "2026-10-20T09:18:02.169543+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+      "grounded_ratio": 1.0,
+      "investigation_id": "bb403f1d-ac06-4f74-9903-61797e2a8027",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 27,
+     "ts": "2026-10-20T09:18:02.096763+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "d08aa687-24a8-4974-aab2-cbc6e575940a",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+      "investigation_id": "ad6a3f57-42fb-48c8-a42f-10a2634e2569"
+     },
+     "event": "action_proposed",
+     "seq": 26,
+     "ts": "2026-10-20T09:18:01.943820+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+      "grounded_ratio": 1.0,
+      "investigation_id": "ad6a3f57-42fb-48c8-a42f-10a2634e2569",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 25,
+     "ts": "2026-10-20T09:18:01.883365+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "ed1cef7a-3ddf-4a4f-aa27-7bb01f32dc50",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+      "investigation_id": "20d09a5f-4145-41b3-a594-6b90e66021ac"
+     },
+     "event": "action_proposed",
+     "seq": 24,
+     "ts": "2026-10-20T09:18:01.747734+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+      "grounded_ratio": 1.0,
+      "investigation_id": "20d09a5f-4145-41b3-a594-6b90e66021ac",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 23,
+     "ts": "2026-10-20T09:18:01.682481+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "5970c78d-0ab1-4b3d-bb39-49f7f9178769",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+      "investigation_id": "da713241-bb1f-448e-b96f-5df39271003a"
+     },
+     "event": "action_proposed",
+     "seq": 22,
+     "ts": "2026-10-20T09:18:01.547816+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+      "grounded_ratio": 1.0,
+      "investigation_id": "da713241-bb1f-448e-b96f-5df39271003a",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 21,
+     "ts": "2026-10-20T09:18:01.506425+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "90bb57ea-15e9-4594-a872-33ac4cc6608f",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+      "investigation_id": "fae89651-cad3-4887-bfdd-90e390700ec4"
+     },
+     "event": "action_proposed",
+     "seq": 20,
+     "ts": "2026-10-20T09:18:01.355644+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+      "grounded_ratio": 1.0,
+      "investigation_id": "fae89651-cad3-4887-bfdd-90e390700ec4",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 19,
+     "ts": "2026-10-20T09:18:01.290646+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "ac1da402-3bfc-491f-9437-cb6af0b502e9",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+      "investigation_id": "b5d3c531-06e3-456b-8988-98f69a295bb6"
+     },
+     "event": "action_proposed",
+     "seq": 18,
+     "ts": "2026-10-20T09:18:01.164941+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+      "grounded_ratio": 1.0,
+      "investigation_id": "b5d3c531-06e3-456b-8988-98f69a295bb6",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 17,
+     "ts": "2026-10-20T09:18:01.104203+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "32ae4e66-b148-4a9e-8a46-fd65d0022d24",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+      "investigation_id": "478140cb-716b-4fe6-aa9b-a6395947cef6"
+     },
+     "event": "action_proposed",
+     "seq": 16,
+     "ts": "2026-10-20T09:18:00.975232+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+      "grounded_ratio": 1.0,
+      "investigation_id": "478140cb-716b-4fe6-aa9b-a6395947cef6",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 15,
+     "ts": "2026-10-20T09:18:00.894799+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+      "grounded_ratio": 0.9167,
+      "investigation_id": "1a1e51d5-1fb7-483d-9468-952bba58915f",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": [
+       "0.512"
+      ]
+     },
+     "event": "investigation_rejected_ungrounded",
+     "seq": 14,
+     "ts": "2026-10-20T09:18:00.781185+05:30"
+    },
+    {
+     "actor": "AJANYA",
+     "detail": {
+      "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+      "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+      "reason": "Delay variance is within seasonal range."
+     },
+     "event": "action_rejected",
+     "seq": 13,
+     "ts": "2026-10-20T09:18:00.671605+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+      "investigation_id": "f7e1c9cd-0dcf-41be-9ec4-619427b48494"
+     },
+     "event": "action_proposed",
+     "seq": 12,
+     "ts": "2026-10-20T09:18:00.529744+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+      "grounded_ratio": 1.0,
+      "investigation_id": "f7e1c9cd-0dcf-41be-9ec4-619427b48494",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 11,
+     "ts": "2026-10-20T09:18:00.462732+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "088e657c-f8e8-46cb-8536-46dabea58b27",
+      "action_type": "request_review",
+      "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+      "investigation_id": "fa22ac40-0b2e-4f6c-8ba2-e1b7e5c76bbe"
+     },
+     "event": "action_proposed",
+     "seq": 10,
+     "ts": "2026-10-20T09:18:00.318287+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+      "grounded_ratio": 1.0,
+      "investigation_id": "fa22ac40-0b2e-4f6c-8ba2-e1b7e5c76bbe",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 9,
+     "ts": "2026-10-20T09:18:00.255185+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "eba594bd-38ac-4adb-b75c-48348b686ba1",
+      "action_type": "request_review",
+      "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+      "investigation_id": "47087bd9-1e85-493b-b2c4-1c8ef0fd600a"
+     },
+     "event": "action_proposed",
+     "seq": 8,
+     "ts": "2026-10-20T09:18:00.096189+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+      "grounded_ratio": 1.0,
+      "investigation_id": "47087bd9-1e85-493b-b2c4-1c8ef0fd600a",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 7,
+     "ts": "2026-10-20T09:18:00.036611+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "ae38af5a-15b5-4a93-ba64-95d2810967f4",
+      "action_type": "request_review",
+      "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+      "investigation_id": "364e9f8c-3438-4a5e-9a82-74a625d2c519"
+     },
+     "event": "action_proposed",
+     "seq": 6,
+     "ts": "2026-10-20T09:17:59.823204+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+      "grounded_ratio": 1.0,
+      "investigation_id": "364e9f8c-3438-4a5e-9a82-74a625d2c519",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 5,
+     "ts": "2026-10-20T09:17:59.741290+05:30"
+    },
+    {
+     "actor": "AJANYA",
+     "detail": {
+      "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+      "action_type": "watchlist",
+      "effect": "agent.watchlist"
+     },
+     "event": "action_applied",
+     "seq": 4,
+     "ts": "2026-10-20T08:50:37.432027+05:30"
+    },
+    {
+     "actor": "AJANYA",
+     "detail": {
+      "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+      "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+      "reason": "Phase 7b demo: country risk rose, keep on watch"
+     },
+     "event": "action_approved",
+     "seq": 3,
+     "ts": "2026-10-20T08:50:37.432027+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+      "action_type": "watchlist",
+      "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+      "investigation_id": "06f44a25-6ddd-4ec3-9324-70bfd46b457b"
+     },
+     "event": "action_proposed",
+     "seq": 2,
+     "ts": "2026-10-20T08:50:11.812768+05:30"
+    },
+    {
+     "actor": "agent",
+     "detail": {
+      "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+      "grounded_ratio": 1.0,
+      "investigation_id": "06f44a25-6ddd-4ec3-9324-70bfd46b457b",
+      "model": "openai/gpt-oss-120b",
+      "ungrounded_numbers": []
+     },
+     "event": "investigation_proposed",
+     "seq": 1,
+     "ts": "2026-10-20T08:50:11.765897+05:30"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/evaluation": {
+  "body": {
+   "case_count": 18,
+   "generated_at": "2026-10-20T03:19:44+00:00",
+   "metrics": {
+    "avg_latency_s": 9.24,
+    "avg_steps": 2.5,
+    "avg_tokens": 4244.72,
+    "edge_case_handled_rate": 1.0,
+    "grounded_rate": 0.944,
+    "guardrail_violations": 0,
+    "low_confidence_handled_rate": 1.0,
+    "memory_recall_rate": 1.0,
+    "top_factor_accuracy": 0.938,
+    "valid_action_rate": 1.0
+   },
+   "model": "openai/gpt-oss-120b"
+  },
+  "status": 200
+ },
+ "/api/flags": {
+  "body": {
+   "count": 20,
+   "items": [
+    {
+     "action": {
+      "action_type": "no_action",
+      "status": "proposed"
+     },
+     "confidence": "low",
+     "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q3",
+     "quarter_start": "2017-07-01",
+     "queue_status": "queued",
+     "score": 0.488,
+     "supplier_key": "cat_boxing_mma",
+     "supplier_name": "Boxing & MMA",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.079,
+      "weighted_contribution_change": -0.232
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q2",
+     "quarter_start": "2017-04-01",
+     "queue_status": "queued",
+     "score": 0.575,
+     "supplier_key": "cat_camping_hiking",
+     "supplier_name": "Camping & Hiking",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.19,
+      "weighted_contribution_change": 0.071
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q2",
+     "quarter_start": "2017-04-01",
+     "queue_status": "queued",
+     "score": 0.548,
+     "supplier_key": "cat_women_s_apparel",
+     "supplier_name": "Women's Apparel",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.201,
+      "weighted_contribution_change": 0.098
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q2",
+     "quarter_start": "2017-04-01",
+     "queue_status": "queued",
+     "score": 0.536,
+     "supplier_key": "cat_men_s_footwear",
+     "supplier_name": "Men's Footwear",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.19,
+      "weighted_contribution_change": 0.071
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-04-01:cat_cardio_equipment",
+     "investigation": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q2",
+     "quarter_start": "2017-04-01",
+     "queue_status": "queued",
+     "score": 0.426,
+     "supplier_key": "cat_cardio_equipment",
+     "supplier_name": "Cardio Equipment",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.199,
+      "weighted_contribution_change": 0.076
+     }
+    },
+    {
+     "action": {
+      "action_type": "request_review",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "high",
+     "old_tier": "medium",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.735,
+     "supplier_key": "cat_golf_balls",
+     "supplier_name": "Golf Balls",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.304,
+      "weighted_contribution_change": 0.22
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_shop_by_sport",
+     "investigation": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.587,
+     "supplier_key": "cat_shop_by_sport",
+     "supplier_name": "Shop By Sport",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.12,
+      "weighted_contribution_change": 0.075
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.58,
+     "supplier_key": "cat_baseball_softball",
+     "supplier_name": "Baseball & Softball",
+     "top_factor": {
+      "name": "late_rate",
+      "weighted_contribution": 0.25,
+      "weighted_contribution_change": 0.151
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_indoor_outdoor_games",
+     "investigation": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.493,
+     "supplier_key": "cat_indoor_outdoor_games",
+     "supplier_name": "Indoor/Outdoor Games",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.124,
+      "weighted_contribution_change": 0.077
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.474,
+     "supplier_key": "cat_fishing",
+     "supplier_name": "Fishing",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.119,
+      "weighted_contribution_change": 0.072
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "applied"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2017-Q1",
+     "quarter_start": "2017-01-01",
+     "queue_status": "queued",
+     "score": 0.437,
+     "supplier_key": "cat_cleats",
+     "supplier_name": "Cleats",
+     "top_factor": {
+      "name": "country_risk",
+      "weighted_contribution": 0.123,
+      "weighted_contribution_change": 0.075
+     }
+    },
+    {
+     "action": {
+      "action_type": "request_review",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "high",
+     "old_tier": "low",
+     "quarter": "2016-Q4",
+     "quarter_start": "2016-10-01",
+     "queue_status": "queued",
+     "score": 0.687,
+     "supplier_key": "cat_girls_apparel",
+     "supplier_name": "Girls' Apparel",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.35,
+      "weighted_contribution_change": 0.345
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "rejected"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q4",
+     "quarter_start": "2016-10-01",
+     "queue_status": "queued",
+     "score": 0.64,
+     "supplier_key": "cat_accessories",
+     "supplier_name": "Accessories",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.306,
+      "weighted_contribution_change": 0.306
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q4",
+     "quarter_start": "2016-10-01",
+     "queue_status": "queued",
+     "score": 0.492,
+     "supplier_key": "cat_golf_gloves",
+     "supplier_name": "Golf Gloves",
+     "top_factor": {
+      "name": "late_rate",
+      "weighted_contribution": 0.25,
+      "weighted_contribution_change": 0.207
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-10-01:cat_water_sports",
+     "investigation": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q4",
+     "quarter_start": "2016-10-01",
+     "queue_status": "queued",
+     "score": 0.406,
+     "supplier_key": "cat_water_sports",
+     "supplier_name": "Water Sports",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.154,
+      "weighted_contribution_change": 0.083
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+     "investigation": {
+      "grounded": false,
+      "status": "rejected_ungrounded"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q3",
+     "quarter_start": "2016-07-01",
+     "queue_status": "queued",
+     "score": 0.465,
+     "supplier_key": "cat_trade_in",
+     "supplier_name": "Trade-In",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.227,
+      "weighted_contribution_change": 0.155
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q3",
+     "quarter_start": "2016-07-01",
+     "queue_status": "queued",
+     "score": 0.45,
+     "supplier_key": "cat_hockey",
+     "supplier_name": "Hockey",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.328,
+      "weighted_contribution_change": 0.081
+     }
+    },
+    {
+     "action": null,
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-07-01:cat_baseball_softball",
+     "investigation": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q3",
+     "quarter_start": "2016-07-01",
+     "queue_status": "queued",
+     "score": 0.445,
+     "supplier_key": "cat_baseball_softball",
+     "supplier_name": "Baseball & Softball",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.35,
+      "weighted_contribution_change": 0.257
+     }
+    },
+    {
+     "action": {
+      "action_type": "watchlist",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "medium",
+     "old_tier": "low",
+     "quarter": "2016-Q1",
+     "quarter_start": "2016-01-01",
+     "queue_status": "queued",
+     "score": 0.495,
+     "supplier_key": "cat_hockey",
+     "supplier_name": "Hockey",
+     "top_factor": {
+      "name": "late_rate",
+      "weighted_contribution": 0.21,
+      "weighted_contribution_change": 0.21
+     }
+    },
+    {
+     "action": {
+      "action_type": "request_review",
+      "status": "proposed"
+     },
+     "confidence": "full",
+     "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+     "investigation": {
+      "grounded": true,
+      "status": "proposed"
+     },
+     "new_tier": "high",
+     "old_tier": "medium",
+     "quarter": "2015-Q3",
+     "quarter_start": "2015-07-01",
+     "queue_status": "queued",
+     "score": 0.795,
+     "supplier_key": "cat_golf_gloves",
+     "supplier_name": "Golf Gloves",
+     "top_factor": {
+      "name": "delay_stddev",
+      "weighted_contribution": 0.344,
+      "weighted_contribution_change": 0.216
+     }
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2015-07-01%3Acat_golf_gloves": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+   "investigation_status": "queued",
+   "new_tier": "high",
+   "old_tier": "medium",
+   "quarter": "2015-Q3",
+   "score": 0.795,
+   "supplier_key": "cat_golf_gloves",
+   "supplier_name": "Golf Gloves",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.983,
+    "raw_value": 1.645,
+    "weight": 0.35,
+    "weighted_contribution": 0.344,
+    "weighted_contribution_change": 0.216
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-01-01%3Acat_hockey": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q1",
+   "score": 0.495,
+   "supplier_key": "cat_hockey",
+   "supplier_name": "Hockey",
+   "top_factor": {
+    "name": "late_rate",
+    "normalized_value": 0.84,
+    "raw_value": 0.618,
+    "weight": 0.25,
+    "weighted_contribution": 0.21,
+    "weighted_contribution_change": 0.21
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-07-01%3Acat_baseball_softball": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-07-01:cat_baseball_softball",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q3",
+   "score": 0.445,
+   "supplier_key": "cat_baseball_softball",
+   "supplier_name": "Baseball & Softball",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 1.0,
+    "raw_value": 1.65,
+    "weight": 0.35,
+    "weighted_contribution": 0.35,
+    "weighted_contribution_change": 0.257
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-07-01%3Acat_hockey": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q3",
+   "score": 0.45,
+   "supplier_key": "cat_hockey",
+   "supplier_name": "Hockey",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.938,
+    "raw_value": 1.633,
+    "weight": 0.35,
+    "weighted_contribution": 0.328,
+    "weighted_contribution_change": 0.081
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-07-01%3Acat_trade_in": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q3",
+   "score": 0.465,
+   "supplier_key": "cat_trade_in",
+   "supplier_name": "Trade-In",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.65,
+    "raw_value": 1.555,
+    "weight": 0.35,
+    "weighted_contribution": 0.227,
+    "weighted_contribution_change": 0.155
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-10-01%3Acat_accessories": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q4",
+   "score": 0.64,
+   "supplier_key": "cat_accessories",
+   "supplier_name": "Accessories",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.875,
+    "raw_value": 1.616,
+    "weight": 0.35,
+    "weighted_contribution": 0.306,
+    "weighted_contribution_change": 0.306
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-10-01%3Acat_girls_apparel": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+   "investigation_status": "queued",
+   "new_tier": "high",
+   "old_tier": "low",
+   "quarter": "2016-Q4",
+   "score": 0.687,
+   "supplier_key": "cat_girls_apparel",
+   "supplier_name": "Girls' Apparel",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 1.0,
+    "raw_value": 1.705,
+    "weight": 0.35,
+    "weighted_contribution": 0.35,
+    "weighted_contribution_change": 0.345
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-10-01%3Acat_golf_gloves": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q4",
+   "score": 0.492,
+   "supplier_key": "cat_golf_gloves",
+   "supplier_name": "Golf Gloves",
+   "top_factor": {
+    "name": "late_rate",
+    "normalized_value": 1.0,
+    "raw_value": 0.689,
+    "weight": 0.25,
+    "weighted_contribution": 0.25,
+    "weighted_contribution_change": 0.207
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2016-10-01%3Acat_water_sports": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2016-10-01:cat_water_sports",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2016-Q4",
+   "score": 0.406,
+   "supplier_key": "cat_water_sports",
+   "supplier_name": "Water Sports",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.44,
+    "raw_value": 1.499,
+    "weight": 0.35,
+    "weighted_contribution": 0.154,
+    "weighted_contribution_change": 0.083
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_baseball_softball": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q1",
+   "score": 0.58,
+   "supplier_key": "cat_baseball_softball",
+   "supplier_name": "Baseball & Softball",
+   "top_factor": {
+    "name": "late_rate",
+    "normalized_value": 1.0,
+    "raw_value": 0.672,
+    "weight": 0.25,
+    "weighted_contribution": 0.25,
+    "weighted_contribution_change": 0.151
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_cleats": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q1",
+   "score": 0.437,
+   "supplier_key": "cat_cleats",
+   "supplier_name": "Cleats",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.307,
+    "raw_value": 0.384,
+    "weight": 0.4,
+    "weighted_contribution": 0.123,
+    "weighted_contribution_change": 0.075
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_fishing": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q1",
+   "score": 0.474,
+   "supplier_key": "cat_fishing",
+   "supplier_name": "Fishing",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.298,
+    "raw_value": 0.383,
+    "weight": 0.4,
+    "weighted_contribution": 0.119,
+    "weighted_contribution_change": 0.072
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_golf_balls": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+   "investigation_status": "queued",
+   "new_tier": "high",
+   "old_tier": "medium",
+   "quarter": "2017-Q1",
+   "score": 0.735,
+   "supplier_key": "cat_golf_balls",
+   "supplier_name": "Golf Balls",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.87,
+    "raw_value": 1.615,
+    "weight": 0.35,
+    "weighted_contribution": 0.304,
+    "weighted_contribution_change": 0.22
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_indoor_outdoor_games": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_indoor_outdoor_games",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q1",
+   "score": 0.493,
+   "supplier_key": "cat_indoor_outdoor_games",
+   "supplier_name": "Indoor/Outdoor Games",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.311,
+    "raw_value": 0.385,
+    "weight": 0.4,
+    "weighted_contribution": 0.124,
+    "weighted_contribution_change": 0.077
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-01-01%3Acat_shop_by_sport": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_shop_by_sport",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q1",
+   "score": 0.587,
+   "supplier_key": "cat_shop_by_sport",
+   "supplier_name": "Shop By Sport",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.301,
+    "raw_value": 0.383,
+    "weight": 0.4,
+    "weighted_contribution": 0.12,
+    "weighted_contribution_change": 0.075
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-04-01%3Acat_camping_hiking": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q2",
+   "score": 0.575,
+   "supplier_key": "cat_camping_hiking",
+   "supplier_name": "Camping & Hiking",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.475,
+    "raw_value": 0.42,
+    "weight": 0.4,
+    "weighted_contribution": 0.19,
+    "weighted_contribution_change": 0.071
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-04-01%3Acat_cardio_equipment": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-04-01:cat_cardio_equipment",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q2",
+   "score": 0.426,
+   "supplier_key": "cat_cardio_equipment",
+   "supplier_name": "Cardio Equipment",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.497,
+    "raw_value": 0.424,
+    "weight": 0.4,
+    "weighted_contribution": 0.199,
+    "weighted_contribution_change": 0.076
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-04-01%3Acat_men_s_footwear": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q2",
+   "score": 0.536,
+   "supplier_key": "cat_men_s_footwear",
+   "supplier_name": "Men's Footwear",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.474,
+    "raw_value": 0.42,
+    "weight": 0.4,
+    "weighted_contribution": 0.19,
+    "weighted_contribution_change": 0.071
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-04-01%3Acat_women_s_apparel": {
+  "body": {
+   "confidence": "full",
+   "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q2",
+   "score": 0.548,
+   "supplier_key": "cat_women_s_apparel",
+   "supplier_name": "Women's Apparel",
+   "top_factor": {
+    "name": "delay_stddev",
+    "normalized_value": 0.575,
+    "raw_value": 1.535,
+    "weight": 0.35,
+    "weighted_contribution": 0.201,
+    "weighted_contribution_change": 0.098
+   }
+  },
+  "status": 200
+ },
+ "/api/flags/risk_flag%3A1.2%3A2017-07-01%3Acat_boxing_mma": {
+  "body": {
+   "confidence": "low",
+   "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+   "investigation_status": "queued",
+   "new_tier": "medium",
+   "old_tier": "low",
+   "quarter": "2017-Q3",
+   "score": 0.488,
+   "supplier_key": "cat_boxing_mma",
+   "supplier_name": "Boxing & MMA",
+   "top_factor": {
+    "name": "country_risk",
+    "normalized_value": 0.198,
+    "raw_value": 0.362,
+    "weight": 0.4,
+    "weighted_contribution": 0.079,
+    "weighted_contribution_change": -0.232
+   }
+  },
+  "status": 200
+ },
+ "/api/health": {
+  "body": {
+   "approval_required": true,
+   "db_reachable": true,
+   "model": "openai/gpt-oss-120b",
+   "status": "ok"
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2015-07-01%3Acat_golf_gloves": {
+  "body": {
+   "action": {
+    "action_id": "ae38af5a-15b5-4a93-ba64-95d2810967f4",
+    "action_type": "request_review",
+    "status": "proposed"
+   },
+   "completion_tokens": 701,
+   "created_at": "2026-10-20T09:17:59.735306+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "364e9f8c-3438-4a5e-9a82-74a625d2c519",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2633,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "event_id=risk_flag:"
+       },
+       {
+        "kind": "number",
+        "text": "1.2",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":"
+       },
+       {
+        "kind": "number",
+        "text": "2015",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "07",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":cat_golf_gloves"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "event_id=risk_flag:1.2:2015-07-01:cat_golf_gloves"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=high"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=high"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.795",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.795"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor=delay_stddev"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "top_factor=delay_stddev"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.344",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.344"
+     }
+    ],
+    "proposed_action": "request_review",
+    "summary": "The risk flag for cat_golf_gloves in 2015-Q3 raised the tier from medium to high with a score of 0.795. The top contributing factor is delay_stddev, which has a weighted contribution of 0.344. No prior investigations were found for this supplier. Full confidence data supports a request for review.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_golf_gloves in "
+     },
+     {
+      "kind": "number",
+      "text": "2015",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q3 raised the tier from medium to high with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.795",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The top contributing factor is delay_stddev, which has a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.344",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". No prior investigations were found for this supplier. Full confidence data supports a request for review."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3334,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-01-01%3Acat_hockey": {
+  "body": {
+   "action": {
+    "action_id": "ac1da402-3bfc-491f-9437-cb6af0b502e9",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 708,
+   "created_at": "2026-10-20T09:18:01.104203+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "b5d3c531-06e3-456b-8988-98f69a295bb6",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4067,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=medium"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor.name=late_rate"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "top_factor.name=late_rate"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.25",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.25"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The risk flag for cat_hockey in 2016-Q1 raised the tier from low to medium with a full confidence score of 0.495. The top contributing factor was late_rate, which had the highest weighted contribution of 0.25 in the score breakdown. No prior investigations exist for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_hockey in "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 raised the tier from low to medium with a full confidence score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.495",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The top contributing factor was late_rate, which had the highest weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.25",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " in the score breakdown. No prior investigations exist for this supplier."
+     }
+    ],
+    "top_factor": "late_rate"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 4775,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-07-01%3Acat_baseball_softball": {
+  "body": {
+   "detail": "No investigation for this event yet."
+  },
+  "status": 404
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-07-01%3Acat_hockey": {
+  "body": {
+   "action": {
+    "action_id": "40b1a4b3-1c69-4554-91e2-be18053eebf7",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 1808,
+   "created_at": "2026-10-20T09:18:02.497005+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2016-07-01:cat_hockey",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "ef646d77-2b5b-4254-b5b8-264ff5d996b8",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4295,
+   "recalled": [
+    {
+     "decision_reason": null,
+     "event_id": "risk_flag:1.2:2016-01-01:cat_hockey",
+     "human_decision": null,
+     "new_tier": "medium",
+     "old_tier": "low",
+     "proposed_action": "watchlist",
+     "quarter": "2016-Q1",
+     "score": 0.495,
+     "top_factor": "late_rate"
+    }
+   ],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor=delay_stddev"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "top_factor=delay_stddev"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor=delay_stddev"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "top_factor=delay_stddev"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "In 2016-Q3 cat_hockey's tier changed from low to medium with a score of 0.45. The delay_stddev factor was the primary contributor to the score increase. A prior investigation in 2016-Q1 also moved from low to medium but the top factor then was late_rate, so the top factor differs this time.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "In "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q3 cat_hockey's tier changed from low to medium with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.45",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The delay_stddev factor was the primary contributor to the score increase. A prior investigation in "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 also moved from low to medium but the top factor then was late_rate, so the top factor differs this time."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 6103,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-07-01%3Acat_trade_in": {
+  "body": {
+   "action": null,
+   "completion_tokens": 747,
+   "created_at": "2026-10-20T09:18:00.778192+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2016-07-01:cat_trade_in",
+   "grounded": false,
+   "grounded_ratio": 0.9167,
+   "human_decision": null,
+   "investigation_id": "1a1e51d5-1fb7-483d-9468-952bba58915f",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4072,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "quarter="
+       },
+       {
+        "kind": "number",
+        "text": "2016",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-Q3"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "quarter=2016-Q3"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.465",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.465"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor.name=delay_stddev"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "top_factor.name=delay_stddev"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "delay_stddev.raw_value="
+       },
+       {
+        "kind": "number",
+        "text": "1.555",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "delay_stddev.raw_value=1.555"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "delay_stddev.weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.227",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "delay_stddev.weighted_contribution=0.227"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "delay_stddev.weighted_contribution_change="
+       },
+       {
+        "kind": "number",
+        "text": "0.155",
+        "tool": null
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "delay_stddev.weighted_contribution_change=0.155"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "In 2016-Q3 the supplier cat_trade_in moved from low to medium tier with a score of 0.465 (previous quarter score 0.215). The top contributing factor was delay_stddev with a raw value of 1.555 and a weighted contribution of 0.227, increasing by 0.155. Confidence is full and no prior investigations exist for this supplier. The score was 0.512 a year earlier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "In "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q3 the supplier cat_trade_in moved from low to medium tier with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.465",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " (previous quarter score "
+     },
+     {
+      "kind": "number",
+      "text": "0.215",
+      "tool": "get_score_breakdown"
+     },
+     {
+      "kind": "text",
+      "text": "). The top contributing factor was delay_stddev with a raw value of "
+     },
+     {
+      "kind": "number",
+      "text": "1.555",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " and a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.227",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ", increasing by "
+     },
+     {
+      "kind": "number",
+      "text": "0.155",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". Confidence is full and no prior investigations exist for this supplier. The score was "
+     },
+     {
+      "kind": "number",
+      "text": "0.512",
+      "tool": null
+     },
+     {
+      "kind": "text",
+      "text": " a year earlier."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "rejected_ungrounded",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 4819,
+   "ungrounded_numbers": [
+    "0.512"
+   ]
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-10-01%3Acat_accessories": {
+  "body": {
+   "action": {
+    "action_id": "69c5b19b-2a88-4fd9-acae-46b973e376dc",
+    "action_type": "watchlist",
+    "status": "rejected"
+   },
+   "completion_tokens": 610,
+   "created_at": "2026-10-20T09:18:00.459749+05:30",
+   "decided_at": "2026-10-20T09:18:00.664568+05:30",
+   "decided_by": "AJANYA",
+   "decision_reason": "Delay variance is within seasonal range.",
+   "event_id": "risk_flag:1.2:2016-10-01:cat_accessories",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": "rejected",
+   "investigation_id": "f7e1c9cd-0dcf-41be-9ec4-619427b48494",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4072,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=medium"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.306",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.306"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The risk flag for cat_accessories in 2016-Q4 raised its tier from low to medium with a score of 0.64. The delay_stddev factor contributed the most to the score (weighted_contribution=0.306). There are no earlier investigations for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_accessories in "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q4 raised its tier from low to medium with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.64",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The delay_stddev factor contributed the most to the score (weighted_contribution="
+     },
+     {
+      "kind": "number",
+      "text": "0.306",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "). There are no earlier investigations for this supplier."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 4682,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-10-01%3Acat_girls_apparel": {
+  "body": {
+   "action": {
+    "action_id": "088e657c-f8e8-46cb-8536-46dabea58b27",
+    "action_type": "request_review",
+    "status": "proposed"
+   },
+   "completion_tokens": 1637,
+   "created_at": "2026-10-20T09:18:00.251633+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2016-10-01:cat_girls_apparel",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "fa22ac40-0b2e-4f6c-8ba2-e1b7e5c76bbe",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 5877,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=high"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=high"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.35",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.35"
+     }
+    ],
+    "proposed_action": "request_review",
+    "summary": "The risk flag for cat_girls_apparel in 2016-Q4 raised the tier from low to high with a full-confidence score of 0.687. The delay_stddev factor contributed the most (weighted contribution 0.35). No prior investigations exist for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_girls_apparel in "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q4 raised the tier from low to high with a full-confidence score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.687",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The delay_stddev factor contributed the most (weighted contribution "
+     },
+     {
+      "kind": "number",
+      "text": "0.35",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "). No prior investigations exist for this supplier."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 4,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 7514,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-10-01%3Acat_golf_gloves": {
+  "body": {
+   "action": {
+    "action_id": "90bb57ea-15e9-4594-a872-33ac4cc6608f",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 833,
+   "created_at": "2026-10-20T09:18:01.290646+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2016-10-01:cat_golf_gloves",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "fae89651-cad3-4887-bfdd-90e390700ec4",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2733,
+   "recalled": [
+    {
+     "decision_reason": null,
+     "event_id": "risk_flag:1.2:2015-07-01:cat_golf_gloves",
+     "human_decision": null,
+     "new_tier": "high",
+     "old_tier": "medium",
+     "proposed_action": "request_review",
+     "quarter": "2015-Q3",
+     "score": 0.795,
+     "top_factor": "delay_stddev"
+    }
+   ],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "event_id=risk_flag:"
+       },
+       {
+        "kind": "number",
+        "text": "1.2",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":"
+       },
+       {
+        "kind": "number",
+        "text": "2016",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "10",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":cat_golf_gloves"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "event_id=risk_flag:1.2:2016-10-01:cat_golf_gloves"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "past_investigations["
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": null
+       },
+       {
+        "kind": "text",
+        "text": "].quarter="
+       },
+       {
+        "kind": "number",
+        "text": "2015",
+        "tool": "recall_past_investigations"
+       },
+       {
+        "kind": "text",
+        "text": "-Q3"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "past_investigations[0].quarter=2015-Q3"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "past_investigations["
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": null
+       },
+       {
+        "kind": "text",
+        "text": "].top_factor=delay_stddev"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "past_investigations[0].top_factor=delay_stddev"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.492",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.492"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "factors["
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "get_score_breakdown"
+       },
+       {
+        "kind": "text",
+        "text": "].factor=late_rate"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "factors[0].factor=late_rate"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "factors["
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "get_score_breakdown"
+       },
+       {
+        "kind": "text",
+        "text": "].weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.25",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "factors[0].weighted_contribution=0.25"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The 2016-Q4 flag for cat_golf_gloves raised the tier from low to medium with a score of 0.492 and full confidence. The top contributing factor was late_rate with a weighted contribution of 0.25. A prior investigation in 2015-Q3 involved a tier change from medium to high and a different top factor (delay_stddev), so this case does not match the earlier one.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The "
+     },
+     {
+      "kind": "number",
+      "text": "2016",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q4 flag for cat_golf_gloves raised the tier from low to medium with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.492",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " and full confidence. The top contributing factor was late_rate with a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.25",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". A prior investigation in "
+     },
+     {
+      "kind": "number",
+      "text": "2015",
+      "tool": "recall_past_investigations"
+     },
+     {
+      "kind": "text",
+      "text": "-Q3 involved a tier change from medium to high and a different top factor (delay_stddev), so this case does not match the earlier one."
+     }
+    ],
+    "top_factor": "late_rate"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3566,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2016-10-01%3Acat_water_sports": {
+  "body": {
+   "detail": "No investigation for this event yet."
+  },
+  "status": 404
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_baseball_softball": {
+  "body": {
+   "action": {
+    "action_id": "5970c78d-0ab1-4b3d-bb39-49f7f9178769",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 781,
+   "created_at": "2026-10-20T09:18:01.499445+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-01-01:cat_baseball_softball",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "da713241-bb1f-448e-b96f-5df39271003a",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2631,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "event_id=risk_flag:"
+       },
+       {
+        "kind": "number",
+        "text": "1.2",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":"
+       },
+       {
+        "kind": "number",
+        "text": "2017",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":cat_baseball_softball"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "event_id=risk_flag:1.2:2017-01-01:cat_baseball_softball"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.58",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.58"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "In 2017-Q1 cat_baseball_softball moved from low to medium tier with a score of 0.58. The primary contributor was the late_rate factor, which had a weighted contribution of 0.25. No earlier investigations exist for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "In "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 cat_baseball_softball moved from low to medium tier with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.58",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The primary contributor was the late_rate factor, which had a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.25",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". No earlier investigations exist for this supplier."
+     }
+    ],
+    "top_factor": "late_rate"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3412,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_cleats": {
+  "body": {
+   "action": {
+    "action_id": "a5f0b6a4-49d6-468f-b41c-1c804f70bdcb",
+    "action_type": "watchlist",
+    "status": "applied"
+   },
+   "completion_tokens": 954,
+   "created_at": "2026-10-20T08:50:11.765897+05:30",
+   "decided_at": "2026-10-20T08:50:37.432027+05:30",
+   "decided_by": "AJANYA",
+   "decision_reason": "Phase 7b demo: country risk rose, keep on watch",
+   "event_id": "risk_flag:1.2:2017-01-01:cat_cleats",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": "approved",
+   "investigation_id": "06f44a25-6ddd-4ec3-9324-70bfd46b457b",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2620,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.437",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.437"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "country_risk_weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.192",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "country_risk_weighted_contribution=0.192"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "In 2017-Q1 the cat_cleats category received a risk score of 0.437, moving its tier from low to medium. The country_risk factor contributed the highest weighted amount (0.192) to the score. No earlier investigations were found for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "In "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 the cat_cleats category received a risk score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.437",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ", moving its tier from low to medium. The country_risk factor contributed the highest weighted amount ("
+     },
+     {
+      "kind": "number",
+      "text": "0.192",
+      "tool": "get_score_breakdown"
+     },
+     {
+      "kind": "text",
+      "text": ") to the score. No earlier investigations were found for this supplier."
+     }
+    ],
+    "top_factor": "country_risk"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3574,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_fishing": {
+  "body": {
+   "action": {
+    "action_id": "ed1cef7a-3ddf-4a4f-aa27-7bb01f32dc50",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 962,
+   "created_at": "2026-10-20T09:18:01.682481+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-01-01:cat_fishing",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "20d09a5f-4145-41b3-a594-6b90e66021ac",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2606,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "event_id=risk_flag:"
+       },
+       {
+        "kind": "number",
+        "text": "1.2",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":"
+       },
+       {
+        "kind": "number",
+        "text": "2017",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": "-"
+       },
+       {
+        "kind": "number",
+        "text": "01",
+        "tool": "get_flag"
+       },
+       {
+        "kind": "text",
+        "text": ":cat_fishing"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "event_id=risk_flag:1.2:2017-01-01:cat_fishing"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.474",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.474"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.189",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.189"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The risk flag for cat_fishing in 2017-Q1 shows a score of 0.474 and a tier increase to medium with full confidence. The country_risk factor contributed the most with a weighted contribution of 0.189. No prior investigations were found for this supplier. Based on the medium tier change and full confidence, the case is placed on the watchlist.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_fishing in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 shows a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.474",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " and a tier increase to medium with full confidence. The country_risk factor contributed the most with a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.189",
+      "tool": "get_score_breakdown"
+     },
+     {
+      "kind": "text",
+      "text": ". No prior investigations were found for this supplier. Based on the medium tier change and full confidence, the case is placed on the watchlist."
+     }
+    ],
+    "top_factor": "country_risk"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3568,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_golf_balls": {
+  "body": {
+   "action": {
+    "action_id": "eba594bd-38ac-4adb-b75c-48348b686ba1",
+    "action_type": "request_review",
+    "status": "proposed"
+   },
+   "completion_tokens": 813,
+   "created_at": "2026-10-20T09:18:00.022816+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-01-01:cat_golf_balls",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "47087bd9-1e85-493b-b2c4-1c8ef0fd600a",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2633,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=high"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=high"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=high"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=high"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.735",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.735"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.304",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "weighted_contribution=0.304"
+     }
+    ],
+    "proposed_action": "request_review",
+    "summary": "The risk flag for cat_golf_balls in 2017-Q1 raised the tier from medium to high with a score of 0.735 (confidence full). The primary contributor was delay_stddev, which had a weighted contribution of 0.304. No prior investigations were found for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_golf_balls in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q1 raised the tier from medium to high with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.735",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " (confidence full). The primary contributor was delay_stddev, which had a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.304",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". No prior investigations were found for this supplier."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 2,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3446,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_indoor_outdoor_games": {
+  "body": {
+   "detail": "No investigation for this event yet."
+  },
+  "status": 404
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-01-01%3Acat_shop_by_sport": {
+  "body": {
+   "detail": "No investigation for this event yet."
+  },
+  "status": 404
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-04-01%3Acat_camping_hiking": {
+  "body": {
+   "action": {
+    "action_id": "d08aa687-24a8-4974-aab2-cbc6e575940a",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 983,
+   "created_at": "2026-10-20T09:18:01.883365+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-04-01:cat_camping_hiking",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "ad6a3f57-42fb-48c8-a42f-10a2634e2569",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4125,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=medium"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.575",
+        "tool": "get_flag"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "score=0.575"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor.name=country_risk"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "top_factor.name=country_risk"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "country_risk.weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.308",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "country_risk.weighted_contribution=0.308"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The supplier cat_camping_hiking moved from low to medium tier in 2017-Q2, with a score of 0.575. The primary contributor was country_risk, which had a weighted contribution of 0.308. There are no earlier investigations for this supplier. With a medium tier increase and full confidence, the case is placed on the watchlist.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The supplier cat_camping_hiking moved from low to medium tier in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q2, with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.575",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The primary contributor was country_risk, which had a weighted contribution of "
+     },
+     {
+      "kind": "number",
+      "text": "0.308",
+      "tool": "get_score_breakdown"
+     },
+     {
+      "kind": "text",
+      "text": ". There are no earlier investigations for this supplier. With a medium tier increase and full confidence, the case is placed on the watchlist."
+     }
+    ],
+    "top_factor": "country_risk"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 5108,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-04-01%3Acat_cardio_equipment": {
+  "body": {
+   "detail": "No investigation for this event yet."
+  },
+  "status": 404
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-04-01%3Acat_men_s_footwear": {
+  "body": {
+   "action": {
+    "action_id": "ef5e86bb-474c-4a87-bca3-99c5045d61d3",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 664,
+   "created_at": "2026-10-20T09:18:02.093742+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-04-01:cat_men_s_footwear",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "bb403f1d-ac06-4f74-9903-61797e2a8027",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2662,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.536",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.536"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "country_risk_weighted_contribution="
+       },
+       {
+        "kind": "number",
+        "text": "0.31",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "country_risk_weighted_contribution=0.31"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The supplier cat_men_s_footwear moved to tier medium in 2017-Q2 with a score of 0.536. The highest weighted contribution came from the country_risk factor (0.31). No prior investigations were found for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The supplier cat_men_s_footwear moved to tier medium in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q2 with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.536",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The highest weighted contribution came from the country_risk factor ("
+     },
+     {
+      "kind": "number",
+      "text": "0.31",
+      "tool": "get_score_breakdown"
+     },
+     {
+      "kind": "text",
+      "text": "). No prior investigations were found for this supplier."
+     }
+    ],
+    "top_factor": "country_risk"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3326,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-04-01%3Acat_women_s_apparel": {
+  "body": {
+   "action": {
+    "action_id": "32ae4e66-b148-4a9e-8a46-fd65d0022d24",
+    "action_type": "watchlist",
+    "status": "proposed"
+   },
+   "completion_tokens": 1135,
+   "created_at": "2026-10-20T09:18:00.891810+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-04-01:cat_women_s_apparel",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "478140cb-716b-4fe6-aa9b-a6395947cef6",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 4273,
+   "recalled": [],
+   "report": {
+    "confidence": "high",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.548",
+        "tool": "get_flag"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "score=0.548"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "old_tier=low"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "old_tier=low"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "new_tier=medium"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "new_tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor.name=delay_stddev"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "top_factor.name=delay_stddev"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "top_factor.raw_value="
+       },
+       {
+        "kind": "number",
+        "text": "1.535",
+        "tool": "get_flag"
+       }
+      ],
+      "tool_name": "get_flag",
+      "value": "top_factor.raw_value=1.535"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.548",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.548"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "count="
+       },
+       {
+        "kind": "number",
+        "text": "0",
+        "tool": "recall_past_investigations"
+       }
+      ],
+      "tool_name": "recall_past_investigations",
+      "value": "count=0"
+     }
+    ],
+    "proposed_action": "watchlist",
+    "summary": "The risk flag for cat_women_s_apparel in 2017-Q2 raised the tier from low to medium with a score of 0.548. The top contributing factor was delay_stddev, which had a raw value of 1.535 in the previous quarter. No earlier investigations were found for this supplier.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The risk flag for cat_women_s_apparel in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q2 raised the tier from low to medium with a score of "
+     },
+     {
+      "kind": "number",
+      "text": "0.548",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": ". The top contributing factor was delay_stddev, which had a raw value of "
+     },
+     {
+      "kind": "number",
+      "text": "1.535",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " in the previous quarter. No earlier investigations were found for this supplier."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 3,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    },
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 2
+    }
+   ],
+   "total_tokens": 5408,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/investigations/risk_flag%3A1.2%3A2017-07-01%3Acat_boxing_mma": {
+  "body": {
+   "action": {
+    "action_id": "4fed00d2-9076-452f-8d1a-9f9b45c17544",
+    "action_type": "no_action",
+    "status": "proposed"
+   },
+   "completion_tokens": 657,
+   "created_at": "2026-10-20T09:18:02.298158+05:30",
+   "decided_at": null,
+   "decided_by": null,
+   "decision_reason": null,
+   "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+   "grounded": true,
+   "grounded_ratio": 1.0,
+   "human_decision": null,
+   "investigation_id": "fa97e879-b5f7-47c4-b681-e7a2b824160a",
+   "model": "openai/gpt-oss-120b",
+   "prompt_tokens": 2635,
+   "recalled": [],
+   "report": {
+    "confidence": "low",
+    "evidence": [
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "score="
+       },
+       {
+        "kind": "number",
+        "text": "0.488",
+        "tool": "get_score_breakdown"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "score=0.488"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "tier=medium"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "tier=medium"
+     },
+     {
+      "spans": [
+       {
+        "kind": "text",
+        "text": "confidence=low"
+       }
+      ],
+      "tool_name": "get_score_breakdown",
+      "value": "confidence=low"
+     }
+    ],
+    "proposed_action": "no_action",
+    "summary": "The flag for cat_boxing_mma in 2017-Q3 has low confidence, making the data insufficient to draw conclusions. The score is 0.488 with a tier change from low to medium, but confidence is low.",
+    "summary_spans": [
+     {
+      "kind": "text",
+      "text": "The flag for cat_boxing_mma in "
+     },
+     {
+      "kind": "number",
+      "text": "2017",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": "-Q3 has low confidence, making the data insufficient to draw conclusions. The score is "
+     },
+     {
+      "kind": "number",
+      "text": "0.488",
+      "tool": "get_flag"
+     },
+     {
+      "kind": "text",
+      "text": " with a tier change from low to medium, but confidence is low."
+     }
+    ],
+    "top_factor": "delay_stddev"
+   },
+   "runs": 1,
+   "status": "proposed",
+   "steps": 2,
+   "tool_calls": [
+    {
+     "name": "get_flag",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "recall_past_investigations",
+     "ok": true,
+     "step": 0
+    },
+    {
+     "name": "get_score_breakdown",
+     "ok": true,
+     "step": 1
+    }
+   ],
+   "total_tokens": 3292,
+   "ungrounded_numbers": []
+  },
+  "status": 200
+ },
+ "/api/quality": {
+  "body": {
+   "items": [
+    {
+     "batch_id": "5b43739b9af076a53ea0c7e652f952370a01bf240c446223dada206482671bdf",
+     "checked_at": "2026-10-14T07:43:21.323484+05:30",
+     "failed_expectations": 0,
+     "passed": true,
+     "passed_expectations": 8,
+     "source": "worldbank_lpi",
+     "status": "validated",
+     "warning_count": 0
+    },
+    {
+     "batch_id": "e54180056a7cddf1143be472a669a79e3915b64e6bd3ce1e1dee0f4f1d8c3690",
+     "checked_at": "2026-10-14T07:43:20.280762+05:30",
+     "failed_expectations": 0,
+     "passed": true,
+     "passed_expectations": 15,
+     "source": "usaspending_contracts",
+     "status": "validated",
+     "warning_count": 0
+    },
+    {
+     "batch_id": "84e1a1650f3562f41a84dfaf1e2b0ba832f5a2eacba65af3dcd7e4bda65badb1",
+     "checked_at": "2026-10-14T07:43:19.495494+05:30",
+     "failed_expectations": 0,
+     "passed": true,
+     "passed_expectations": 15,
+     "source": "usaspending_contracts",
+     "status": "passed_with_warnings",
+     "warning_count": 2
+    },
+    {
+     "batch_id": "36f1f466426968bd259023c0dcdf311ecaabb04972744d2037cc618c787c08c3",
+     "checked_at": "2026-10-14T07:43:15.820017+05:30",
+     "failed_expectations": 0,
+     "passed": true,
+     "passed_expectations": 15,
+     "source": "usaspending_contracts",
+     "status": "passed_with_warnings",
+     "warning_count": 2
+    },
+    {
+     "batch_id": "fa6d022ed437155e1a2f0378710602848703c8a7f203f7ff5d77805bf8480aa6",
+     "checked_at": "2026-10-14T07:43:12.334757+05:30",
+     "failed_expectations": 0,
+     "passed": true,
+     "passed_expectations": 50,
+     "source": "dataco_shipments",
+     "status": "validated",
+     "warning_count": 0
+    },
+    {
+     "batch_id": "phase3-demo-dfa80f8b7ffc465ea6ab47ee66fbb9bf",
+     "checked_at": "2026-10-11T23:30:31.307099+05:30",
+     "failed_expectations": 1,
+     "passed": false,
+     "passed_expectations": 49,
+     "source": "dataco_shipments",
+     "status": "quarantined",
+     "warning_count": 0
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_accessories/history": {
+  "body": {
+   "supplier_key": "cat_accessories",
+   "supplier_name": "Accessories",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "medium"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_accessories/markets/2016-Q4": {
+  "body": {
+   "markets": [
+    {
+     "market": "Africa",
+     "previous_share": 0.205,
+     "share": 0.444,
+     "share_change": 0.239
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.187,
+     "share": 0.313,
+     "share_change": 0.126
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.053,
+     "share": 0.21,
+     "share_change": 0.158
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.556,
+     "share": 0.033,
+     "share_change": -0.523
+    }
+   ],
+   "previous_quarter": "2016-Q3",
+   "quarter": "2016-Q4",
+   "supplier_key": "cat_accessories"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_accessories/score/2016-Q4": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.875,
+     "previous_raw_value": 1.378,
+     "raw_value": 1.616,
+     "weight": 0.35,
+     "weighted_contribution": 0.306
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.819,
+     "previous_raw_value": 0.617,
+     "raw_value": 0.615,
+     "weight": 0.25,
+     "weighted_contribution": 0.205
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.323,
+     "previous_raw_value": 0.349,
+     "raw_value": 0.388,
+     "weight": 0.4,
+     "weighted_contribution": 0.129
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q3",
+    "score": 0.265,
+    "tier": "low"
+   },
+   "quarter": "2016-Q4",
+   "quarter_metrics": {
+    "avg_delay_days": 0.702,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.616,
+    "eligible_quarters_to_date": 8,
+    "late_rate": 0.615,
+    "shipment_count": 214
+   },
+   "rules_version": "1.2",
+   "score": 0.64,
+   "supplier_key": "cat_accessories",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_baseball_softball/history": {
+  "body": {
+   "supplier_key": "cat_baseball_softball",
+   "supplier_name": "Baseball & Softball",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-04-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 2,
+     "volume_band": "low"
+    },
+    {
+     "delivery_band": "high",
+     "effective_from": "2015-01-01",
+     "effective_to": "2015-04-01",
+     "is_current": false,
+     "version": 1,
+     "volume_band": "low"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_baseball_softball/markets/2016-Q3": {
+  "body": {
+   "markets": [
+    {
+     "market": "USCA",
+     "previous_share": 0.966,
+     "share": 0.657,
+     "share_change": -0.309
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.0,
+     "share": 0.239,
+     "share_change": 0.239
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.0,
+     "share": 0.09,
+     "share_change": 0.09
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.034,
+     "share": 0.015,
+     "share_change": -0.019
+    }
+   ],
+   "previous_quarter": "2016-Q2",
+   "quarter": "2016-Q3",
+   "supplier_key": "cat_baseball_softball"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_baseball_softball/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.841,
+     "share_change": 0.841
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.293,
+     "share": 0.072,
+     "share_change": -0.221
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.517,
+     "share": 0.058,
+     "share_change": -0.459
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.172,
+     "share": 0.029,
+     "share_change": -0.143
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.017,
+     "share": 0.0,
+     "share_change": -0.017
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_baseball_softball"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_baseball_softball/score/2016-Q3": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 1.0,
+     "previous_raw_value": 1.452,
+     "raw_value": 1.65,
+     "weight": 0.35,
+     "weighted_contribution": 0.35
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.223,
+     "previous_raw_value": 0.544,
+     "raw_value": 0.531,
+     "weight": 0.25,
+     "weighted_contribution": 0.056
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.099,
+     "previous_raw_value": 0.32,
+     "raw_value": 0.341,
+     "weight": 0.4,
+     "weighted_contribution": 0.04
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q2",
+    "score": 0.171,
+    "tier": "low"
+   },
+   "quarter": "2016-Q3",
+   "quarter_metrics": {
+    "avg_delay_days": 0.578,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.65,
+    "eligible_quarters_to_date": 7,
+    "late_rate": 0.531,
+    "shipment_count": 67
+   },
+   "rules_version": "1.2",
+   "score": 0.445,
+   "supplier_key": "cat_baseball_softball",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_baseball_softball/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "late_rate",
+     "normalized_value": 1.0,
+     "previous_raw_value": 0.556,
+     "raw_value": 0.672,
+     "weight": 0.25,
+     "weighted_contribution": 0.25
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.494,
+     "previous_raw_value": 0.379,
+     "raw_value": 0.424,
+     "weight": 0.4,
+     "weighted_contribution": 0.198
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.379,
+     "previous_raw_value": 1.311,
+     "raw_value": 1.482,
+     "weight": 0.35,
+     "weighted_contribution": 0.133
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.212,
+    "tier": "low"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.881,
+    "country_coverage": 0.996,
+    "delay_stddev": 1.482,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.672,
+    "shipment_count": 69
+   },
+   "rules_version": "1.2",
+   "score": 0.58,
+   "supplier_key": "cat_baseball_softball",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_boxing_mma/history": {
+  "body": {
+   "supplier_key": "cat_boxing_mma",
+   "supplier_name": "Boxing & MMA",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2017-04-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 2,
+     "volume_band": "low"
+    },
+    {
+     "delivery_band": "unrated",
+     "effective_from": "2015-01-01",
+     "effective_to": "2017-04-01",
+     "is_current": false,
+     "version": 1,
+     "volume_band": "unrated"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_boxing_mma/markets/2017-Q3": {
+  "body": {
+   "markets": [
+    {
+     "market": "Europe",
+     "previous_share": 0.149,
+     "share": 1.0,
+     "share_change": 0.851
+    },
+    {
+     "market": "LATAM",
+     "previous_share": 0.851,
+     "share": 0.0,
+     "share_change": -0.851
+    }
+   ],
+   "previous_quarter": "2017-Q2",
+   "quarter": "2017-Q3",
+   "supplier_key": "cat_boxing_mma"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_boxing_mma/score/2017-Q3": {
+  "body": {
+   "confidence": "low",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.616,
+     "previous_raw_value": 1.353,
+     "raw_value": 1.546,
+     "weight": 0.35,
+     "weighted_contribution": 0.216
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.772,
+     "previous_raw_value": 0.508,
+     "raw_value": 0.608,
+     "weight": 0.25,
+     "weighted_contribution": 0.193
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.198,
+     "previous_raw_value": 0.483,
+     "raw_value": 0.362,
+     "weight": 0.4,
+     "weighted_contribution": 0.079
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2017-Q2",
+    "score": 0.325,
+    "tier": "low"
+   },
+   "quarter": "2017-Q3",
+   "quarter_metrics": {
+    "avg_delay_days": 0.784,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.546,
+    "eligible_quarters_to_date": 2,
+    "late_rate": 0.608,
+    "shipment_count": 76
+   },
+   "rules_version": "1.2",
+   "score": 0.488,
+   "supplier_key": "cat_boxing_mma",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_camping_hiking/history": {
+  "body": {
+   "supplier_key": "cat_camping_hiking",
+   "supplier_name": "Camping & Hiking",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_camping_hiking/markets/2017-Q2": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.816,
+     "share": 0.873,
+     "share_change": 0.056
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.039,
+     "share": 0.127,
+     "share_change": 0.089
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.072,
+     "share": 0.0,
+     "share_change": -0.072
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.061,
+     "share": 0.0,
+     "share_change": -0.061
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.012,
+     "share": 0.0,
+     "share_change": -0.012
+    }
+   ],
+   "previous_quarter": "2017-Q1",
+   "quarter": "2017-Q2",
+   "supplier_key": "cat_camping_hiking"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_camping_hiking/score/2017-Q2": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.771,
+     "previous_raw_value": 0.42,
+     "raw_value": 0.482,
+     "weight": 0.4,
+     "weighted_contribution": 0.308
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.393,
+     "previous_raw_value": 1.459,
+     "raw_value": 1.486,
+     "weight": 0.35,
+     "weighted_contribution": 0.138
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.518,
+     "previous_raw_value": 0.585,
+     "raw_value": 0.572,
+     "weight": 0.25,
+     "weighted_contribution": 0.129
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2017-Q1",
+    "score": 0.444,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q2",
+   "quarter_metrics": {
+    "avg_delay_days": 0.585,
+    "country_coverage": 0.997,
+    "delay_stddev": 1.486,
+    "eligible_quarters_to_date": 10,
+    "late_rate": 0.572,
+    "shipment_count": 1297
+   },
+   "rules_version": "1.2",
+   "score": 0.575,
+   "supplier_key": "cat_camping_hiking",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cardio_equipment/history": {
+  "body": {
+   "supplier_key": "cat_cardio_equipment",
+   "supplier_name": "Cardio Equipment",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cardio_equipment/markets/2017-Q2": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.796,
+     "share": 0.857,
+     "share_change": 0.061
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.042,
+     "share": 0.143,
+     "share_change": 0.101
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.086,
+     "share": 0.0,
+     "share_change": -0.086
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.067,
+     "share": 0.0,
+     "share_change": -0.067
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.009,
+     "share": 0.0,
+     "share_change": -0.009
+    }
+   ],
+   "previous_quarter": "2017-Q1",
+   "quarter": "2017-Q2",
+   "supplier_key": "cat_cardio_equipment"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cardio_equipment/score/2017-Q2": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.776,
+     "previous_raw_value": 0.424,
+     "raw_value": 0.483,
+     "weight": 0.4,
+     "weighted_contribution": 0.311
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.309,
+     "previous_raw_value": 0.575,
+     "raw_value": 0.543,
+     "weight": 0.25,
+     "weighted_contribution": 0.077
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.108,
+     "previous_raw_value": 1.48,
+     "raw_value": 1.409,
+     "weight": 0.35,
+     "weighted_contribution": 0.038
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2017-Q1",
+    "score": 0.463,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q2",
+   "quarter_metrics": {
+    "avg_delay_days": 0.447,
+    "country_coverage": 0.998,
+    "delay_stddev": 1.409,
+    "eligible_quarters_to_date": 10,
+    "late_rate": 0.543,
+    "shipment_count": 1040
+   },
+   "rules_version": "1.2",
+   "score": 0.426,
+   "supplier_key": "cat_cardio_equipment",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cleats/history": {
+  "body": {
+   "supplier_key": "cat_cleats",
+   "supplier_name": "Cleats",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cleats/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.796,
+     "share_change": 0.796
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.459,
+     "share": 0.089,
+     "share_change": -0.37
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.317,
+     "share": 0.07,
+     "share_change": -0.247
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.183,
+     "share": 0.037,
+     "share_change": -0.146
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.041,
+     "share": 0.008,
+     "share_change": -0.033
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_cleats"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_cleats/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.479,
+     "previous_raw_value": 0.384,
+     "raw_value": 0.421,
+     "weight": 0.4,
+     "weighted_contribution": 0.192
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.405,
+     "previous_raw_value": 1.478,
+     "raw_value": 1.489,
+     "weight": 0.35,
+     "weighted_contribution": 0.142
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.417,
+     "previous_raw_value": 0.573,
+     "raw_value": 0.558,
+     "weight": 0.25,
+     "weighted_contribution": 0.104
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.381,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.53,
+    "country_coverage": 0.999,
+    "delay_stddev": 1.489,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.558,
+    "shipment_count": 2209
+   },
+   "rules_version": "1.2",
+   "score": 0.437,
+   "supplier_key": "cat_cleats",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_fishing/history": {
+  "body": {
+   "supplier_key": "cat_fishing",
+   "supplier_name": "Fishing",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_fishing/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.806,
+     "share_change": 0.806
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.466,
+     "share": 0.082,
+     "share_change": -0.384
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.317,
+     "share": 0.075,
+     "share_change": -0.243
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.182,
+     "share": 0.034,
+     "share_change": -0.148
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.035,
+     "share": 0.003,
+     "share_change": -0.031
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_fishing"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_fishing/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.473,
+     "previous_raw_value": 0.383,
+     "raw_value": 0.419,
+     "weight": 0.4,
+     "weighted_contribution": 0.189
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.462,
+     "previous_raw_value": 1.482,
+     "raw_value": 1.505,
+     "weight": 0.35,
+     "weighted_contribution": 0.162
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.493,
+     "previous_raw_value": 0.582,
+     "raw_value": 0.569,
+     "weight": 0.25,
+     "weighted_contribution": 0.123
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.398,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.582,
+    "country_coverage": 0.999,
+    "delay_stddev": 1.505,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.569,
+    "shipment_count": 1500
+   },
+   "rules_version": "1.2",
+   "score": 0.474,
+   "supplier_key": "cat_fishing",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_girls_apparel/history": {
+  "body": {
+   "supplier_key": "cat_girls_apparel",
+   "supplier_name": "Girls' Apparel",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "medium"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_girls_apparel/markets/2016-Q4": {
+  "body": {
+   "markets": [
+    {
+     "market": "Africa",
+     "previous_share": 0.153,
+     "share": 0.415,
+     "share_change": 0.262
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.107,
+     "share": 0.382,
+     "share_change": 0.275
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.092,
+     "share": 0.179,
+     "share_change": 0.087
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.649,
+     "share": 0.024,
+     "share_change": -0.624
+    }
+   ],
+   "previous_quarter": "2016-Q3",
+   "quarter": "2016-Q4",
+   "supplier_key": "cat_girls_apparel"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_girls_apparel/score/2016-Q4": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 1.0,
+     "previous_raw_value": 1.384,
+     "raw_value": 1.705,
+     "weight": 0.35,
+     "weighted_contribution": 0.35
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.917,
+     "previous_raw_value": 0.579,
+     "raw_value": 0.628,
+     "weight": 0.25,
+     "weighted_contribution": 0.229
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.27,
+     "previous_raw_value": 0.342,
+     "raw_value": 0.377,
+     "weight": 0.4,
+     "weighted_contribution": 0.108
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q3",
+    "score": 0.189,
+    "tier": "low"
+   },
+   "quarter": "2016-Q4",
+   "quarter_metrics": {
+    "avg_delay_days": 0.699,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.705,
+    "eligible_quarters_to_date": 8,
+    "late_rate": 0.628,
+    "shipment_count": 123
+   },
+   "rules_version": "1.2",
+   "score": 0.687,
+   "supplier_key": "cat_girls_apparel",
+   "tier": "high"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_balls/history": {
+  "body": {
+   "supplier_key": "cat_golf_balls",
+   "supplier_name": "Golf Balls",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "medium"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_balls/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.777,
+     "share_change": 0.777
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.286,
+     "share": 0.088,
+     "share_change": -0.198
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.447,
+     "share": 0.081,
+     "share_change": -0.366
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.23,
+     "share": 0.041,
+     "share_change": -0.189
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.037,
+     "share": 0.014,
+     "share_change": -0.024
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_golf_balls"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_balls/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.87,
+     "previous_raw_value": 1.445,
+     "raw_value": 1.615,
+     "weight": 0.35,
+     "weighted_contribution": 0.304
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.937,
+     "previous_raw_value": 0.597,
+     "raw_value": 0.631,
+     "weight": 0.25,
+     "weighted_contribution": 0.234
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.491,
+     "previous_raw_value": 0.39,
+     "raw_value": 0.423,
+     "weight": 0.4,
+     "weighted_contribution": 0.196
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.391,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.709,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.615,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.631,
+    "shipment_count": 148
+   },
+   "rules_version": "1.2",
+   "score": 0.735,
+   "supplier_key": "cat_golf_balls",
+   "tier": "high"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_gloves/history": {
+  "body": {
+   "supplier_key": "cat_golf_gloves",
+   "supplier_name": "Golf Gloves",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-10-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 2,
+     "volume_band": "low"
+    },
+    {
+     "delivery_band": "low",
+     "effective_from": "2015-01-01",
+     "effective_to": "2015-10-01",
+     "is_current": false,
+     "version": 1,
+     "volume_band": "low"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_gloves/markets/2015-Q3": {
+  "body": {
+   "markets": [
+    {
+     "market": "Europe",
+     "previous_share": 0.3,
+     "share": 1.0,
+     "share_change": 0.7
+    },
+    {
+     "market": "LATAM",
+     "previous_share": 0.7,
+     "share": 0.0,
+     "share_change": -0.7
+    }
+   ],
+   "previous_quarter": "2015-Q2",
+   "quarter": "2015-Q3",
+   "supplier_key": "cat_golf_gloves"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_gloves/markets/2016-Q4": {
+  "body": {
+   "markets": [
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.146,
+     "share": 0.376,
+     "share_change": 0.23
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.191,
+     "share": 0.367,
+     "share_change": 0.176
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.0,
+     "share": 0.229,
+     "share_change": 0.229
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.663,
+     "share": 0.028,
+     "share_change": -0.635
+    }
+   ],
+   "previous_quarter": "2016-Q3",
+   "quarter": "2016-Q4",
+   "supplier_key": "cat_golf_gloves"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_gloves/score/2015-Q3": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.983,
+     "previous_raw_value": 1.479,
+     "raw_value": 1.645,
+     "weight": 0.35,
+     "weighted_contribution": 0.344
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 1.0,
+     "previous_raw_value": 0.562,
+     "raw_value": 0.671,
+     "weight": 0.25,
+     "weighted_contribution": 0.25
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.501,
+     "previous_raw_value": 0.49,
+     "raw_value": 0.425,
+     "weight": 0.4,
+     "weighted_contribution": 0.2
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2015-Q2",
+    "score": 0.565,
+    "tier": "medium"
+   },
+   "quarter": "2015-Q3",
+   "quarter_metrics": {
+    "avg_delay_days": 0.899,
+    "country_coverage": 0.989,
+    "delay_stddev": 1.645,
+    "eligible_quarters_to_date": 3,
+    "late_rate": 0.671,
+    "shipment_count": 81
+   },
+   "rules_version": "1.2",
+   "score": 0.795,
+   "supplier_key": "cat_golf_gloves",
+   "tier": "high"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_golf_gloves/score/2016-Q4": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "late_rate",
+     "normalized_value": 1.0,
+     "previous_raw_value": 0.524,
+     "raw_value": 0.689,
+     "weight": 0.25,
+     "weighted_contribution": 0.25
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.309,
+     "previous_raw_value": 0.338,
+     "raw_value": 0.385,
+     "weight": 0.4,
+     "weighted_contribution": 0.124
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.339,
+     "previous_raw_value": 1.428,
+     "raw_value": 1.472,
+     "weight": 0.35,
+     "weighted_contribution": 0.119
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q3",
+    "score": 0.14,
+    "tier": "low"
+   },
+   "quarter": "2016-Q4",
+   "quarter_metrics": {
+    "avg_delay_days": 0.925,
+    "country_coverage": 0.997,
+    "delay_stddev": 1.472,
+    "eligible_quarters_to_date": 8,
+    "late_rate": 0.689,
+    "shipment_count": 109
+   },
+   "rules_version": "1.2",
+   "score": 0.492,
+   "supplier_key": "cat_golf_gloves",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_hockey/history": {
+  "body": {
+   "supplier_key": "cat_hockey",
+   "supplier_name": "Hockey",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2016-04-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 2,
+     "volume_band": "low"
+    },
+    {
+     "delivery_band": "low",
+     "effective_from": "2015-01-01",
+     "effective_to": "2016-04-01",
+     "is_current": false,
+     "version": 1,
+     "volume_band": "low"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_hockey/markets/2016-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.786,
+     "share": 1.0,
+     "share_change": 0.214
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.214,
+     "share": 0.0,
+     "share_change": -0.214
+    }
+   ],
+   "previous_quarter": "2015-Q4",
+   "quarter": "2016-Q1",
+   "supplier_key": "cat_hockey"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_hockey/markets/2016-Q3": {
+  "body": {
+   "markets": [
+    {
+     "market": "USCA",
+     "previous_share": 0.983,
+     "share": 0.729,
+     "share_change": -0.254
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.0,
+     "share": 0.143,
+     "share_change": 0.143
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.017,
+     "share": 0.114,
+     "share_change": 0.097
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.0,
+     "share": 0.014,
+     "share_change": 0.014
+    }
+   ],
+   "previous_quarter": "2016-Q2",
+   "quarter": "2016-Q3",
+   "supplier_key": "cat_hockey"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_hockey/score/2016-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "late_rate",
+     "normalized_value": 1.0,
+     "previous_raw_value": 0.618,
+     "raw_value": 0.714,
+     "weight": 0.25,
+     "weighted_contribution": 0.25
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.386,
+     "previous_raw_value": 1.319,
+     "raw_value": 1.484,
+     "weight": 0.35,
+     "weighted_contribution": 0.135
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.273,
+     "previous_raw_value": 0.413,
+     "raw_value": 0.377,
+     "weight": 0.4,
+     "weighted_contribution": 0.109
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2015-Q4",
+    "score": 0.386,
+    "tier": "medium"
+   },
+   "quarter": "2016-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 1.079,
+    "country_coverage": 0.996,
+    "delay_stddev": 1.484,
+    "eligible_quarters_to_date": 5,
+    "late_rate": 0.714,
+    "shipment_count": 63
+   },
+   "rules_version": "1.2",
+   "score": 0.495,
+   "supplier_key": "cat_hockey",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_hockey/score/2016-Q3": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.938,
+     "previous_raw_value": 1.571,
+     "raw_value": 1.633,
+     "weight": 0.35,
+     "weighted_contribution": 0.328
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.267,
+     "previous_raw_value": 0.509,
+     "raw_value": 0.537,
+     "weight": 0.25,
+     "weighted_contribution": 0.067
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.138,
+     "previous_raw_value": 0.333,
+     "raw_value": 0.349,
+     "weight": 0.4,
+     "weighted_contribution": 0.055
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q2",
+    "score": 0.289,
+    "tier": "low"
+   },
+   "quarter": "2016-Q3",
+   "quarter_metrics": {
+    "avg_delay_days": 0.299,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.633,
+    "eligible_quarters_to_date": 7,
+    "late_rate": 0.537,
+    "shipment_count": 70
+   },
+   "rules_version": "1.2",
+   "score": 0.45,
+   "supplier_key": "cat_hockey",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_indoor_outdoor_games/history": {
+  "body": {
+   "supplier_key": "cat_indoor_outdoor_games",
+   "supplier_name": "Indoor/Outdoor Games",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_indoor_outdoor_games/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.816,
+     "share_change": 0.816
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.464,
+     "share": 0.078,
+     "share_change": -0.386
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.315,
+     "share": 0.06,
+     "share_change": -0.255
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.183,
+     "share": 0.04,
+     "share_change": -0.143
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.038,
+     "share": 0.006,
+     "share_change": -0.032
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_indoor_outdoor_games"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_indoor_outdoor_games/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.486,
+     "previous_raw_value": 0.385,
+     "raw_value": 0.422,
+     "weight": 0.4,
+     "weighted_contribution": 0.195
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.666,
+     "previous_raw_value": 0.566,
+     "raw_value": 0.593,
+     "weight": 0.25,
+     "weighted_contribution": 0.166
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.378,
+     "previous_raw_value": 1.49,
+     "raw_value": 1.482,
+     "weight": 0.35,
+     "weighted_contribution": 0.132
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.384,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.609,
+    "country_coverage": 0.998,
+    "delay_stddev": 1.482,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.593,
+    "shipment_count": 1784
+   },
+   "rules_version": "1.2",
+   "score": 0.493,
+   "supplier_key": "cat_indoor_outdoor_games",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_men_s_footwear/history": {
+  "body": {
+   "supplier_key": "cat_men_s_footwear",
+   "supplier_name": "Men's Footwear",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_men_s_footwear/markets/2017-Q2": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.809,
+     "share": 0.871,
+     "share_change": 0.062
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.038,
+     "share": 0.129,
+     "share_change": 0.091
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.081,
+     "share": 0.0,
+     "share_change": -0.081
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.065,
+     "share": 0.0,
+     "share_change": -0.065
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.008,
+     "share": 0.0,
+     "share_change": -0.008
+    }
+   ],
+   "previous_quarter": "2017-Q1",
+   "quarter": "2017-Q2",
+   "supplier_key": "cat_men_s_footwear"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_men_s_footwear/score/2017-Q2": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.774,
+     "previous_raw_value": 0.42,
+     "raw_value": 0.482,
+     "weight": 0.4,
+     "weighted_contribution": 0.31
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.325,
+     "previous_raw_value": 1.497,
+     "raw_value": 1.468,
+     "weight": 0.35,
+     "weighted_contribution": 0.114
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.453,
+     "previous_raw_value": 0.551,
+     "raw_value": 0.563,
+     "weight": 0.25,
+     "weighted_contribution": 0.113
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2017-Q1",
+    "score": 0.431,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q2",
+   "quarter_metrics": {
+    "avg_delay_days": 0.566,
+    "country_coverage": 0.998,
+    "delay_stddev": 1.468,
+    "eligible_quarters_to_date": 10,
+    "late_rate": 0.563,
+    "shipment_count": 2079
+   },
+   "rules_version": "1.2",
+   "score": 0.536,
+   "supplier_key": "cat_men_s_footwear",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_shop_by_sport/history": {
+  "body": {
+   "supplier_key": "cat_shop_by_sport",
+   "supplier_name": "Shop By Sport",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_shop_by_sport/markets/2017-Q1": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.0,
+     "share": 0.81,
+     "share_change": 0.81
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.455,
+     "share": 0.074,
+     "share_change": -0.38
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.33,
+     "share": 0.071,
+     "share_change": -0.259
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.174,
+     "share": 0.038,
+     "share_change": -0.136
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.041,
+     "share": 0.006,
+     "share_change": -0.035
+    }
+   ],
+   "previous_quarter": "2016-Q4",
+   "quarter": "2017-Q1",
+   "supplier_key": "cat_shop_by_sport"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_shop_by_sport/score/2017-Q1": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.798,
+     "previous_raw_value": 1.503,
+     "raw_value": 1.596,
+     "weight": 0.35,
+     "weighted_contribution": 0.279
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.473,
+     "previous_raw_value": 0.383,
+     "raw_value": 0.419,
+     "weight": 0.4,
+     "weighted_contribution": 0.189
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.475,
+     "previous_raw_value": 0.569,
+     "raw_value": 0.567,
+     "weight": 0.25,
+     "weighted_contribution": 0.119
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q4",
+    "score": 0.403,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q1",
+   "quarter_metrics": {
+    "avg_delay_days": 0.572,
+    "country_coverage": 0.998,
+    "delay_stddev": 1.596,
+    "eligible_quarters_to_date": 9,
+    "late_rate": 0.567,
+    "shipment_count": 970
+   },
+   "rules_version": "1.2",
+   "score": 0.587,
+   "supplier_key": "cat_shop_by_sport",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_trade_in/history": {
+  "body": {
+   "supplier_key": "cat_trade_in",
+   "supplier_name": "Trade-In",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "medium"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_trade_in/markets/2016-Q3": {
+  "body": {
+   "markets": [
+    {
+     "market": "USCA",
+     "previous_share": 0.978,
+     "share": 0.556,
+     "share_change": -0.423
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.0,
+     "share": 0.194,
+     "share_change": 0.194
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.022,
+     "share": 0.185,
+     "share_change": 0.164
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.0,
+     "share": 0.065,
+     "share_change": 0.065
+    }
+   ],
+   "previous_quarter": "2016-Q2",
+   "quarter": "2016-Q3",
+   "supplier_key": "cat_trade_in"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_trade_in/score/2016-Q3": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.65,
+     "previous_raw_value": 1.436,
+     "raw_value": 1.555,
+     "weight": 0.35,
+     "weighted_contribution": 0.227
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.77,
+     "previous_raw_value": 0.575,
+     "raw_value": 0.608,
+     "weight": 0.25,
+     "weighted_contribution": 0.193
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.113,
+     "previous_raw_value": 0.325,
+     "raw_value": 0.344,
+     "weight": 0.4,
+     "weighted_contribution": 0.045
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q2",
+    "score": 0.215,
+    "tier": "low"
+   },
+   "quarter": "2016-Q3",
+   "quarter_metrics": {
+    "avg_delay_days": 0.765,
+    "country_coverage": 1.0,
+    "delay_stddev": 1.555,
+    "eligible_quarters_to_date": 7,
+    "late_rate": 0.608,
+    "shipment_count": 108
+   },
+   "rules_version": "1.2",
+   "score": 0.465,
+   "supplier_key": "cat_trade_in",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_water_sports/history": {
+  "body": {
+   "supplier_key": "cat_water_sports",
+   "supplier_name": "Water Sports",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_water_sports/markets/2016-Q4": {
+  "body": {
+   "markets": [
+    {
+     "market": "Africa",
+     "previous_share": 0.208,
+     "share": 0.461,
+     "share_change": 0.253
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.114,
+     "share": 0.33,
+     "share_change": 0.216
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.056,
+     "share": 0.168,
+     "share_change": 0.112
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.622,
+     "share": 0.041,
+     "share_change": -0.581
+    }
+   ],
+   "previous_quarter": "2016-Q3",
+   "quarter": "2016-Q4",
+   "supplier_key": "cat_water_sports"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_water_sports/score/2016-Q4": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.44,
+     "previous_raw_value": 1.435,
+     "raw_value": 1.499,
+     "weight": 0.35,
+     "weighted_contribution": 0.154
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.511,
+     "previous_raw_value": 0.574,
+     "raw_value": 0.572,
+     "weight": 0.25,
+     "weighted_contribution": 0.128
+    },
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.31,
+     "previous_raw_value": 0.345,
+     "raw_value": 0.385,
+     "weight": 0.4,
+     "weighted_contribution": 0.124
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2016-Q3",
+    "score": 0.25,
+    "tier": "low"
+   },
+   "quarter": "2016-Q4",
+   "quarter_metrics": {
+    "avg_delay_days": 0.561,
+    "country_coverage": 0.999,
+    "delay_stddev": 1.499,
+    "eligible_quarters_to_date": 8,
+    "late_rate": 0.572,
+    "shipment_count": 1411
+   },
+   "rules_version": "1.2",
+   "score": 0.406,
+   "supplier_key": "cat_water_sports",
+   "tier": "medium"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_women_s_apparel/history": {
+  "body": {
+   "supplier_key": "cat_women_s_apparel",
+   "supplier_name": "Women's Apparel",
+   "versions": [
+    {
+     "delivery_band": "medium",
+     "effective_from": "2015-01-01",
+     "effective_to": null,
+     "is_current": true,
+     "version": 1,
+     "volume_band": "high"
+    }
+   ]
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_women_s_apparel/markets/2017-Q2": {
+  "body": {
+   "markets": [
+    {
+     "market": "LATAM",
+     "previous_share": 0.801,
+     "share": 0.845,
+     "share_change": 0.044
+    },
+    {
+     "market": "Europe",
+     "previous_share": 0.038,
+     "share": 0.155,
+     "share_change": 0.117
+    },
+    {
+     "market": "Africa",
+     "previous_share": 0.079,
+     "share": 0.0,
+     "share_change": -0.079
+    },
+    {
+     "market": "Pacific Asia",
+     "previous_share": 0.077,
+     "share": 0.0,
+     "share_change": -0.077
+    },
+    {
+     "market": "USCA",
+     "previous_share": 0.005,
+     "share": 0.0,
+     "share_change": -0.005
+    }
+   ],
+   "previous_quarter": "2017-Q1",
+   "quarter": "2017-Q2",
+   "supplier_key": "cat_women_s_apparel"
+  },
+  "status": 200
+ },
+ "/api/suppliers/cat_women_s_apparel/score/2017-Q2": {
+  "body": {
+   "confidence": "full",
+   "factors": [
+    {
+     "factor": "country_risk",
+     "normalized_value": 0.765,
+     "previous_raw_value": 0.42,
+     "raw_value": 0.481,
+     "weight": 0.4,
+     "weighted_contribution": 0.306
+    },
+    {
+     "factor": "late_rate",
+     "normalized_value": 0.5,
+     "previous_raw_value": 0.545,
+     "raw_value": 0.57,
+     "weight": 0.25,
+     "weighted_contribution": 0.125
+    },
+    {
+     "factor": "delay_stddev",
+     "normalized_value": 0.335,
+     "previous_raw_value": 1.535,
+     "raw_value": 1.471,
+     "weight": 0.35,
+     "weighted_contribution": 0.117
+    }
+   ],
+   "previous_scored_quarter": {
+    "quarter": "2017-Q1",
+    "score": 0.472,
+    "tier": "medium"
+   },
+   "quarter": "2017-Q2",
+   "quarter_metrics": {
+    "avg_delay_days": 0.558,
+    "country_coverage": 0.997,
+    "delay_stddev": 1.471,
+    "eligible_quarters_to_date": 10,
+    "late_rate": 0.57,
+    "shipment_count": 1838
+   },
+   "rules_version": "1.2",
+   "score": 0.548,
+   "supplier_key": "cat_women_s_apparel",
+   "tier": "medium"
+  },
+  "status": 200
+ }
+}

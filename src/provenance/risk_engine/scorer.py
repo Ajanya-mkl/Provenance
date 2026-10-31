@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import math
 import os
@@ -25,6 +26,8 @@ class ScoringSummary:
     scores_written: int
     flags_emitted: int
     events_emitted: int
+    events_superseded: int = 0
+    flags_resolved: int = 0
 
 
 def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> dict[str, Any]:
@@ -69,10 +72,7 @@ def load_rules(path: str | Path = DEFAULT_RULES_PATH) -> dict[str, Any]:
             raise ValueError(
                 "as_of_quarter must be latest_complete or an ISO quarter-start date."
             ) from error
-        if (
-            parsed_quarter.day != 1
-            or parsed_quarter.month not in {1, 4, 7, 10}
-        ):
+        if parsed_quarter.day != 1 or parsed_quarter.month not in {1, 4, 7, 10}:
             raise ValueError("An explicit as_of_quarter must be the first day of a quarter.")
 
     trailing_window = int(rules["country_risk_trailing_eligible_quarters"])
@@ -139,12 +139,9 @@ def score_row(
         tier = rules["tier_order"][2]
 
     confidence_rules = rules["confidence"]
-    low_confidence = (
-        int(row["eligible_quarters_to_date"])
-        < int(confidence_rules["minimum_eligible_quarters"])
-        or float(row["country_coverage"])
-        < float(confidence_rules["minimum_country_coverage"])
-    )
+    low_confidence = int(row["eligible_quarters_to_date"]) < int(
+        confidence_rules["minimum_eligible_quarters"]
+    ) or float(row["country_coverage"]) < float(confidence_rules["minimum_country_coverage"])
     return {
         "supplier_key": str(row["supplier_key"]),
         "quarter": row["quarter"],
@@ -195,6 +192,16 @@ def _create_score_tables(connection: duckdb.DuckDBPyConnection) -> None:
         )
         """
     )
+    # Phase 9a: a flag keeps its row when it stops qualifying; it is resolved instead.
+    for column, definition in (
+        ("event_id", "VARCHAR"),
+        ("status", "VARCHAR DEFAULT 'active'"),
+        ("resolved_at", "TIMESTAMPTZ"),
+        ("resolution", "VARCHAR"),
+    ):
+        connection.execute(
+            f"ALTER TABLE gold.supplier_risk_flags ADD COLUMN IF NOT EXISTS {column} {definition}"
+        )
 
 
 def _mart_rows(connection: duckdb.DuckDBPyConnection) -> list[dict[str, Any]]:
@@ -249,6 +256,30 @@ def _insert_or_update_scores(
     )
 
 
+TOP_FACTOR_FALLBACK = "largest_contributor_fallback"
+
+
+def select_top_factor(
+    changes: Mapping[str, float],
+    factors: Mapping[str, Mapping[str, Any]],
+    direction: int,
+) -> tuple[str, bool]:
+    """Name the factor that drove a tier change, and whether a fallback was needed.
+
+    For a rise (direction 1) only factors whose weighted contribution increased
+    can be named; for a fall (direction -1) only those that decreased. The largest
+    such change wins. If none moved in that direction, the largest current
+    contributor is named and the fallback is reported.
+    """
+    moved = {name: change for name, change in changes.items() if change * direction > 0}
+    if moved:
+        return max(moved, key=lambda name: abs(moved[name])), False
+    return (
+        max(factors, key=lambda name: float(factors[name]["weighted_contribution"])),
+        True,
+    )
+
+
 def _historical_tier_flags(
     scores: Sequence[Mapping[str, Any]],
     rules: Mapping[str, Any],
@@ -291,23 +322,23 @@ def _historical_tier_flags(
                 - float(previous["contributing_factors"][name]["weighted_contribution"])
                 for name, factor in transition_score["contributing_factors"].items()
             }
-            top_factor_name = max(
-                contributing_changes,
-                key=lambda name: abs(contributing_changes[name]),
+            # Flags are raised only for tier rises, so the direction is upward.
+            top_factor_name, fallback = select_top_factor(
+                contributing_changes, transition_score["contributing_factors"], direction=1
             )
             top_factor = {
                 **transition_score["contributing_factors"][top_factor_name],
                 "weighted_contribution_change": contributing_changes[top_factor_name],
                 "observed_quarter": transition_score["quarter"].isoformat(),
             }
+            if fallback:
+                top_factor["selection"] = TOP_FACTOR_FALLBACK
             flags.append(
                 {
                     **score,
                     "old_tier": old_tier,
                     "top_factor": {"name": top_factor_name, **top_factor},
-                    "prior_eligible_quarters": (
-                        int(score["eligible_quarters_to_date"]) - 1
-                    ),
+                    "prior_eligible_quarters": (int(score["eligible_quarters_to_date"]) - 1),
                 }
             )
     return flags
@@ -371,108 +402,191 @@ def _supersede_previous_flags(
             )
 
 
+PAYLOAD_HASH_CHARS = 10
+
+
+def payload_hash(payload: Mapping[str, Any]) -> str:
+    """Short, stable hash of an event payload (key order does not matter)."""
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:PAYLOAD_HASH_CHARS]
+
+
+def _event_payload(flag: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        "supplier_key": flag["supplier_key"],
+        "quarter": flag["quarter"].isoformat(),
+        "old_tier": flag["old_tier"],
+        "new_tier": flag["tier"],
+        "score": flag["score"],
+        "top_contributing_factor": flag["top_factor"],
+        "confidence": flag["confidence"],
+        "prior_eligible_quarters": flag["prior_eligible_quarters"],
+    }
+
+
+def _active_flag_events(
+    connection: duckdb.DuckDBPyConnection, base_id: str
+) -> list[tuple[str, Any]]:
+    return connection.execute(
+        """
+        SELECT event_id, payload
+        FROM agent.events
+        WHERE event_type = 'risk_flag'
+          AND source = 'risk_engine'
+          AND (event_id = ? OR starts_with(event_id, ?))
+          AND resolved_at IS NULL
+        ORDER BY created_at
+        """,
+        [base_id, f"{base_id}:p"],
+    ).fetchall()
+
+
+def _stored_hash(payload: Any) -> str:
+    return payload_hash(json.loads(payload) if isinstance(payload, str) else payload)
+
+
 def _write_flags_and_events(
     connection: duckdb.DuckDBPyConnection,
     flags: Sequence[Mapping[str, Any]],
-) -> tuple[int, int]:
+) -> tuple[int, int, int]:
+    """Upsert current flags and keep flag events append-only.
+
+    An event whose payload is unchanged keeps its id and is not touched. When a
+    payload would change, the old event is kept and marked superseded (its
+    investigations stay bound to the numbers they saw) and a new event is created
+    whose id carries the payload hash.
+    """
     flags_added = 0
     events_added = 0
+    events_superseded = 0
     for flag in flags:
-        existing_flag = connection.execute(
-            """
-            SELECT 1
-            FROM gold.supplier_risk_flags
-            WHERE supplier_key = ? AND quarter = ?
-            """,
-            [flag["supplier_key"], flag["quarter"]],
-        ).fetchone()
+        event = _event_payload(flag)
+        digest = payload_hash(event)
+        base_id = f"risk_flag:{flag['rules_version']}:{flag['quarter']}:{flag['supplier_key']}"
+
+        active = _active_flag_events(connection, base_id)
+        current_id = next(
+            (event_id for event_id, payload in active if _stored_hash(payload) == digest),
+            None,
+        )
+        if current_id is None:
+            hashed_id = f"{base_id}:p{digest}"
+            known = {
+                row[0]
+                for row in connection.execute(
+                    "SELECT event_id FROM agent.events WHERE event_id IN (?, ?)",
+                    [base_id, hashed_id],
+                ).fetchall()
+            }
+            current_id = base_id if base_id not in known else hashed_id
+            for old_id, _payload in active:
+                connection.execute(
+                    """
+                    UPDATE agent.events
+                    SET resolved_at = current_timestamp, resolution = ?
+                    WHERE event_id = ?
+                    """,
+                    [f"superseded: payload changed; replaced by {current_id}", old_id],
+                )
+                events_superseded += 1
+            if current_id in known:
+                # This exact payload was seen before: reopen that event, never rewrite it.
+                connection.execute(
+                    "UPDATE agent.events SET resolved_at = NULL, resolution = NULL "
+                    "WHERE event_id = ?",
+                    [current_id],
+                )
+            else:
+                connection.execute(
+                    """
+                    INSERT INTO agent.events (
+                        event_id, event_type, source, batch_id, created_at, payload
+                    )
+                    VALUES (?, 'risk_flag', 'risk_engine', ?, current_timestamp, ?::JSON)
+                    """,
+                    [current_id, flag["quarter"].isoformat(), json.dumps(event, sort_keys=True)],
+                )
+                events_added += 1
+
         flag_values = [
             flag["old_tier"],
             flag["tier"],
             flag["score"],
             json.dumps(flag["top_factor"], sort_keys=True),
             flag["confidence"],
+            current_id,
         ]
+        existing_flag = connection.execute(
+            "SELECT 1 FROM gold.supplier_risk_flags WHERE supplier_key = ? AND quarter = ?",
+            [flag["supplier_key"], flag["quarter"]],
+        ).fetchone()
         if existing_flag:
             connection.execute(
                 """
                 UPDATE gold.supplier_risk_flags
                 SET old_tier = ?, new_tier = ?, score = ?,
-                    top_contributing_factor = ?::JSON, confidence = ?
+                    top_contributing_factor = ?::JSON, confidence = ?, event_id = ?,
+                    status = 'active', resolved_at = NULL, resolution = NULL
                 WHERE supplier_key = ? AND quarter = ?
                 """,
-                [
-                    *flag_values,
-                    flag["supplier_key"],
-                    flag["quarter"],
-                ],
+                [*flag_values, flag["supplier_key"], flag["quarter"]],
             )
         else:
             connection.execute(
                 """
                 INSERT INTO gold.supplier_risk_flags (
                     supplier_key, quarter, old_tier, new_tier, score,
-                    top_contributing_factor, confidence
+                    top_contributing_factor, confidence, event_id, status
                 )
-                VALUES (?, ?, ?, ?, ?, ?::JSON, ?)
+                VALUES (?, ?, ?, ?, ?, ?::JSON, ?, ?, 'active')
                 """,
-                [
-                    flag["supplier_key"],
-                    flag["quarter"],
-                    *flag_values,
-                ],
+                [flag["supplier_key"], flag["quarter"], *flag_values],
             )
             flags_added += 1
+    return flags_added, events_added, events_superseded
 
-        event_id = (
-            f"risk_flag:{flag['rules_version']}:"
-            f"{flag['quarter']}:{flag['supplier_key']}"
-        )
-        event = {
-            "supplier_key": flag["supplier_key"],
-            "quarter": flag["quarter"].isoformat(),
-            "old_tier": flag["old_tier"],
-            "new_tier": flag["tier"],
-            "score": flag["score"],
-            "top_contributing_factor": flag["top_factor"],
-            "confidence": flag["confidence"],
-            "prior_eligible_quarters": flag["prior_eligible_quarters"],
-        }
-        existing_event = connection.execute(
-            "SELECT 1 FROM agent.events WHERE event_id = ?",
-            [event_id],
-        ).fetchone()
-        if existing_event:
-            connection.execute(
-                """
-                UPDATE agent.events
-                SET batch_id = ?, payload = ?::JSON
-                WHERE event_id = ?
-                """,
-                [
-                    flag["quarter"].isoformat(),
-                    json.dumps(event, sort_keys=True),
-                    event_id,
-                ],
-            )
+
+def _resolve_unqualified_flags(
+    connection: duckdb.DuckDBPyConnection,
+    flags: Sequence[Mapping[str, Any]],
+    rules_version: str,
+) -> int:
+    """Resolve, never delete, flags of this rules version that no longer qualify."""
+    current = {(flag["supplier_key"], flag["quarter"]) for flag in flags}
+    reason = f"resolved: no longer qualifies under rules {rules_version}"
+    stale_events = connection.execute(
+        """
+        SELECT
+            event_id,
+            json_extract_string(payload, '$.supplier_key'),
+            try_cast(json_extract_string(payload, '$.quarter') AS DATE)
+        FROM agent.events
+        WHERE event_type = 'risk_flag'
+          AND source = 'risk_engine'
+          AND starts_with(event_id, ?)
+          AND resolved_at IS NULL
+        """,
+        [f"risk_flag:{rules_version}:"],
+    ).fetchall()
+    resolved = 0
+    for event_id, supplier_key, quarter in stale_events:
+        if (supplier_key, quarter) in current:
             continue
-        result = connection.execute(
+        connection.execute(
+            "UPDATE agent.events SET resolved_at = current_timestamp, resolution = ? "
+            "WHERE event_id = ?",
+            [reason, event_id],
+        )
+        connection.execute(
             """
-            INSERT INTO agent.events (
-                event_id, event_type, source, batch_id, created_at, payload
-            )
-            VALUES (?, 'risk_flag', 'risk_engine', ?, current_timestamp, ?::JSON)
-            ON CONFLICT (event_id) DO NOTHING
-            RETURNING event_id
+            UPDATE gold.supplier_risk_flags
+            SET status = 'resolved', resolved_at = current_timestamp, resolution = ?
+            WHERE supplier_key = ? AND quarter = ? AND coalesce(status, 'active') = 'active'
             """,
-            [
-                event_id,
-                flag["quarter"].isoformat(),
-                json.dumps(event, sort_keys=True),
-            ],
-        ).fetchone()
-        events_added += int(result is not None)
-    return flags_added, events_added
+            [reason, supplier_key, quarter],
+        )
+        resolved += 1
+    return resolved
 
 
 def score_supplier_risk(
@@ -480,11 +594,7 @@ def score_supplier_risk(
     rules_path: str | Path = DEFAULT_RULES_PATH,
 ) -> ScoringSummary:
     rules = load_rules(rules_path)
-    target_db = Path(
-        db_path
-        or os.environ.get("PROVENANCE_DUCKDB_PATH")
-        or DEFAULT_DB_PATH
-    )
+    target_db = Path(db_path or os.environ.get("PROVENANCE_DUCKDB_PATH") or DEFAULT_DB_PATH)
     with duckdb.connect(str(target_db)) as connection:
         _create_score_tables(connection)
         ensure_agent_events_table(connection)
@@ -503,14 +613,24 @@ def score_supplier_risk(
                 f"as_of_quarter {current_quarter.isoformat()} has no eligible "
                 "supplier-quarter rows."
             )
-        _supersede_previous_flags(connection, str(rules["rules_version"]))
-        flags = _historical_tier_flags(scores, rules)
-        _insert_or_update_scores(connection, scores)
-        flags_added, events_added = _write_flags_and_events(connection, flags)
+        # One transaction: a failure part-way leaves the previous scores and flags.
+        connection.execute("BEGIN TRANSACTION")
+        try:
+            _supersede_previous_flags(connection, str(rules["rules_version"]))
+            flags = _historical_tier_flags(scores, rules)
+            _insert_or_update_scores(connection, scores)
+            flags_added, events_added, superseded = _write_flags_and_events(connection, flags)
+            resolved = _resolve_unqualified_flags(connection, flags, str(rules["rules_version"]))
+        except BaseException:
+            connection.execute("ROLLBACK")
+            raise
+        connection.execute("COMMIT")
 
     return ScoringSummary(
         quarter=current_quarter,
         scores_written=len(scores),
         flags_emitted=flags_added,
         events_emitted=events_added,
+        events_superseded=superseded,
+        flags_resolved=resolved,
     )

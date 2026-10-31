@@ -17,6 +17,7 @@ from typing import Any
 import duckdb
 
 from provenance.agent.memory.investigation_memory import MAX_RECALL, recall_past_investigations
+from provenance.db import connect_read_only
 
 DECIMALS = 3
 EVENT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_.:\-]{1,128}$")
@@ -62,10 +63,16 @@ def _previous_quarter(quarter: date) -> date:
 
 
 class InvestigationTools:
-    """The read-only tools, bound to one read-only connection."""
+    """The read-only tools.
+
+    A read-only connection is opened on demand and closed after every tool call,
+    so nothing holds the warehouse while the model is thinking (DuckDB refuses a
+    writer while any reader is open, and the reverse).
+    """
 
     def __init__(self, db_path: str | Path) -> None:
-        self._connection = duckdb.connect(str(db_path), read_only=True)
+        self._db_path = db_path
+        self._open: duckdb.DuckDBPyConnection | None = None
         self._handlers: dict[str, Callable[..., dict[str, Any]]] = {
             "get_flag": self.get_flag,
             "get_supplier_history": self.get_supplier_history,
@@ -75,8 +82,20 @@ class InvestigationTools:
             "recall_past_investigations": self.recall_past_investigations,
         }
 
+    @property
+    def _connection(self) -> duckdb.DuckDBPyConnection:
+        if self._open is None:
+            self._open = connect_read_only(self._db_path)
+        return self._open
+
+    @property
+    def is_open(self) -> bool:
+        return self._open is not None
+
     def close(self) -> None:
-        self._connection.close()
+        if self._open is not None:
+            self._open.close()
+            self._open = None
 
     def __enter__(self) -> InvestigationTools:
         return self
@@ -100,8 +119,12 @@ class InvestigationTools:
             return _error(f"{name} takes exactly these arguments: {', '.join(expected)}")
         try:
             return handler(**arguments)
+        except duckdb.IOException:
+            return _error("the warehouse is busy (a pipeline run holds it); try again shortly")
         except duckdb.Error as error:
             return _error(f"query failed: {type(error).__name__}")
+        finally:
+            self.close()
 
     # -- validation -------------------------------------------------------
 

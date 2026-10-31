@@ -8,6 +8,8 @@ from typing import Any
 from dagster import AssetExecutionContext, AssetKey
 from dagster_dbt import DagsterDbtTranslator, DbtCliResource, DbtProject, dbt_assets
 
+from provenance.dags.restore_point import guarded_dbt_build
+
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 TRANSFORM_DIR = PROJECT_ROOT / "src" / "provenance" / "transform"
 DEFAULT_DB_PATH = PROJECT_ROOT / "data" / "provenance.duckdb"
@@ -44,25 +46,20 @@ class GatedSilverTranslator(DagsterDbtTranslator):
 
 
 @dbt_assets(
-    select=(
-        "path:models/staging path:models/intermediate "
-        "path:models/silver path:seeds"
-    ),
+    select=("path:models/staging path:models/intermediate " "path:models/silver path:seeds"),
     manifest=dbt_project.manifest_path,
     project=dbt_project,
     dagster_dbt_translator=GatedSilverTranslator(),
 )
 def silver_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iterator[Any]:
-    yield from dbt.cli(
-        [
-            "build",
-            "--project-dir",
-            str(TRANSFORM_DIR),
-            "--profiles-dir",
-            str(TRANSFORM_DIR),
-        ],
-        context=context,
-    ).stream()
+    # All-or-nothing with gold: a failure restores the previous silver and gold.
+    yield from guarded_dbt_build(
+        context,
+        dbt,
+        ["build", "--project-dir", str(TRANSFORM_DIR), "--profiles-dir", str(TRANSFORM_DIR)],
+        db_path=os.environ["PROVENANCE_DUCKDB_PATH"],
+        phase="silver",
+    )
 
 
 dbt_resource = DbtCliResource(project_dir=dbt_project)

@@ -28,6 +28,7 @@ from provenance.agent.llm import GroqLLM
 from provenance.agent.loop import MAX_STEPS, InvestigationResult, investigate
 from provenance.agent.store import append_audit, now, table_exists, writer
 from provenance.agent.tools.investigation_tools import InvestigationTools
+from provenance.db import connect_read_only
 from provenance.risk_engine.scorer import DEFAULT_DB_PATH
 
 LOGGER = logging.getLogger(__name__)
@@ -44,9 +45,31 @@ def _database_path() -> Path:
     return Path(os.environ.get("PROVENANCE_DUCKDB_PATH", DEFAULT_DB_PATH))
 
 
+def writer_activity(db_path: str | Path) -> str | None:
+    """Why the agent must not start now, or None when the warehouse is free.
+
+    Checks Dagster for an active run tagged as a DuckDB writer (when DAGSTER_HOME
+    is set), then probes the file itself, since DuckDB refuses a reader while a
+    writer holds it and a writer while a reader holds it.
+    """
+    if os.environ.get("DAGSTER_HOME"):
+        from provenance.run_pipeline import _active_writer_runs, _instance
+
+        instance = _instance()
+        if instance is not None:
+            active = _active_writer_runs(instance)
+            if active:
+                return f"a pipeline run is writing to the warehouse ({', '.join(active)})"
+    try:
+        connect_read_only(db_path).close()
+    except duckdb.IOException:
+        return "another process holds the warehouse (likely a pipeline run)"
+    return None
+
+
 def next_queued_event(db_path: str | Path) -> str | None:
     """Oldest queued risk_flag that has no proposed investigation yet."""
-    with duckdb.connect(str(db_path), read_only=True) as connection:
+    with connect_read_only(db_path) as connection:
         done_filter = (
             "AND event_id NOT IN (SELECT event_id FROM agent.investigations "
             "WHERE status = 'proposed')"
@@ -151,8 +174,8 @@ def run_investigation(
     llm: Any,
     max_steps: int = MAX_STEPS,
 ) -> tuple[InvestigationResult, GroundingResult]:
-    # The read-only connection must close before the writer opens: DuckDB will
-    # not hold both configurations on one file in one process.
+    # Tools open a read-only connection per call and close it straight after, so
+    # no connection is held across the LLM loop (or when the writer opens below).
     with InvestigationTools(db_path) as toolbox:
         result = investigate(event_id, llm, toolbox, max_steps=max_steps)
     if result.report is None:
@@ -173,6 +196,10 @@ def main(argv: list[str] | None = None) -> int:
 
     load_dotenv()
     db_path = args.db_path or _database_path()
+    busy = writer_activity(db_path)
+    if busy:
+        print(f"Refusing to start: {busy}. Try again when it finishes.")
+        return 3
     event_id = args.event_id or next_queued_event(db_path)
     if event_id is None:
         print("No queued risk_flag events without a proposed investigation.")

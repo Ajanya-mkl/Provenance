@@ -1,10 +1,12 @@
 import json
+import os
 from collections.abc import Iterator, Mapping
 from typing import Any
 
 from dagster import AssetExecutionContext
 from dagster_dbt import DagsterDbtTranslator, DbtCliResource, dbt_assets
 
+from provenance.dags.restore_point import guarded_dbt_build
 from provenance.dags.silver_assets import TRANSFORM_DIR, dbt_project
 from provenance.risk_engine.scorer import load_rules
 
@@ -29,7 +31,9 @@ def gold_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iter
             ]
         }
     )
-    yield from dbt.cli(
+    yield from guarded_dbt_build(
+        context,
+        dbt,
         [
             "build",
             "--project-dir",
@@ -39,5 +43,6 @@ def gold_dbt_assets(context: AssetExecutionContext, dbt: DbtCliResource) -> Iter
             "--vars",
             dbt_vars,
         ],
-        context=context,
-    ).stream()
+        db_path=os.environ["PROVENANCE_DUCKDB_PATH"],
+        phase="gold",
+    )

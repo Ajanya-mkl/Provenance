@@ -192,11 +192,11 @@
       "old_tier": "low",
       "new_tier": "medium",
       "confidence": "low",
-      "expected_top_factor": "country_risk",
+      "expected_top_factor": "delay_stddev",
       "expect_insufficient_data": true,
       "expect_recall": false,
       "synthetic_event": null,
-      "note": "The scorer picks the factor with the largest absolute change in weighted contribution, so the expected country_risk is the factor that fell (-0.232) while the score rose; delay_stddev is the largest contributor."
+      "note": "Phase 9a: the scorer now names, for a tier rise, only a factor whose weighted contribution increased. Before, it picked the largest absolute change and named country_risk, which fell by 0.232 while the tier rose. Rescoring supersedes risk_flag:1.2:2017-07-01:cat_boxing_mma with a new event (...:cat_boxing_mma:p7f1b3f8080) whose top factor is delay_stddev (+0.216). The case keeps the original event id until the real warehouse is rescored."
     },
     {
       "case_id": "women_s_golf_clubs_2017q2",

@@ -2,6 +2,7 @@ import os
 from collections.abc import Callable
 from pathlib import Path
 
+import duckdb
 from dagster import (
     AssetExecutionContext,
     AssetKey,
@@ -10,10 +11,12 @@ from dagster import (
     MaterializeResult,
     MetadataValue,
     RetryPolicy,
+    RetryRequested,
     asset,
 )
 
 from provenance.data_quality.gate import validate_source_batches
+from provenance.ingestion.precheck import precheck_dataco_csv
 from provenance.ingestion.sources.dataco_shipments import load_dataco_shipments
 from provenance.ingestion.sources.usaspending_contracts import load_usaspending_contracts
 from provenance.ingestion.sources.worldbank_lpi import load_worldbank_lpi
@@ -51,20 +54,36 @@ def _pipeline_paths() -> tuple[Path, Path, Path]:
     return database, bronze, quarantine
 
 
+LOCK_RETRIES = 3
+LOCK_RETRY_SECONDS = 5
+
+
 def _run_quality_gate(source: str) -> MaterializeResult:
     database, bronze, quarantine = _pipeline_paths()
-    results = validate_source_batches(
-        source,
-        bronze_root=bronze,
-        db_path=database,
-        quarantine_root=quarantine,
-    )
+    try:
+        results = validate_source_batches(
+            source,
+            bronze_root=bronze,
+            db_path=database,
+            quarantine_root=quarantine,
+        )
+    except duckdb.IOException as error:
+        # Another process holds the warehouse. Batches already checked are
+        # recorded, so a retry only checks what is left.
+        raise RetryRequested(
+            max_retries=LOCK_RETRIES, seconds_to_wait=LOCK_RETRY_SECONDS
+        ) from error
     failed = next((result for result in results if not result.passed), None)
     if failed is not None:
         raise Failure(
             description=(
                 f"Bronze DQ gate quarantined {source} batch {failed.batch_id}; "
                 f"{failed.failed_expectations} expectation(s) failed."
+                + "".join(
+                    f" {detail['message']}"
+                    for detail in failed.failed_details
+                    if detail.get("message")
+                )
             ),
             metadata={
                 "source": source,
@@ -109,11 +128,19 @@ def _run_quality_gate(source: str) -> MaterializeResult:
 @asset
 def dataco_shipments() -> MaterializeResult:
     database, bronze, _quarantine = _pipeline_paths()
+    csv_path = os.environ.get(
+        "PROVENANCE_DATACO_CSV_PATH",
+        PROJECT_ROOT / "data" / "raw" / "DataCoSupplyChainDataset.csv",
+    )
+    # Phase 9a: refuse a malformed file before anything is written.
+    precheck = precheck_dataco_csv(csv_path)
+    if not precheck.passed:
+        raise Failure(
+            description=precheck.summary(),
+            metadata={"problems": MetadataValue.json(precheck.problems)},
+        )
     row_count = load_dataco_shipments(
-        csv_path=os.environ.get(
-            "PROVENANCE_DATACO_CSV_PATH",
-            PROJECT_ROOT / "data" / "raw" / "DataCoSupplyChainDataset.csv",
-        ),
+        csv_path=csv_path,
         db_path=database,
         bronze_root=bronze,
     )
