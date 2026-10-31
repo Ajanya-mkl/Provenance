@@ -1,14 +1,14 @@
 {
-  "generated_at": "2026-10-20T03:19:44+00:00",
+  "generated_at": "2026-10-31T10:54:31+00:00",
   "model": "openai/gpt-oss-120b",
   "max_steps": 6,
   "case_count": 18,
-  "cached_cases": 16,
-  "live_cases": 2,
+  "cached_cases": 17,
+  "live_cases": 1,
   "prompt_sha256": "7f725db53f4c",
   "metrics": {
     "top_factor_accuracy": {
-      "value": 0.938,
+      "value": 1.0,
       "n": 16
     },
     "grounded_rate": {
@@ -40,11 +40,11 @@
       "n": 18
     },
     "avg_tokens": {
-      "value": 4244.72,
+      "value": 4243.78,
       "n": 18
     },
     "avg_latency_s": {
-      "value": 9.24,
+      "value": 9.23,
       "n": 18
     }
   },
@@ -364,28 +364,26 @@
     {
       "case_id": "boxing_mma_2017q3",
       "kind": "low_confidence",
-      "note": "The scorer picks the factor with the largest absolute change in weighted contribution, so the expected country_risk is the factor that fell (-0.232) while the score rose; delay_stddev is the largest contributor.",
-      "expected_top_factor": "country_risk",
+      "note": "Phase 9a: for a tier rise the scorer now names only a factor whose weighted contribution increased. Before, it picked the largest absolute change and named country_risk, which fell by 0.232 while the tier rose. The 2026-10-31 rescore superseded risk_flag:1.2:2017-07-01:cat_boxing_mma with this event, whose top factor is delay_stddev (+0.216).",
+      "expected_top_factor": "delay_stddev",
       "top_factor": "delay_stddev",
-      "top_factor_correct": false,
+      "top_factor_correct": true,
       "grounded": true,
       "grounded_ratio": 1.0,
       "ungrounded_numbers": [],
       "unknown_evidence_tools": [],
       "proposed_action": "no_action",
       "valid_action": true,
-      "says_insufficient_data": false,
+      "says_insufficient_data": true,
       "insufficient_data_handled": true,
       "recalled_cases": 0,
       "memory_referenced": null,
       "steps": 2,
-      "tokens": 3292,
+      "tokens": 3275,
       "stop_reason": "final_answer",
-      "failures": [
-        "top factor 'delay_stddev', expected 'country_risk'"
-      ],
+      "failures": [],
       "source": "live",
-      "latency_s": 2.94
+      "latency_s": 2.74
     },
     {
       "case_id": "women_s_golf_clubs_2017q2",
@@ -408,7 +406,7 @@
       "tokens": 3230,
       "stop_reason": "final_answer",
       "failures": [],
-      "source": "live",
+      "source": "cache",
       "latency_s": 2.8
     },
     {

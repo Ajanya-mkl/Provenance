@@ -1,22 +1,18 @@
 {
-  "key": "472e23060e329bbb64d70702e96bf8c9f914eb136a2cf6485c80da998e0359c9",
+  "key": "20bf109d6e4c8674168450c5614977f493d71660e9b90d118118a7dbc2473209",
   "case_id": "boxing_mma_2017q3",
   "model": "openai/gpt-oss-120b",
-  "created_at": "2026-10-20T03:19:08.095973+00:00",
-  "latency_s": 2.94,
+  "created_at": "2026-10-31T10:54:27.820276+00:00",
+  "latency_s": 2.74,
   "result": {
-    "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
+    "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma:p7f1b3f8080",
     "report": {
-      "summary": "The flag for cat_boxing_mma in 2017-Q3 has low confidence, making the data insufficient to draw conclusions. The score is 0.488 with a tier change from low to medium, but confidence is low.",
+      "summary": "insufficient data",
       "top_factor": "delay_stddev",
       "evidence": [
         {
           "tool_name": "get_score_breakdown",
-          "value": "score=0.488"
-        },
-        {
-          "tool_name": "get_score_breakdown",
-          "value": "tier=medium"
+          "value": "factor=delay_stddev"
         },
         {
           "tool_name": "get_score_breakdown",
@@ -32,10 +28,10 @@
       {
         "step": 0,
         "name": "get_flag",
-        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-07-01:cat_boxing_mma\"}",
+        "arguments": "{\"event_id\": \"risk_flag:1.2:2017-07-01:cat_boxing_mma:p7f1b3f8080\"}",
         "result": {
-          "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma",
-          "investigation_status": "queued",
+          "event_id": "risk_flag:1.2:2017-07-01:cat_boxing_mma:p7f1b3f8080",
+          "investigation_status": "open",
           "supplier_key": "cat_boxing_mma",
           "quarter": "2017-Q3",
           "old_tier": "low",
@@ -43,12 +39,12 @@
           "score": 0.488,
           "confidence": "low",
           "top_factor": {
-            "name": "country_risk",
-            "raw_value": 0.362,
-            "normalized_value": 0.198,
-            "weight": 0.4,
-            "weighted_contribution": 0.079,
-            "weighted_contribution_change": -0.232
+            "name": "delay_stddev",
+            "raw_value": 1.546,
+            "normalized_value": 0.616,
+            "weight": 0.35,
+            "weighted_contribution": 0.216,
+            "weighted_contribution_change": 0.216
           }
         }
       },
@@ -115,13 +111,13 @@
         }
       }
     ],
-    "prompt_tokens": 2635,
-    "completion_tokens": 657
+    "prompt_tokens": 2687,
+    "completion_tokens": 588
   },
   "grounding": {
     "grounded": true,
     "grounded_ratio": 1.0,
-    "numbers_checked": 3,
+    "numbers_checked": 0,
     "ungrounded_numbers": [],
     "unknown_evidence_tools": []
   }
