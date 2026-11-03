@@ -84,7 +84,10 @@ def list_flags(
         SELECT
             events.event_id, flags.supplier_key, names.supplier_name, flags.quarter,
             flags.old_tier, flags.new_tier, flags.score, flags.confidence,
-            flags.top_contributing_factor, events.investigation_status,
+            flags.top_contributing_factor,
+            -- Unresolved only: a resolved event keeps its old label in the column.
+            CASE WHEN events.resolved_at IS NOT NULL THEN 'resolved'
+                 ELSE events.investigation_status END,
             {investigation_columns}, {action_columns}
         FROM gold.supplier_risk_flags AS flags
         INNER JOIN gold.supplier_risk_score AS scores

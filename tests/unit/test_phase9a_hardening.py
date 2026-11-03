@@ -616,3 +616,80 @@ def test_precheck_reports_column_order_and_missing_columns(tmp_path):
 
     assert not result.passed
     assert "missing ['Sales']" in result.problems[0]
+
+
+# ------------------------------------------------- float-noise hash fix
+
+
+def _cleats_payload(score, raw, weighted):
+    return {
+        "supplier_key": "cat_cleats",
+        "quarter": "2017-01-01",
+        "old_tier": "low",
+        "new_tier": "medium",
+        "score": score,
+        "confidence": "full",
+        "prior_eligible_quarters": 8,
+        "top_contributing_factor": {
+            "name": "country_risk",
+            "raw_value": raw,
+            "weighted_contribution": weighted,
+        },
+    }
+
+
+def test_float_noise_from_a_mart_rebuild_hashes_the_same():
+    # The real cleats payloads before and after the 2026-10-31 rebuild.
+    before = _cleats_payload(0.4374753012614397, 0.38445730575939513, 0.12277582049408593)
+    after = _cleats_payload(0.4374753012614398, 0.3844573057593952, 0.12277582049408604)
+
+    assert before != after
+    assert payload_hash(before) == payload_hash(after)
+
+
+def test_a_real_top_factor_change_still_changes_the_hash():
+    common = {"supplier_key": "cat_boxing_mma", "quarter": "2017-07-01", "score": 0.488}
+    before = {
+        **common,
+        "top_contributing_factor": {
+            "name": "country_risk",
+            "weighted_contribution": 0.0792389443889444,
+            "weighted_contribution_change": -0.23195040884488638,
+        },
+    }
+    after = {
+        **common,
+        "top_contributing_factor": {
+            "name": "delay_stddev",
+            "weighted_contribution": 0.21554163864512496,
+            "weighted_contribution_change": 0.21554163864512496,
+        },
+    }
+
+    assert payload_hash(before) != payload_hash(after)
+    # A change in the 9th decimal place is still a change.
+    assert payload_hash({"score": 0.123456789}) != payload_hash({"score": 0.123456788})
+
+
+# ------------------------------------------- open/queued means unresolved only
+
+
+def test_resolved_events_are_never_queued_or_reported_as_open(warehouse):
+    from provenance.agent.run import next_queued_event
+    from tests.unit.agent_fixtures import EARLIER_EVENT_ID
+
+    with duckdb.connect(str(warehouse)) as connection:
+        # Both fixture events are 'queued'; the later one is resolved (superseded).
+        connection.execute(
+            "UPDATE agent.events SET resolved_at = now(), "
+            "resolution = 'superseded: payload changed; replaced by x' WHERE event_id = ?",
+            [EARLIER_EVENT_ID],
+        )
+
+    assert next_queued_event(warehouse) == EVENT_ID
+    with InvestigationTools(warehouse) as tools:
+        assert (
+            tools.call("get_flag", {"event_id": EARLIER_EVENT_ID})["investigation_status"]
+            == "resolved"
+        )
+        assert tools.call("get_flag", {"event_id": EVENT_ID})["investigation_status"] == "queued"

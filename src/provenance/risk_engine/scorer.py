@@ -405,9 +405,29 @@ def _supersede_previous_flags(
 PAYLOAD_HASH_CHARS = 10
 
 
+PAYLOAD_HASH_DECIMALS = 10
+
+
+def _round_floats(value: Any) -> Any:
+    if isinstance(value, float):
+        return round(value, PAYLOAD_HASH_DECIMALS)
+    if isinstance(value, Mapping):
+        return {key: _round_floats(item) for key, item in value.items()}
+    if isinstance(value, list | tuple):
+        return [_round_floats(item) for item in value]
+    return value
+
+
 def payload_hash(payload: Mapping[str, Any]) -> str:
-    """Short, stable hash of an event payload (key order does not matter)."""
-    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    """Short, stable hash of an event payload (key order does not matter).
+
+    Floats are rounded to 10 decimal places for the hash only (stored payloads
+    keep full precision): rebuilding the gold mart sums floats in a different
+    order each time, which moves country_risk, and so scores, by ~1e-16.
+    """
+    canonical = json.dumps(
+        _round_floats(payload), sort_keys=True, separators=(",", ":"), default=str
+    )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:PAYLOAD_HASH_CHARS]
 
 

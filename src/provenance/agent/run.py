@@ -80,6 +80,7 @@ def next_queued_event(db_path: str | Path) -> str | None:
             f"""
             SELECT event_id FROM agent.events
             WHERE event_type = 'risk_flag' AND investigation_status = 'queued'
+              AND resolved_at IS NULL
             {done_filter}
             ORDER BY created_at, event_id
             LIMIT 1

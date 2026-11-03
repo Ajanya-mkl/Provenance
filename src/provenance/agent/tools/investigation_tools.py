@@ -160,7 +160,10 @@ class InvestigationTools:
             return _error("event_id has an invalid format")
         row = self._connection.execute(
             """
-            SELECT event_type, investigation_status, payload
+            SELECT event_type,
+                   CASE WHEN resolved_at IS NOT NULL THEN 'resolved'
+                        ELSE investigation_status END,
+                   payload
             FROM agent.events
             WHERE event_id = ?
             """,
