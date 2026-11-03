@@ -256,13 +256,31 @@ def validate(
         result.mappable = contract.Verdict(False, result.errors[0])
         return result
     mapping = contract.normalize(raw_mapping)
-    # late_when may be given as the column's own value ("no" means late when false).
+    # late_when may be given as one of the column's own values ("no", "N", "0"): it is
+    # normalised to the polarity that value stands for, and refused when the column
+    # does not contain it.
+    late_when_error = None
     outcome_in = mapping.get("outcome")
-    if isinstance(outcome_in, dict) and isinstance(outcome_in.get("late_when"), str):
-        if outcome_in["late_when"] in TRUTHY:
+    if (
+        isinstance(outcome_in, dict)
+        and outcome_in.get("kind") == "late_flag"
+        and isinstance(outcome_in.get("late_when"), str)
+        and outcome_in["late_when"] not in contract.POLARITIES
+        and outcome_in.get("col") in context.columns
+    ):
+        given = outcome_in["late_when"]
+        values = {
+            str(v).strip().lower() for v in context.frame[outcome_in["col"]].dropna().unique()
+        }
+        if given in values and given in TRUTHY:
             outcome_in["late_when"] = "true"
-        elif outcome_in["late_when"] in FALSY:
+        elif given in values and given in FALSY:
             outcome_in["late_when"] = "false"
+        else:
+            late_when_error = (
+                f"outcome.late_when {given!r} is not a value of {outcome_in['col']!r}; "
+                "give 'true' or 'false', or one of the column's own values."
+            )
     if isinstance(mapping.get("confidence"), str):
         try:
             mapping["confidence"] = float(mapping["confidence"])
@@ -307,13 +325,24 @@ def validate(
         ]
         if missing:
             errors.append(f"outcome kind {kind!r} needs column(s) {missing}.")
-        if kind == "late_flag" and outcome.get("late_when") not in contract.POLARITIES:
+        if late_when_error:
+            errors.append(late_when_error)
+        elif kind == "late_flag" and outcome.get("late_when") not in contract.POLARITIES:
             errors.append("outcome.late_when must be 'true' or 'false'.")
         if kind in ("days_pair", "delay_value") and outcome.get("unit") not in contract.UNITS:
             errors.append(f"outcome.unit must be one of {list(contract.UNITS)}.")
     country = mapping.get("country")
     if country is not None and not isinstance(country, str):
         errors.append("country must be a column name or null.")
+    cancelled = mapping.get("cancelled")
+    if cancelled is not None and not (
+        isinstance(cancelled, Mapping)
+        and isinstance(cancelled.get("col"), str)
+        and isinstance(cancelled.get("value"), str)
+        and cancelled["value"].strip()
+    ):
+        errors.append("cancelled must be null or {'col': column, 'value': text}.")
+        cancelled = None
     confidence = mapping.get("confidence")
     if confidence is not None and not (
         isinstance(confidence, int | float) and 0 <= float(confidence) <= 1
@@ -367,6 +396,13 @@ def validate(
                 errors.append(f"outcome.{key}: {col!r} holds {kind_of(col)} values, not numbers.")
     if isinstance(country, str) and country in columns and kind_of(country) != "string":
         errors.append(f"country: {country!r} holds {kind_of(country)} values, not names.")
+    if cancelled and cancelled["col"] in columns:
+        present = context.frame[cancelled["col"]].dropna().astype(str)
+        if not (present == cancelled["value"].strip()).any():
+            errors.append(
+                f"cancelled: no row of {cancelled['col']!r} equals the given value, so it "
+                "would mark nothing as cancelled."
+            )
 
     # Evidence numbers must come from the profile.
     evidence = mapping.get("evidence") or {}

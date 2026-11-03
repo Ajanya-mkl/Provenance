@@ -3,6 +3,7 @@
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
+    "decided_by": "agent",
     "mapping": {
       "entity": "category",
       "event_date": {
@@ -18,22 +19,27 @@
       "evidence": {
         "entity": [
           "distinct_count=5",
+          "null_pct=0.0",
           "min_length=6",
           "max_length=16"
         ],
         "event_date": [
+          "distinct_count=140",
+          "null_pct=0.0",
           "date_format=%Y-%m-%d",
           "min_value=2022-09-02",
           "max_value=2023-01-19"
         ],
         "outcome": [
           "distinct_count=2",
+          "null_pct=0.0",
           "min_value=0",
           "max_value=1"
         ]
       },
-      "confidence": 0.9,
-      "notes": "category used as entity (supplier/vendor/category); shipped_on provides shipment date with given format; is_late is a boolean-like int where 1 indicates late, mapped as late_flag with late_when 'true'; no country column present."
+      "confidence": 1,
+      "notes": "",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "category",
@@ -50,31 +56,36 @@
       "evidence": {
         "entity": [
           "distinct_count=5",
+          "null_pct=0.0",
           "min_length=6",
           "max_length=16"
         ],
         "event_date": [
+          "distinct_count=140",
+          "null_pct=0.0",
           "date_format=%Y-%m-%d",
           "min_value=2022-09-02",
           "max_value=2023-01-19"
         ],
         "outcome": [
           "distinct_count=2",
+          "null_pct=0.0",
           "min_value=0",
           "max_value=1"
         ]
       },
-      "confidence": 0.9,
-      "notes": "category used as entity (supplier/vendor/category); shipped_on provides shipment date with given format; is_late is a boolean-like int where 1 indicates late, mapped as late_flag with late_when 'true'; no country column present."
+      "confidence": 1,
+      "notes": "",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'category', event_date 'shipped_on' and a late_flag outcome all map to valid columns",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 6167,
-    "completion_tokens": 1718,
-    "latency_s": 45.345,
+    "prompt_tokens": 5527,
+    "completion_tokens": 1907,
+    "latency_s": 47.692,
     "steps": 6
   }
 }

@@ -1,0 +1,123 @@
+{
+  "key": "9134da55c27cd27d25799dc0f0195151d3793fad771f2180587b7720b9e315d2",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "decided_by": "agent",
+    "mapping": {
+      "entity": "supplier",
+      "event_date": {
+        "col": "delivery_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "delay_days",
+        "unit": "days"
+      },
+      "country": "country",
+      "cancelled": null,
+      "evidence": {
+        "entity": [
+          "column=supplier",
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_length=7",
+          "mean_length=8.1",
+          "max_length=9"
+        ],
+        "event_date": [
+          "column=delivery_date",
+          "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=81",
+          "date_format=%Y-%m-%d",
+          "min_value=2023-05-01",
+          "max_value=2023-07-20"
+        ],
+        "outcome": [
+          "column=delay_days",
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_value=-1",
+          "max_value=5"
+        ],
+        "country": [
+          "column=country",
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_length=5",
+          "mean_length=5.9",
+          "max_length=7"
+        ]
+      },
+      "confidence": 0.9,
+      "notes": "supplier used as entity; delivery_date chosen as event_date (shipment/order date) with its format; delay_days provides numeric delay, mapping to delay_value outcome; country column mapped; no cancelled indicator present."
+    },
+    "first_answer": {
+      "entity": "supplier",
+      "event_date": {
+        "col": "delivery_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "delay_days",
+        "unit": "days"
+      },
+      "country": "country",
+      "cancelled": null,
+      "evidence": {
+        "entity": [
+          "column=supplier",
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_length=7",
+          "mean_length=8.1",
+          "max_length=9"
+        ],
+        "event_date": [
+          "column=delivery_date",
+          "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=81",
+          "date_format=%Y-%m-%d",
+          "min_value=2023-05-01",
+          "max_value=2023-07-20"
+        ],
+        "outcome": [
+          "column=delay_days",
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_value=-1",
+          "max_value=5"
+        ],
+        "country": [
+          "column=country",
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
+          "min_length=5",
+          "mean_length=5.9",
+          "max_length=7"
+        ]
+      },
+      "confidence": 0.9,
+      "notes": "supplier used as entity; delivery_date chosen as event_date (shipment/order date) with its format; delay_days provides numeric delay, mapping to delay_value outcome; country column mapped; no cancelled indicator present."
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'supplier', event_date 'delivery_date' and a delay_value outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 5867,
+    "completion_tokens": 1870,
+    "latency_s": 47.114,
+    "steps": 6
+  }
+}

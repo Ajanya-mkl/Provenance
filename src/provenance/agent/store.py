@@ -48,6 +48,8 @@ _DDL = (
     "ALTER TABLE agent.investigations ADD COLUMN IF NOT EXISTS decision_reason VARCHAR",
     "ALTER TABLE agent.investigations ADD COLUMN IF NOT EXISTS decided_by VARCHAR",
     "ALTER TABLE agent.investigations ADD COLUMN IF NOT EXISTS decided_at TIMESTAMPTZ",
+    # Phase 10c: NULL for DataCo, the onboarded dataset's id otherwise.
+    "ALTER TABLE agent.investigations ADD COLUMN IF NOT EXISTS dataset_id VARCHAR",
     f"""
     CREATE TABLE IF NOT EXISTS agent.actions (
         action_id VARCHAR PRIMARY KEY,

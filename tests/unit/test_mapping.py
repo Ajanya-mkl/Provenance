@@ -17,7 +17,7 @@ from provenance.datasets import contract, mapping_store, registry
 from provenance.datasets import map as map_cli
 from provenance.datasets.eval.run import load_cases, score
 from provenance.datasets.heuristic_mapper import heuristic_mapping
-from provenance.datasets.mapping_agent import propose_mapping
+from provenance.datasets.mapping_agent import escalation_reasons, propose_mapping
 from provenance.datasets.onboard import PROJECT_ROOT, Paths, onboard
 from provenance.datasets.validator import MappingInvalid, load_context, validate
 
@@ -133,12 +133,67 @@ def test_validator_rejects(context, changes, message):
     assert any(message in error for error in result.errors), result.errors
 
 
-def test_inverted_polarity_is_accepted_and_value_words_normalise(context):
-    for late_when in ("false", False, "no"):
+def test_inverted_polarity_is_accepted(context):
+    for late_when in ("false", False, "FALSE"):
         mapping = _with(outcome={"kind": "late_flag", "col": "on_time", "late_when": late_when})
         result = validate(mapping, context)
         assert result.ok, result.errors
         assert result.mapping["outcome"]["late_when"] == "false"
+
+
+@pytest.fixture
+def flags_context(tmp_path):
+    """Late flags spelled Y/N, 0/1 and yes/no."""
+    rows = ["supplier,order_date,late_yn,late_01,on_time_answer"]
+    for i in range(60):
+        late = i % 3 == 0
+        rows.append(
+            f"S{i % 4},2023-01-{1 + i % 28:02d},{'Y' if late else 'N'},{int(late)},"
+            f"{'no' if late else 'yes'}"
+        )
+    csv_path = tmp_path / "flags.csv"
+    csv_path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    paths = Paths(tmp_path / "w.duckdb", tmp_path / "datasets", tmp_path / "quarantine")
+    result = onboard(csv_path, "flags", paths=paths)
+    assert result.status == "gated", result.problems
+    return load_context(paths.db_path, result.dataset_id)
+
+
+@pytest.mark.parametrize(
+    ("col", "given", "expected"),
+    [
+        ("late_yn", "Y", "true"),
+        ("on_time_answer", "no", "false"),
+        ("on_time_answer", "NO", "false"),
+        ("late_01", "1", "true"),
+        ("late_01", "true", "true"),
+    ],
+)
+def test_late_when_given_as_a_column_value_is_normalised(flags_context, col, given, expected):
+    mapping = {
+        "entity": "supplier",
+        "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
+        "outcome": {"kind": "late_flag", "col": col, "late_when": given},
+    }
+    result = validate(mapping, flags_context)
+
+    assert result.ok, result.errors
+    assert result.mapping["outcome"]["late_when"] == expected
+
+
+@pytest.mark.parametrize(
+    ("col", "given"), [("late_yn", "yes"), ("late_01", "N"), ("on_time_answer", "0")]
+)
+def test_late_when_that_is_not_a_value_of_the_column_is_rejected(flags_context, col, given):
+    mapping = {
+        "entity": "supplier",
+        "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
+        "outcome": {"kind": "late_flag", "col": col, "late_when": given},
+    }
+    result = validate(mapping, flags_context)
+
+    assert not result.ok
+    assert any("is not a value of" in error for error in result.errors), result.errors
 
 
 def test_null_required_field_is_valid_but_not_mappable(context):
@@ -167,8 +222,13 @@ def test_scoreable_rule_with_synthetic_counts():
 # --- heuristic --------------------------------------------------------------------
 
 
+HARD_CASES = ("h_abbreviated", "i_mixed_languages", "j_misleading_date", "k_hours")
+
+
 @pytest.mark.parametrize("case", load_cases(), ids=lambda case: case["case_id"])
-def test_heuristic_gets_every_expected_field_on_the_fixtures(case, tmp_path):
+def test_heuristic_on_the_fixtures(case, tmp_path):
+    """Original cases: every field right. Hard cases (written to beat the heuristic): a
+    required field it gets wrong must make heuristic-first ask the agent."""
     paths = Paths(tmp_path / "w.duckdb", tmp_path / "datasets", tmp_path / "quarantine")
     result = onboard(PROJECT_ROOT / case["fixture"], case["case_id"], paths=paths)
     context = load_context(paths.db_path, result.dataset_id)
@@ -177,7 +237,12 @@ def test_heuristic_gets_every_expected_field_on_the_fixtures(case, tmp_path):
 
     assert validation.ok, validation.errors
     marks = score(mapping, validation.mappable.ok, case["expected"])
-    assert all(marks.values()), marks
+    if case["case_id"] not in HARD_CASES:
+        assert all(marks.values()), marks
+        return
+    wrong_required = [f for f in ("entity", "event_date", "outcome") if not marks.get(f, True)]
+    if wrong_required:
+        assert escalation_reasons(context), (case["case_id"], wrong_required)
 
 
 # --- agent ------------------------------------------------------------------------
@@ -185,7 +250,7 @@ def test_heuristic_gets_every_expected_field_on_the_fixtures(case, tmp_path):
 
 def test_agent_answer_that_validates_is_kept_with_tokens(context):
     llm = ScriptedLLM([_tools("get_contract", "get_dataset_profile"), _answer(GOOD)])
-    proposal = propose_mapping(context, llm_factory=lambda: llm)
+    proposal = propose_mapping(context, llm_factory=lambda: llm, mode="agent")
 
     assert proposal.source == "agent" and not proposal.attempts
     assert (proposal.prompt_tokens, proposal.completion_tokens) == (300, 60)
@@ -195,7 +260,7 @@ def test_agent_answer_that_validates_is_kept_with_tokens(context):
 def test_agent_gets_one_retry_with_the_validator_message(context):
     bad = _with(entity="unit_price")
     llm = ScriptedLLM([_tools("get_dataset_profile"), _answer(bad), _answer(GOOD)])
-    proposal = propose_mapping(context, llm_factory=lambda: llm)
+    proposal = propose_mapping(context, llm_factory=lambda: llm, mode="agent")
 
     assert proposal.source == "agent" and len(proposal.attempts) == 1
     retry_prompt = llm.sent[-1][-1]["content"]
@@ -205,7 +270,7 @@ def test_agent_gets_one_retry_with_the_validator_message(context):
 def test_two_failures_fall_back_to_the_heuristic(context):
     bad = _with(country="supplier_code")
     llm = ScriptedLLM([_answer(bad), _answer(bad)])
-    proposal = propose_mapping(context, llm_factory=lambda: llm)
+    proposal = propose_mapping(context, llm_factory=lambda: llm, mode="agent")
 
     assert proposal.source == "heuristic"
     assert len(proposal.attempts) == 2 and "twice" in proposal.fallback_reason
@@ -215,7 +280,7 @@ def test_two_failures_fall_back_to_the_heuristic(context):
 
 def test_unreachable_llm_falls_back(context):
     llm = ScriptedLLM([LLMError("rate limited after retries")])
-    proposal = propose_mapping(context, llm_factory=lambda: llm)
+    proposal = propose_mapping(context, llm_factory=lambda: llm, mode="agent")
 
     assert proposal.source == "heuristic" and "LLMError" in proposal.fallback_reason
 
@@ -232,7 +297,7 @@ def test_no_text_values_are_sent_to_the_model_by_default(context):
         llm.replies[0].tool_calls[1] = ToolCall(
             "c9", "get_column_profile", '{"column": "supplier_code"}'
         )
-        propose_mapping(context, llm_factory=lambda: llm, sample_values=sample_values)
+        propose_mapping(context, llm_factory=lambda: llm, mode="agent", sample_values=sample_values)
         return json.dumps(llm.sent)
 
     default = sent_text(False)
@@ -429,3 +494,82 @@ def test_api_lock_returns_409(client, clean_id, monkeypatch):
         f"/api/datasets/{clean_id}/mapping/propose", json={"by": "Ajanya", "heuristic_only": True}
     )
     assert response.status_code == 409
+
+
+# --- Phase 10c: heuristic-first, human confidence, cancelled ----------------------
+
+
+def _never_called():
+    raise AssertionError("the agent must not be asked when the heuristic is confident")
+
+
+def test_heuristic_first_keeps_a_confident_heuristic_without_calling_the_agent(context):
+    proposal = propose_mapping(context, llm_factory=_never_called)
+
+    assert proposal.decided_by == "heuristic" and proposal.source == "heuristic"
+    assert proposal.escalation_reasons == [] and proposal.prompt_tokens == 0
+
+
+def test_heuristic_first_asks_the_agent_when_a_required_field_is_unmapped(db, template):
+    context = load_context(db, template["marks"])
+    marks_answer = {
+        "entity": None,
+        "event_date": {"col": "exam_date", "format": "%d/%m/%Y"},
+        "outcome": None,
+        "notes": "student marks, not shipments",
+    }
+    llm = ScriptedLLM([_answer(marks_answer)])
+    proposal = propose_mapping(context, llm_factory=lambda: llm)
+
+    assert proposal.decided_by == "agent"
+    assert "heuristic left entity unmapped" in proposal.escalation_reasons
+    assert not proposal.validation.mappable.ok
+
+
+def test_heuristic_first_asks_the_agent_below_the_confidence_threshold(context):
+    llm = ScriptedLLM([_answer(GOOD)])
+    proposal = propose_mapping(context, llm_factory=lambda: llm, threshold=0.99)
+
+    assert proposal.decided_by == "agent"
+    assert any("below 0.99" in reason for reason in proposal.escalation_reasons)
+
+
+def test_heuristic_first_records_a_fallback_as_its_own_path(context):
+    bad = _with(country="supplier_code")
+    llm = ScriptedLLM([_answer(bad), _answer(bad)])
+    proposal = propose_mapping(context, llm_factory=lambda: llm, threshold=0.99)
+
+    assert proposal.decided_by == "heuristic_fallback" and proposal.source == "heuristic"
+
+
+def test_the_decision_path_is_stored_with_the_proposal(db, clean_id, context):
+    proposal = propose_mapping(context, llm_factory=_never_called)
+    mapping_id = mapping_store.record_proposal(db, clean_id, proposal, created_by="heuristic")
+
+    record = mapping_store.get_mapping(db, mapping_id)
+    assert record["validation"]["decided_by"] == "heuristic"
+    assert "decided by path: heuristic" in map_cli.render_mapping(record)
+
+
+def test_a_human_edit_has_no_confidence_and_says_so(db, clean_id, context):
+    first = mapping_store.record_proposal(
+        db, clean_id, propose_mapping(context, heuristic_only=True), created_by="heuristic"
+    )
+    new_id, _ = mapping_store.edit(db, first, {"country": None}, by="Ajanya")
+    record = mapping_store.get_mapping(db, new_id)
+
+    assert record["proposal"]["confidence"] is None
+    assert record["validation"]["decided_by"] == "human"
+    rendered = map_cli.render_mapping(record)
+    assert "human-edited (no model confidence)" in rendered and "confidence None" not in rendered
+
+
+def test_cancelled_must_name_a_value_the_column_contains(context):
+    ok = validate(_with(cancelled={"col": "on_time", "value": "true"}), context)
+    missing = validate(_with(cancelled={"col": "on_time", "value": "Shipping canceled"}), context)
+    malformed = validate(_with(cancelled={"col": "on_time"}), context)
+
+    assert ok.ok, ok.errors
+    assert any("would mark nothing" in error for error in missing.errors)
+    assert any("cancelled must be null" in error for error in malformed.errors)
+    assert ("cancelled", "on_time") in contract.used_columns(ok.mapping)

@@ -32,7 +32,11 @@ def render_mapping(record: dict[str, Any]) -> str:
     lines = [
         f"Mapping {record['mapping_id']} (version {record['version']}, source "
         f"{record['source']}, status {record['status']})",
-        f"  confidence {mapping.get('confidence')}"
+        (
+            "  human-edited (no model confidence)"
+            if record["source"] == "human"
+            else f"  confidence {mapping.get('confidence')}"
+        )
         + (
             f"; tokens {record['prompt_tokens']}+{record['completion_tokens']}"
             if record.get("prompt_tokens")
@@ -47,6 +51,10 @@ def render_mapping(record: dict[str, Any]) -> str:
     if mapping.get("notes"):
         lines.append(f"  notes: {mapping['notes']}")
     validation = record["validation"]
+    if validation.get("decided_by"):
+        lines.append(f"  decided by path: {validation['decided_by']}")
+    for reason in validation.get("escalation_reasons") or []:
+        lines.append(f"  agent asked because: {reason}")
     if validation.get("fallback_reason"):
         lines.append(f"  fell back to the heuristic: {validation['fallback_reason']}")
     for errors in validation.get("agent_attempt_errors") or []:
@@ -69,6 +77,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("dataset_id", nargs="?")
     parser.add_argument("--heuristic-only", action="store_true")
+    parser.add_argument(
+        "--mode",
+        choices=("heuristic_first", "agent", "heuristic"),
+        default="heuristic_first",
+        help="heuristic_first (default) asks the agent only when the heuristic is unsure",
+    )
     parser.add_argument("--sample-values", action="store_true", help="let the agent see 5 values")
     parser.add_argument("--show", action="store_true", help="list this dataset's mappings")
     action = parser.add_mutually_exclusive_group()
@@ -109,6 +123,7 @@ def main(argv: list[str] | None = None) -> int:
             context,
             llm_factory=None if args.heuristic_only else _llm_factory,
             heuristic_only=args.heuristic_only,
+            mode=args.mode,
             sample_values=args.sample_values,
         )
         mapping_id = mapping_store.record_proposal(

@@ -5,9 +5,18 @@
     "description": "DataCo-like, renamed English columns, planned vs real transit days",
     "expected": {
       "entity": "Product Category",
-      "event_date": {"col": "Order Placed", "format": "%m/%d/%Y %H:%M"},
-      "outcome": [{"kind": "days_pair", "scheduled_col": "Planned Transit Days",
-                   "actual_col": "Real Transit Days", "unit": "days"}],
+      "event_date": {
+        "col": "Order Placed",
+        "format": "%m/%d/%Y %H:%M"
+      },
+      "outcome": [
+        {
+          "kind": "days_pair",
+          "scheduled_col": "Planned Transit Days",
+          "actual_col": "Real Transit Days",
+          "unit": "days"
+        }
+      ],
       "country": "Ship To Country",
       "mappable": true
     }
@@ -18,8 +27,17 @@
     "description": "Spanish column names, delay in hours, day-first dates",
     "expected": {
       "entity": "proveedor",
-      "event_date": {"col": "fecha_pedido", "format": "%d/%m/%Y"},
-      "outcome": [{"kind": "delay_value", "col": "retraso_horas", "unit": "hours"}],
+      "event_date": {
+        "col": "fecha_pedido",
+        "format": "%d/%m/%Y"
+      },
+      "outcome": [
+        {
+          "kind": "delay_value",
+          "col": "retraso_horas",
+          "unit": "hours"
+        }
+      ],
       "country": "pais_destino",
       "mappable": true
     }
@@ -30,8 +48,17 @@
     "description": "ISO dates and an on-time flag (inverted polarity)",
     "expected": {
       "entity": "vendor_name",
-      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
-      "outcome": [{"kind": "late_flag", "col": "delivered_on_time", "late_when": "false"}],
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": [
+        {
+          "kind": "late_flag",
+          "col": "delivered_on_time",
+          "late_when": "false"
+        }
+      ],
       "country": "ship_country",
       "mappable": true
     }
@@ -42,8 +69,17 @@
     "description": "0/1 late flag only, category entity, no country",
     "expected": {
       "entity": "category",
-      "event_date": {"col": "shipped_on", "format": "%Y-%m-%d"},
-      "outcome": [{"kind": "late_flag", "col": "is_late", "late_when": "true"}],
+      "event_date": {
+        "col": "shipped_on",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": [
+        {
+          "kind": "late_flag",
+          "col": "is_late",
+          "late_when": "true"
+        }
+      ],
       "country": null,
       "mappable": true
     }
@@ -54,9 +90,18 @@
     "description": "Ambiguous: order and delivery dates, promised and actual day counts",
     "expected": {
       "entity": "supplier",
-      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
-      "outcome": [{"kind": "days_pair", "scheduled_col": "promised_days",
-                   "actual_col": "actual_days", "unit": "days"}],
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": [
+        {
+          "kind": "days_pair",
+          "scheduled_col": "promised_days",
+          "actual_col": "actual_days",
+          "unit": "days"
+        }
+      ],
       "country": "country",
       "mappable": true
     }
@@ -65,7 +110,13 @@
     "case_id": "f_not_supply_chain",
     "fixture": "tests/fixtures/datasets/student_marks.csv",
     "description": "Student marks (10a fixture): not a shipment dataset",
-    "expected": {"entity": null, "outcome": [null], "mappable": false}
+    "expected": {
+      "entity": null,
+      "outcome": [
+        null
+      ],
+      "mappable": false
+    }
   },
   {
     "case_id": "g_clean_10a",
@@ -73,10 +124,109 @@
     "description": "10a clean fixture: delay_days and an on_time flag both describe lateness",
     "expected": {
       "entity": "supplier_code",
-      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
-      "outcome": [{"kind": "delay_value", "col": "delay_days", "unit": "days"},
-                  {"kind": "late_flag", "col": "on_time", "late_when": "false"}],
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": [
+        {
+          "kind": "delay_value",
+          "col": "delay_days",
+          "unit": "days"
+        },
+        {
+          "kind": "late_flag",
+          "col": "on_time",
+          "late_when": "false"
+        }
+      ],
       "country": "destination_country",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "h_abbreviated",
+    "fixture": "tests/fixtures/datasets/mapping/h_abbreviated.csv",
+    "description": "Abbreviated names: vndr_cd, dt_ord, dt_shp, sch_lt, act_lt, dest_ctry",
+    "expected": {
+      "entity": "vndr_cd",
+      "event_date": {
+        "col": "dt_ord",
+        "format": "%Y%m%d"
+      },
+      "outcome": [
+        {
+          "kind": "days_pair",
+          "scheduled_col": "sch_lt",
+          "actual_col": "act_lt",
+          "unit": "days"
+        }
+      ],
+      "country": "dest_ctry",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "i_mixed_languages",
+    "fixture": "tests/fixtures/datasets/mapping/i_mixed_languages.csv",
+    "description": "Mixed languages: Lieferant (DE), fecha_envio (ES), retard_jours (FR), Zielland (DE)",
+    "expected": {
+      "entity": "Lieferant",
+      "event_date": {
+        "col": "fecha_envio",
+        "format": "%d.%m.%Y"
+      },
+      "outcome": [
+        {
+          "kind": "delay_value",
+          "col": "retard_jours",
+          "unit": "days"
+        }
+      ],
+      "country": "Zielland",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "j_misleading_date",
+    "fixture": "tests/fixtures/datasets/mapping/j_misleading_date.csv",
+    "description": "Misleading name: 'delivery_date' holds the order date (always the earlier date)",
+    "expected": {
+      "entity": "supplier",
+      "event_date": {
+        "col": "delivery_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": [
+        {
+          "kind": "delay_value",
+          "col": "delay_days",
+          "unit": "days"
+        }
+      ],
+      "country": "country",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "k_hours",
+    "fixture": "tests/fixtures/datasets/mapping/k_hours.csv",
+    "description": "Planned and actual transit in hours, US dates, ISO2 country codes",
+    "expected": {
+      "entity": "Supplier Name",
+      "event_date": {
+        "col": "Ship Date",
+        "format": "%m/%d/%Y"
+      },
+      "outcome": [
+        {
+          "kind": "days_pair",
+          "scheduled_col": "transit_hrs_planned",
+          "actual_col": "transit_hrs_actual",
+          "unit": "hours"
+        }
+      ],
+      "country": "Country Code",
       "mappable": true
     }
   }

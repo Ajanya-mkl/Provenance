@@ -97,6 +97,21 @@ _DDL = (
         UNIQUE (dataset_id, version)
     )
     """,
+    # Scoring rules frozen at a dataset's first scoring (Phase 10c): normalisation
+    # bounds, effective weights and which factors were left out. A later scoring
+    # reuses the latest version; only an explicit refreeze adds a new one.
+    """
+    CREATE TABLE IF NOT EXISTS meta.dataset_rules (
+        dataset_id VARCHAR NOT NULL,
+        version INTEGER NOT NULL,
+        rules_version VARCHAR NOT NULL,
+        bounds_mode VARCHAR NOT NULL CHECK (bounds_mode IN ('dataset', 'flagship')),
+        mapping_id VARCHAR NOT NULL,
+        rules JSON NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL,
+        PRIMARY KEY (dataset_id, version)
+    )
+    """,
 )
 
 
@@ -319,3 +334,54 @@ def get_dataset(db_path: str | Path, dataset_id: str) -> dict[str, Any] | None:
             dict(zip(names, values, strict=True)) for values in columns.fetchall()
         ]
     return dataset
+
+
+def frozen_rules(connection: duckdb.DuckDBPyConnection, dataset_id: str) -> dict[str, Any] | None:
+    """The latest frozen rules for a dataset, or None before its first scoring."""
+    row = connection.execute(
+        """
+        SELECT version, rules_version, bounds_mode, mapping_id, rules, created_at
+        FROM meta.dataset_rules WHERE dataset_id = ? ORDER BY version DESC LIMIT 1
+        """,
+        [dataset_id],
+    ).fetchone()
+    if row is None:
+        return None
+    version, rules_version, bounds_mode, mapping_id, rules, created_at = row
+    return {
+        "version": version,
+        "rules_version": rules_version,
+        "bounds_mode": bounds_mode,
+        "mapping_id": mapping_id,
+        "rules": json.loads(rules) if isinstance(rules, str) else rules,
+        "created_at": created_at,
+    }
+
+
+def freeze_rules(
+    connection: duckdb.DuckDBPyConnection,
+    dataset_id: str,
+    *,
+    version: int,
+    rules_version: str,
+    bounds_mode: str,
+    mapping_id: str,
+    rules: dict[str, Any],
+) -> None:
+    """Append a frozen rules version (never updates an earlier one)."""
+    connection.execute(
+        """
+        INSERT INTO meta.dataset_rules
+            (dataset_id, version, rules_version, bounds_mode, mapping_id, rules, created_at)
+        VALUES (?, ?, ?, ?, ?, ?::JSON, ?)
+        """,
+        [
+            dataset_id,
+            version,
+            rules_version,
+            bounds_mode,
+            mapping_id,
+            json.dumps(rules, default=str, sort_keys=True),
+            _now(),
+        ],
+    )

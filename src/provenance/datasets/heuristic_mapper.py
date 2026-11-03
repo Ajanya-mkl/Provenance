@@ -124,7 +124,13 @@ def _bool_like(context: DatasetContext, name: str) -> bool:
 
 
 def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
+    return heuristic_assessment(context)[0]
+
+
+def heuristic_assessment(context: DatasetContext) -> tuple[dict[str, Any], list[str]]:
+    """The heuristic mapping plus the places where two candidates were equally good."""
     columns = context.columns
+    close: list[str] = []
     order = list(columns)
     used: set[str] = set()
     evidence: dict[str, list[str]] = {}
@@ -152,6 +158,9 @@ def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
             ),
         )
         best = ranked[0]
+        rank = lambda n: _score(n, DATE_WORDS) - 2 * has_word(n, LATE_DATE_WORDS)  # noqa: E731
+        if len(ranked) > 1 and rank(ranked[1]) == rank(best):
+            close.append(f"event_date: {best!r} and {ranked[1]!r} rank equally")
         event_date = {"col": best, "format": columns[best]["date_format"]}
         used.add(best)
         evidence["event_date"] = [
@@ -173,6 +182,13 @@ def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
     entity = None
     if entity_candidates:
         entity = max(entity_candidates, key=lambda n: (_score(n, ENTITY_WORDS), -order.index(n)))
+        rivals = [
+            n
+            for n in entity_candidates
+            if n != entity and _score(n, ENTITY_WORDS) == _score(entity, ENTITY_WORDS)
+        ]
+        if rivals:
+            close.append(f"entity: {entity!r} and {rivals[0]!r} rank equally")
         used.add(entity)
         evidence["entity"] = [f"inferred_type={columns[entity]['inferred_type']}",
                               *_fact(columns[entity], "distinct_count", "null_pct")]  # fmt: skip
@@ -203,6 +219,11 @@ def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
         ),
         None,
     )
+    delays = [
+        n for n in free if numeric(n) and has_word(n, LATE_WORDS) and not has_word(n, ON_TIME_WORDS)
+    ]
+    if not (scheduled and actual) and len(delays) > 1:
+        close.append(f"outcome: {delays[0]!r} and {delays[1]!r} both look like delays")
     if scheduled and actual:
         unit = (
             "hours" if has_word(scheduled, HOUR_WORDS) or has_word(actual, HOUR_WORDS) else "days"
@@ -254,7 +275,7 @@ def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
 
     required_found = sum(value is not None for value in (entity, event_date, outcome))
     confidence = round(sum(confidences) / 3, 2) if required_found else 0.0
-    return {
+    mapping = {
         "entity": entity,
         "event_date": event_date,
         "outcome": outcome,
@@ -263,3 +284,4 @@ def heuristic_mapping(context: DatasetContext) -> dict[str, Any]:
         "confidence": confidence,
         "notes": "; ".join(notes) if notes else "matched by column names and profiled types",
     }
+    return mapping, close

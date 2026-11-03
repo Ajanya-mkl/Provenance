@@ -1,0 +1,97 @@
+{
+  "key": "d6584debd9f45a36137b14125c1a6d09e7addaff70bd02474cac6f99eef113bb",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "decided_by": "agent",
+    "mapping": {
+      "entity": "Lieferant",
+      "event_date": {
+        "col": "fecha_envio",
+        "format": "%d.%m.%Y"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "retard_jours",
+        "unit": "days"
+      },
+      "country": "Zielland",
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "min_length=8",
+          "max_length=12"
+        ],
+        "event_date": [
+          "date_format=%d.%m.%Y",
+          "distinct_count=76",
+          "min_value=2023-04-01",
+          "max_value=2023-06-15"
+        ],
+        "outcome": [
+          "col=retard_jours",
+          "inferred_type=int",
+          "min_value=-2",
+          "max_value=8"
+        ],
+        "country": [
+          "distinct_count=4",
+          "min_length=7",
+          "max_length=11"
+        ]
+      },
+      "confidence": 0.97,
+      "notes": "",
+      "cancelled": null
+    },
+    "first_answer": {
+      "entity": "Lieferant",
+      "event_date": {
+        "col": "fecha_envio",
+        "format": "%d.%m.%Y"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "retard_jours",
+        "unit": "days"
+      },
+      "country": "Zielland",
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "min_length=8",
+          "max_length=12"
+        ],
+        "event_date": [
+          "date_format=%d.%m.%Y",
+          "distinct_count=76",
+          "min_value=2023-04-01",
+          "max_value=2023-06-15"
+        ],
+        "outcome": [
+          "col=retard_jours",
+          "inferred_type=int",
+          "min_value=-2",
+          "max_value=8"
+        ],
+        "country": [
+          "distinct_count=4",
+          "min_length=7",
+          "max_length=11"
+        ]
+      },
+      "confidence": 0.97,
+      "notes": "",
+      "cancelled": null
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'Lieferant', event_date 'fecha_envio' and a delay_value outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 5837,
+    "completion_tokens": 1544,
+    "latency_s": 52.804,
+    "steps": 6
+  }
+}

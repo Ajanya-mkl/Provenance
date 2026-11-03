@@ -368,3 +368,45 @@ exposes the same under `/api/datasets/{id}/mapping`.
 - **Evaluation**: `python -m provenance.datasets.eval.run [--limit N]
   [--fresh]` runs both mappers on synthetic fixtures in temporary databases;
   results are in `docs/mapping_evaluation.md`.
+
+## Phase 10c-1: silver, metrics, scores and flags for a dataset
+
+`python -m provenance.datasets.score <dataset_id> [--bounds-mode dataset|flagship]
+[--refreeze]` (or the Dagster op job `score_dataset`, run config `dataset_id`,
+`duckdb_writer` tag, lock retry) scores one dataset. It refuses unless the
+dataset is `mapped` and its approved mapping is scoreable, and while a flagship
+restore point exists. Everything after that is one transaction on one connection:
+
+- **Canonical silver** (`build_silver.py`): `ds_<id>.silver_shipments`
+  (entity_key, entity_name, event_date, quarter, is_late, delay_days,
+  is_cancelled, country_iso3, _batch_id) from `bronze_raw` and the approved
+  mapping. Fixed SQL template; column names only from the validated mapping,
+  quoted against the profile; every value (format, polarity words, cancelled
+  value, null tokens, the hours divisor) bound. Rows that do not parse go to
+  `silver_rejects` with a reason. The contract gained one optional field,
+  `cancelled: {col, value}`: cancelled rows count as shipments but not toward
+  late rate or delay, as the flagship treats DataCo's "Shipping canceled".
+- **Country** (`country.py`): the flagship's Spanish seed (exact spelling first),
+  then ISO3, ISO2 and names (seed English names, World Bank names, aliases),
+  never World Bank aggregates. Below `--min-country-match` (default 80% of rows)
+  or without a country column or LPI, country risk is left out.
+- **Metrics and mart** (`metrics.py`): `int_supplier_quarter_metrics` and
+  `mart_supplier_risk` rewritten over the canonical table with the same
+  definitions, thresholds read from `dbt_project.yml` vars.
+- **Bounds** (`meta.dataset_rules`): 5th/95th percentile of each metric over the
+  dataset's eligible rows, frozen at its first scoring (rules version
+  `<rules.yaml version>-ds<n>`) and reused until `--refreeze`, so adding rows
+  does not move them. `bounds_mode=flagship` uses rules.yaml's bounds. **Scores
+  are comparable within one dataset only.** A factor the dataset cannot provide
+  is left out: remaining weights renormalised, confidence `low`, and an
+  `excluded` entry with the reason in `contributing_factors`.
+- **Scorer** (`risk_engine/scorer.py`): the flagship's tiering, hysteresis,
+  payload hashing, superseding and resolving, parameterised by a `FlagTarget`.
+  Dataset events are `ds_<id>:risk_flag:<rules>:<quarter>:<entity>` from source
+  `dataset_risk_engine`, so neither path can supersede or resolve the other's
+  events; DataCo ids and tables are unchanged. The investigation tools take an
+  optional `dataset_id` (derived from the event id), and
+  `agent.investigations.dataset_id` records it.
+- **Equivalence**: `tests/integration/test_dataco_equivalence.py` maps DataCo
+  through the contract on a copy of the warehouse and checks that the generic
+  path reproduces the flagship's mart, scores (within 1e-9), tiers and flags.

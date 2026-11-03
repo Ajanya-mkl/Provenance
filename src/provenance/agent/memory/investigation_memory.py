@@ -20,9 +20,16 @@ MAX_REASON_CHARS = 200
 
 
 def recall_past_investigations(
-    connection: duckdb.DuckDBPyConnection, supplier_key: str, limit: int
+    connection: duckdb.DuckDBPyConnection,
+    supplier_key: str,
+    limit: int,
+    dataset_id: str | None = None,
 ) -> list[dict[str, Any]]:
-    """Latest grounded investigation per earlier event for one supplier."""
+    """Latest grounded investigation per earlier event for one supplier.
+
+    DataCo (dataset_id None) recalls only DataCo events; a dataset recalls only
+    its own ('ds_<id>:' events), so a key shared by two datasets never mixes.
+    """
     if not table_exists(connection, "agent", "investigations"):
         return []
     has_actions = table_exists(connection, "agent", "actions")
@@ -64,13 +71,17 @@ def recall_past_investigations(
         WHERE investigations.grounded
           AND investigations.status = 'proposed'
           AND json_extract_string(events.payload, '$.supplier_key') = ?
+          AND (
+              (CAST(? AS VARCHAR) IS NULL AND NOT starts_with(events.event_id, 'ds_'))
+              OR starts_with(events.event_id, 'ds_' || CAST(? AS VARCHAR) || ':')
+          )
         QUALIFY row_number() OVER (
             PARTITION BY investigations.event_id ORDER BY investigations.created_at DESC
         ) = 1
         ORDER BY quarter DESC
         LIMIT ?
         """,
-        [supplier_key, limit],
+        [supplier_key, dataset_id, dataset_id, limit],
     ).fetchall()
     return [
         {

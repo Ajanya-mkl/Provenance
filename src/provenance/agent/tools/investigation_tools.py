@@ -3,6 +3,11 @@
 Every tool runs fixed, parameterised SQL on a read-only DuckDB connection; the
 model only supplies arguments. Results are small, rounded, supplier-category
 aggregates. Bad or unknown arguments return {"error": ...} instead of raising.
+
+The tools read DataCo (the flagship) by default. Given a dataset_id (Phase 10c)
+they read that onboarded dataset's ds_<id> tables instead: risk_score, mart_risk
+and silver_shipments. A dataset has no SCD2 dimension (history is its scored
+quarters) and no market column (get_market_mix explains that).
 """
 
 from __future__ import annotations
@@ -18,6 +23,9 @@ import duckdb
 
 from provenance.agent.memory.investigation_memory import MAX_RECALL, recall_past_investigations
 from provenance.db import connect_read_only
+
+DATASET_EVENT_PATTERN = re.compile(r"^ds_([0-9a-f]{12}):")
+DATASET_ID_PATTERN = re.compile(r"^[0-9a-f]{12}$")
 
 DECIMALS = 3
 EVENT_ID_PATTERN = re.compile(r"^[A-Za-z0-9_.:\-]{1,128}$")
@@ -54,6 +62,30 @@ def quarter_label(quarter: date) -> str:
     return f"{quarter.year}-Q{(quarter.month - 1) // 3 + 1}"
 
 
+def dataset_id_for_event(event_id: str) -> str | None:
+    """'ds_<id>:risk_flag:...' -> '<id>'; None for a DataCo event."""
+    match = DATASET_EVENT_PATTERN.match(event_id or "")
+    return match[1] if match else None
+
+
+class _Tables:
+    """Fixed table and column names for one scoring path (never user input)."""
+
+    def __init__(self, dataset_id: str | None) -> None:
+        self.dataset_id = dataset_id
+        if dataset_id is None:
+            self.scores, self.mart = "gold.supplier_risk_score", "gold.mart_supplier_risk"
+            self.shipments, self.key = "silver.fact_shipments", "supplier_key"
+            self.date, self.country = "order_date", "order_country_iso3"
+        else:
+            if not DATASET_ID_PATTERN.match(dataset_id):
+                raise ValueError("dataset ids are 12 lowercase hex characters")
+            schema = f'"ds_{dataset_id}"'
+            self.scores, self.mart = f"{schema}.risk_score", f"{schema}.mart_risk"
+            self.shipments, self.key = f"{schema}.silver_shipments", "entity_key"
+            self.date, self.country = "event_date", "country_iso3"
+
+
 def _previous_quarter(quarter: date) -> date:
     return (
         date(quarter.year - 1, 10, 1)
@@ -70,8 +102,10 @@ class InvestigationTools:
     writer while any reader is open, and the reverse).
     """
 
-    def __init__(self, db_path: str | Path) -> None:
+    def __init__(self, db_path: str | Path, dataset_id: str | None = None) -> None:
         self._db_path = db_path
+        self.dataset_id = dataset_id
+        self._tables = _Tables(dataset_id)
         self._open: duckdb.DuckDBPyConnection | None = None
         self._handlers: dict[str, Callable[..., dict[str, Any]]] = {
             "get_flag": self.get_flag,
@@ -131,10 +165,11 @@ class InvestigationTools:
     def _check_supplier(self, supplier_key: Any) -> str | None:
         if not isinstance(supplier_key, str) or not SUPPLIER_KEY_PATTERN.match(supplier_key):
             return "supplier_key must be a lowercase key such as cat_golf_balls"
-        found = self._connection.execute(
-            "SELECT 1 FROM silver.dim_supplier_scd2 WHERE supplier_key = ? LIMIT 1",
-            [supplier_key],
-        ).fetchone()
+        if self.dataset_id is None:
+            sql = "SELECT 1 FROM silver.dim_supplier_scd2 WHERE supplier_key = ? LIMIT 1"
+        else:
+            sql = f"SELECT 1 FROM {self._tables.scores} WHERE entity_key = ? LIMIT 1"
+        found = self._connection.execute(sql, [supplier_key]).fetchone()
         return None if found else f"unknown supplier {supplier_key!r}"
 
     def _check_supplier_quarter(
@@ -145,8 +180,9 @@ class InvestigationTools:
         parsed = parse_quarter(quarter)
         if parsed is None:
             return None, "quarter must look like 2017-Q1 or 2017-01-01"
+        tables = self._tables
         scored = self._connection.execute(
-            "SELECT 1 FROM gold.supplier_risk_score WHERE supplier_key = ? AND quarter = ?",
+            f"SELECT 1 FROM {tables.scores} WHERE {tables.key} = ? AND quarter = ?",
             [supplier_key, parsed],
         ).fetchone()
         if not scored:
@@ -174,6 +210,8 @@ class InvestigationTools:
         event_type, status, payload = row
         if event_type != "risk_flag":
             return _error(f"event {event_id!r} is a {event_type}, not a risk_flag")
+        if dataset_id_for_event(event_id) != self.dataset_id:
+            return _error(f"event {event_id!r} belongs to a different dataset")
         payload = json.loads(payload) if isinstance(payload, str) else payload
         factor = payload.get("top_contributing_factor") or {}
         quarter = parse_quarter(str(payload.get("quarter")))
@@ -199,6 +237,8 @@ class InvestigationTools:
     def get_supplier_history(self, supplier_key: Any) -> dict[str, Any]:
         if problem := self._check_supplier(supplier_key):
             return _error(problem)
+        if self.dataset_id is not None:
+            return self._dataset_history(supplier_key)
         rows = self._connection.execute(
             """
             SELECT supplier_name, version_number, delivery_band, volume_band,
@@ -226,34 +266,60 @@ class InvestigationTools:
             ],
         }
 
+    def _dataset_history(self, entity_key: str) -> dict[str, Any]:
+        """A dataset has no SCD2 dimension: its history is the tier per scored quarter."""
+        tables = self._tables
+        rows = self._connection.execute(
+            f"""
+            SELECT score.quarter, score.tier, score.score, mart.entity_name
+            FROM {tables.scores} AS score
+            LEFT JOIN {tables.mart} AS mart
+                ON mart.entity_key = score.entity_key AND mart.quarter = score.quarter
+            WHERE score.entity_key = ?
+            ORDER BY score.quarter DESC
+            LIMIT ?
+            """,
+            [entity_key, MAX_HISTORY_ROWS],
+        ).fetchall()
+        return {
+            "supplier_key": entity_key,
+            "supplier_name": rows[0][3] if rows else None,
+            "dataset_id": self.dataset_id,
+            "scored_quarters": [
+                {"quarter": quarter_label(row[0]), "tier": row[1], "score": _round(row[2])}
+                for row in rows
+            ],
+        }
+
     def get_score_breakdown(self, supplier_key: Any, quarter: Any) -> dict[str, Any]:
         parsed, problem = self._check_supplier_quarter(supplier_key, quarter)
         if problem:
             return _error(problem)
+        tables = self._tables
         score, tier, factors, confidence, rules_version = self._connection.execute(
-            """
+            f"""
             SELECT score, tier, contributing_factors, confidence, rules_version
-            FROM gold.supplier_risk_score
-            WHERE supplier_key = ? AND quarter = ?
+            FROM {tables.scores}
+            WHERE {tables.key} = ? AND quarter = ?
             """,
             [supplier_key, parsed],
         ).fetchone()
         previous = self._connection.execute(
-            """
+            f"""
             SELECT quarter, score, tier, contributing_factors
-            FROM gold.supplier_risk_score
-            WHERE supplier_key = ? AND quarter < ?
+            FROM {tables.scores}
+            WHERE {tables.key} = ? AND quarter < ?
             ORDER BY quarter DESC
             LIMIT 1
             """,
             [supplier_key, parsed],
         ).fetchone()
         metrics = self._connection.execute(
-            """
+            f"""
             SELECT shipment_count, late_rate, avg_delay_days, delay_stddev,
                    eligible_quarters_to_date, country_coverage
-            FROM gold.mart_supplier_risk
-            WHERE supplier_key = ? AND quarter = ?
+            FROM {tables.mart}
+            WHERE {tables.key} = ? AND quarter = ?
             """,
             [supplier_key, parsed],
         ).fetchone()
@@ -265,6 +331,11 @@ class InvestigationTools:
                 json.loads(previous[3]) if isinstance(previous[3], str) else previous[3]
             )
         breakdown = []
+        # A dataset may leave a factor out (no country, or no delay); say so, with why.
+        excluded = {
+            name: factor.get("reason") for name, factor in factors.items() if factor.get("excluded")
+        }
+        factors = {name: factor for name, factor in factors.items() if name not in excluded}
         for name, factor in sorted(
             factors.items(), key=lambda item: -float(item[1]["weighted_contribution"])
         ):
@@ -275,7 +346,7 @@ class InvestigationTools:
                 "weight": _round(factor["weight"]),
                 "weighted_contribution": _round(factor["weighted_contribution"]),
             }
-            if name in previous_factors:
+            if name in previous_factors and "raw_value" in previous_factors[name]:
                 entry["previous_raw_value"] = _round(previous_factors[name]["raw_value"])
             breakdown.append(entry)
 
@@ -289,6 +360,10 @@ class InvestigationTools:
             "factors": breakdown,
             "previous_scored_quarter": None,
         }
+        if excluded:
+            result["excluded_factors"] = excluded
+        if self.dataset_id is not None:
+            result["dataset_id"] = self.dataset_id
         if previous:
             result["previous_scored_quarter"] = {
                 "quarter": quarter_label(previous[0]),
@@ -310,10 +385,17 @@ class InvestigationTools:
         parsed, problem = self._check_supplier_quarter(supplier_key, quarter)
         if problem:
             return _error(problem)
+        tables = self._tables
+        if self.dataset_id is not None:
+            unused = self._connection.execute(
+                f"SELECT count(*) FROM {tables.mart} WHERE country_risk IS NOT NULL"
+            ).fetchone()[0]
+            if not unused:
+                return _error("this dataset is scored without country risk")
         # Same formula as gold.mart_supplier_risk: latest LPI at or before the
         # quarter's year, median LPI for destinations without one.
         destinations = self._connection.execute(
-            """
+            f"""
             WITH lpi AS (
                 SELECT country_iso3, lpi_score
                 FROM silver.stg_worldbank_lpi
@@ -324,12 +406,12 @@ class InvestigationTools:
             ),
             median_lpi AS (SELECT median(lpi_score) AS median_score FROM lpi),
             destinations AS (
-                SELECT order_country_iso3 AS iso3, count(*) AS shipments
-                FROM silver.fact_shipments
-                WHERE supplier_key = ?
-                  AND order_date >= ?::DATE
-                  AND order_date < ?::DATE + INTERVAL 3 MONTH
-                GROUP BY order_country_iso3
+                SELECT {tables.country} AS iso3, count(*) AS shipments
+                FROM {tables.shipments}
+                WHERE {tables.key} = ?
+                  AND {tables.date} >= ?::DATE
+                  AND {tables.date} < ?::DATE + INTERVAL 3 MONTH
+                GROUP BY {tables.country}
             )
             SELECT
                 destinations.iso3,
@@ -344,10 +426,10 @@ class InvestigationTools:
             [parsed, supplier_key, parsed, parsed],
         ).fetchall()
         trailing = self._connection.execute(
-            """
+            f"""
             SELECT country_risk, country_coverage
-            FROM gold.mart_supplier_risk
-            WHERE supplier_key = ? AND quarter = ?
+            FROM {tables.mart}
+            WHERE {tables.key} = ? AND quarter = ?
             """,
             [supplier_key, parsed],
         ).fetchone()
@@ -377,6 +459,8 @@ class InvestigationTools:
         parsed, problem = self._check_supplier_quarter(supplier_key, quarter)
         if problem:
             return _error(problem)
+        if self.dataset_id is not None:
+            return _error("market mix is DataCo-only; the shipment contract has no market column")
         previous = _previous_quarter(parsed)
         rows = self._connection.execute(
             """
@@ -418,7 +502,9 @@ class InvestigationTools:
             return _error(problem)
         if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= MAX_RECALL:
             return _error(f"limit must be an integer from 1 to {MAX_RECALL}")
-        cases = recall_past_investigations(self._connection, supplier_key, limit)
+        cases = recall_past_investigations(
+            self._connection, supplier_key, limit, dataset_id=self.dataset_id
+        )
         for case in cases:
             parsed = parse_quarter(case["quarter"])
             case["quarter"] = quarter_label(parsed) if parsed else case["quarter"]

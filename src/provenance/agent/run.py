@@ -27,7 +27,7 @@ from provenance.agent.grounding import GroundingResult, check_grounding
 from provenance.agent.llm import GroqLLM
 from provenance.agent.loop import MAX_STEPS, InvestigationResult, investigate
 from provenance.agent.store import append_audit, now, table_exists, writer
-from provenance.agent.tools.investigation_tools import InvestigationTools
+from provenance.agent.tools.investigation_tools import InvestigationTools, dataset_id_for_event
 from provenance.db import connect_read_only
 from provenance.risk_engine.scorer import DEFAULT_DB_PATH
 
@@ -112,8 +112,8 @@ def record_outcome(
             INSERT INTO agent.investigations
                 (investigation_id, event_id, report, status, grounded, grounded_ratio,
                  ungrounded_numbers, tool_calls, steps, prompt_tokens, completion_tokens,
-                 total_tokens, model, requires_approval, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 total_tokens, model, requires_approval, created_at, dataset_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             [
                 investigation_id,
@@ -131,6 +131,7 @@ def record_outcome(
                 model,
                 requires_approval,
                 now(),
+                dataset_id_for_event(result.event_id),
             ],
         )
         append_audit(
@@ -143,6 +144,7 @@ def record_outcome(
                 "grounded_ratio": grounding.grounded_ratio,
                 "ungrounded_numbers": grounding.ungrounded_numbers,
                 "model": model,
+                "dataset_id": dataset_id_for_event(result.event_id),
             },
         )
         if status == "proposed":
@@ -174,10 +176,18 @@ def run_investigation(
     db_path: str | Path,
     llm: Any,
     max_steps: int = MAX_STEPS,
+    dataset_id: str | None = None,
 ) -> tuple[InvestigationResult, GroundingResult]:
     # Tools open a read-only connection per call and close it straight after, so
     # no connection is held across the LLM loop (or when the writer opens below).
-    with InvestigationTools(db_path) as toolbox:
+    # A dataset event ('ds_<id>:...') is investigated with that dataset's tables.
+    dataset_id = dataset_id or dataset_id_for_event(event_id)
+    toolbox_for = (
+        InvestigationTools(db_path, dataset_id=dataset_id)
+        if dataset_id
+        else InvestigationTools(db_path)
+    )
+    with toolbox_for as toolbox:
         result = investigate(event_id, llm, toolbox, max_steps=max_steps)
     if result.report is None:
         grounding = GroundingResult(False, 0.0, 0)

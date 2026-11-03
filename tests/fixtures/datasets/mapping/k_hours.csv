@@ -1,0 +1,151 @@
+Supplier Name,Ship Date,transit_hrs_planned,transit_hrs_actual,Country Code
+Dunmore,01/02/2024,96,90,DE
+Crestline,01/03/2024,96,126,MX
+Crestline,01/03/2024,24,36,MX
+Apex Logistics,01/04/2024,48,60,FR
+Blue Harbor,01/04/2024,72,102,FR
+Crestline,01/05/2024,72,72,MX
+Crestline,01/05/2024,96,126,JP
+Crestline,01/06/2024,96,96,DE
+Blue Harbor,01/06/2024,96,96,JP
+Crestline,01/07/2024,72,84,MX
+Crestline,01/07/2024,72,102,MX
+Dunmore,01/08/2024,96,108,US
+Blue Harbor,01/08/2024,48,78,DE
+Apex Logistics,01/09/2024,96,90,JP
+Blue Harbor,01/09/2024,24,24,BR
+Crestline,01/10/2024,48,48,MX
+Crestline,01/10/2024,72,72,BR
+Crestline,01/11/2024,72,72,MX
+Apex Logistics,01/11/2024,96,90,MX
+Dunmore,01/12/2024,48,48,JP
+Apex Logistics,01/12/2024,48,48,DE
+Apex Logistics,01/13/2024,72,102,BR
+Apex Logistics,01/13/2024,72,72,FR
+Blue Harbor,01/14/2024,48,48,FR
+Apex Logistics,01/14/2024,72,84,BR
+Apex Logistics,01/15/2024,96,96,FR
+Apex Logistics,01/15/2024,96,126,MX
+Crestline,01/16/2024,48,60,DE
+Apex Logistics,01/16/2024,48,60,BR
+Blue Harbor,01/17/2024,72,72,DE
+Crestline,01/17/2024,72,72,JP
+Blue Harbor,01/18/2024,48,48,JP
+Crestline,01/18/2024,48,48,DE
+Blue Harbor,01/19/2024,24,24,MX
+Dunmore,01/19/2024,96,96,JP
+Blue Harbor,01/20/2024,72,84,BR
+Dunmore,01/20/2024,72,72,MX
+Apex Logistics,01/21/2024,24,24,BR
+Crestline,01/21/2024,24,36,MX
+Apex Logistics,01/22/2024,48,42,US
+Dunmore,01/22/2024,96,126,DE
+Dunmore,01/23/2024,96,96,DE
+Apex Logistics,01/23/2024,72,102,FR
+Dunmore,01/24/2024,72,66,MX
+Dunmore,01/24/2024,24,36,JP
+Blue Harbor,01/25/2024,72,72,FR
+Dunmore,01/25/2024,96,90,DE
+Crestline,01/26/2024,48,48,BR
+Blue Harbor,01/26/2024,72,72,US
+Apex Logistics,01/27/2024,24,36,DE
+Apex Logistics,01/27/2024,96,90,BR
+Dunmore,01/28/2024,96,126,BR
+Blue Harbor,01/28/2024,24,18,BR
+Dunmore,01/29/2024,48,48,MX
+Blue Harbor,01/29/2024,96,96,US
+Apex Logistics,01/30/2024,96,90,DE
+Dunmore,01/30/2024,24,24,JP
+Crestline,01/31/2024,48,48,DE
+Apex Logistics,01/31/2024,24,24,MX
+Crestline,02/01/2024,72,102,US
+Crestline,02/01/2024,96,96,DE
+Crestline,02/02/2024,96,96,DE
+Dunmore,02/02/2024,96,108,FR
+Dunmore,02/03/2024,48,60,JP
+Dunmore,02/03/2024,96,90,BR
+Dunmore,02/04/2024,96,96,US
+Blue Harbor,02/04/2024,96,96,MX
+Apex Logistics,02/05/2024,96,90,DE
+Crestline,02/05/2024,72,66,BR
+Apex Logistics,02/06/2024,96,96,US
+Apex Logistics,02/06/2024,48,48,JP
+Crestline,02/07/2024,48,60,FR
+Blue Harbor,02/07/2024,72,66,US
+Blue Harbor,02/08/2024,72,72,DE
+Dunmore,02/08/2024,72,66,DE
+Crestline,02/09/2024,24,36,US
+Apex Logistics,02/09/2024,72,102,FR
+Dunmore,02/10/2024,72,72,DE
+Apex Logistics,02/10/2024,24,36,FR
+Crestline,02/11/2024,96,96,JP
+Apex Logistics,02/11/2024,48,42,MX
+Apex Logistics,02/12/2024,24,36,BR
+Crestline,02/12/2024,48,48,DE
+Apex Logistics,02/13/2024,24,18,DE
+Apex Logistics,02/13/2024,96,126,DE
+Apex Logistics,02/14/2024,72,66,US
+Dunmore,02/14/2024,48,78,FR
+Blue Harbor,02/15/2024,96,108,JP
+Blue Harbor,02/15/2024,72,72,FR
+Blue Harbor,02/16/2024,24,18,BR
+Crestline,02/16/2024,48,48,DE
+Dunmore,02/17/2024,96,126,US
+Dunmore,02/17/2024,24,24,MX
+Crestline,02/18/2024,48,48,BR
+Dunmore,02/18/2024,24,24,DE
+Blue Harbor,02/19/2024,24,24,US
+Crestline,02/19/2024,24,18,FR
+Dunmore,02/20/2024,96,126,BR
+Apex Logistics,02/20/2024,96,90,MX
+Blue Harbor,02/21/2024,72,84,JP
+Apex Logistics,02/21/2024,24,54,US
+Apex Logistics,02/22/2024,48,48,MX
+Dunmore,02/22/2024,24,24,FR
+Apex Logistics,02/23/2024,48,48,JP
+Dunmore,02/23/2024,72,66,MX
+Dunmore,02/24/2024,24,18,DE
+Crestline,02/24/2024,24,18,BR
+Dunmore,02/25/2024,96,108,US
+Apex Logistics,02/25/2024,24,18,DE
+Dunmore,02/26/2024,24,24,BR
+Apex Logistics,02/26/2024,24,24,MX
+Dunmore,02/27/2024,72,72,FR
+Crestline,02/27/2024,72,72,DE
+Blue Harbor,02/28/2024,24,24,DE
+Blue Harbor,02/28/2024,72,84,FR
+Apex Logistics,02/29/2024,48,78,DE
+Apex Logistics,02/29/2024,24,24,JP
+Apex Logistics,03/01/2024,48,48,FR
+Apex Logistics,03/01/2024,72,66,US
+Blue Harbor,03/02/2024,96,126,JP
+Crestline,03/02/2024,48,42,DE
+Blue Harbor,03/03/2024,24,24,JP
+Apex Logistics,03/03/2024,96,108,MX
+Crestline,03/04/2024,96,108,US
+Crestline,03/04/2024,24,36,BR
+Blue Harbor,03/05/2024,96,90,US
+Apex Logistics,03/05/2024,48,42,DE
+Blue Harbor,03/06/2024,24,36,MX
+Apex Logistics,03/06/2024,72,72,FR
+Blue Harbor,03/07/2024,24,18,DE
+Dunmore,03/07/2024,96,96,JP
+Crestline,03/08/2024,48,48,DE
+Apex Logistics,03/08/2024,96,96,JP
+Apex Logistics,03/09/2024,72,84,BR
+Crestline,03/09/2024,48,48,DE
+Crestline,03/10/2024,96,96,BR
+Blue Harbor,03/10/2024,96,96,JP
+Dunmore,03/11/2024,48,48,US
+Dunmore,03/11/2024,96,108,US
+Dunmore,03/12/2024,48,42,BR
+Dunmore,03/12/2024,24,24,BR
+Apex Logistics,03/13/2024,48,48,DE
+Crestline,03/13/2024,48,48,MX
+Apex Logistics,03/14/2024,96,90,FR
+Crestline,03/14/2024,96,126,JP
+Apex Logistics,03/15/2024,24,54,MX
+Blue Harbor,03/15/2024,24,18,FR
+Crestline,03/16/2024,96,96,FR
+Blue Harbor,03/16/2024,96,108,DE
+Crestline,03/17/2024,48,60,US

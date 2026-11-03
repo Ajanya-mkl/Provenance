@@ -1,7 +1,9 @@
 """The standard shipment contract a dataset is mapped onto.
 
 Required: entity (who is scored: supplier, vendor or category), event_date (when
-the shipment happened) and an outcome (whether it was late). Optional: country.
+the shipment happened) and an outcome (whether it was late). Optional: country,
+and cancelled ({col, value}: cancelled rows count as shipments but are left out of
+late rate and delay, as the flagship does with DataCo's 'Shipping canceled').
 
 An outcome takes one of three shapes:
 - late_flag:   one boolean-like column; late_when says which value means late,
@@ -29,7 +31,7 @@ from dataclasses import dataclass
 from typing import Any
 
 REQUIRED_FIELDS = ("entity", "event_date", "outcome")
-OPTIONAL_FIELDS = ("country",)
+OPTIONAL_FIELDS = ("country", "cancelled")
 OUTCOME_KINDS = ("late_flag", "days_pair", "delay_value")
 UNITS = ("days", "hours")
 POLARITIES = ("true", "false")
@@ -48,7 +50,13 @@ CONTRACT_DESCRIPTION: dict[str, Any] = {
         "event_date": "the shipment or order date column, with its strftime format",
         "outcome": "how lateness is recorded, as exactly one of the outcome kinds",
     },
-    "optional": {"country": "destination or origin country column, or null"},
+    "optional": {
+        "country": "destination or origin country column, or null",
+        "cancelled": (
+            "null, or {'col': column, 'value': text}: rows whose column equals the value "
+            "were cancelled; they count as shipments but not toward lateness or delay"
+        ),
+    },
     "outcome_kinds": {
         "late_flag": {
             "fields": {"col": "boolean-like column", "late_when": "'true' or 'false'"},
@@ -98,6 +106,12 @@ def normalize(mapping: Mapping[str, Any]) -> dict[str, Any]:
     if result.get("country") in ("", "null", "none"):
         result["country"] = None
     result.setdefault("country", None)
+    cancelled = result.get("cancelled")
+    if cancelled in ("", "null", "none") or (
+        isinstance(cancelled, dict) and cancelled.get("col") in (None, "", "null")
+    ):
+        result["cancelled"] = None
+    result.setdefault("cancelled", None)
     result.setdefault("evidence", {})
     result.setdefault("notes", "")
     return result
@@ -118,6 +132,9 @@ def used_columns(mapping: Mapping[str, Any]) -> list[tuple[str, str]]:
                 used.append((f"outcome.{key}", outcome[key]))
     if isinstance(mapping.get("country"), str):
         used.append(("country", mapping["country"]))
+    cancelled = mapping.get("cancelled")
+    if isinstance(cancelled, Mapping) and isinstance(cancelled.get("col"), str):
+        used.append(("cancelled", cancelled["col"]))
     return used
 
 

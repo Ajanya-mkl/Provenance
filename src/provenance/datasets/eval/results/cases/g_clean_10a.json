@@ -3,6 +3,7 @@
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
+    "decided_by": "agent",
     "mapping": {
       "entity": "supplier_code",
       "event_date": {
@@ -17,34 +18,39 @@
       "country": "destination_country",
       "evidence": {
         "entity": [
-          "distinct_count=12",
-          "null_pct=0.0",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=12",
           "min_length=6",
+          "mean_length=6.0",
           "max_length=6"
         ],
         "event_date": [
-          "distinct_count=200",
-          "null_pct=0.0",
           "inferred_type=date",
-          "date_format=%Y-%m-%d",
+          "null_pct=0.0",
+          "distinct_count=200",
           "min_value=2023-01-02",
-          "max_value=2023-07-20"
+          "max_value=2023-07-20",
+          "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "distinct_count=2",
-          "null_pct=0.0",
           "inferred_type=bool",
-          "distinct_values=false,true"
+          "null_pct=0.0",
+          "distinct_count=2",
+          "distinct_values=false|true"
         ],
         "country": [
-          "distinct_count=8",
+          "inferred_type=string",
           "null_pct=0.0",
-          "inferred_type=string"
+          "distinct_count=8",
+          "min_length=5",
+          "mean_length=6.0",
+          "max_length=7"
         ]
       },
-      "confidence": 1.0,
-      "notes": ""
+      "confidence": 1,
+      "notes": "",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "supplier_code",
@@ -60,43 +66,52 @@
       "country": "destination_country",
       "evidence": {
         "entity": [
-          "distinct_count=12",
-          "null_pct=0.0",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=12",
           "min_length=6",
+          "mean_length=6.0",
           "max_length=6"
         ],
         "event_date": [
-          "distinct_count=200",
-          "null_pct=0.0",
           "inferred_type=date",
-          "date_format=%Y-%m-%d",
+          "null_pct=0.0",
+          "distinct_count=200",
           "min_value=2023-01-02",
-          "max_value=2023-07-20"
+          "max_value=2023-07-20",
+          "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "distinct_count=2",
-          "null_pct=0.0",
           "inferred_type=bool",
-          "distinct_values=false,true"
+          "null_pct=0.0",
+          "distinct_count=2",
+          "distinct_values=false|true"
         ],
         "country": [
-          "distinct_count=8",
+          "inferred_type=string",
           "null_pct=0.0",
-          "inferred_type=string"
+          "distinct_count=8",
+          "min_length=5",
+          "mean_length=6.0",
+          "max_length=7"
         ]
       },
-      "confidence": 1.0,
-      "notes": ""
+      "confidence": 1,
+      "notes": "",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'supplier_code', event_date 'order_date' and a late_flag outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [],
+    "rejections": [
+      [
+        "Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON."
+      ]
+    ],
     "fallback_reason": null,
-    "prompt_tokens": 3820,
-    "completion_tokens": 1519,
-    "latency_s": 25.866,
-    "steps": 4
+    "prompt_tokens": 5565,
+    "completion_tokens": 2003,
+    "latency_s": 39.435,
+    "steps": 5
   }
 }

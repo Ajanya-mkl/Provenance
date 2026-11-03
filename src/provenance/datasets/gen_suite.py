@@ -167,7 +167,7 @@ def build_rules(profile: DatasetProfile) -> list[Rule]:
 
     for column in profile.columns:
         name = column.column_name
-        if column.null_pct == 0:
+        if column.null_count == 0:
             add(
                 column=name,
                 check="no empty values",

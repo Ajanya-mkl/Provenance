@@ -1,0 +1,151 @@
+Lieferant,fecha_envio,retard_jours,Zielland,montant
+Fischer & Co,01.04.2023,0,Spanien,308.06
+Müller GmbH,02.04.2023,0,Frankreich,248.75
+Müller GmbH,02.04.2023,0,Spanien,423.41
+Weber KG,03.04.2023,3,Spanien,153.74
+Schmidt AG,03.04.2023,0,Frankreich,329.27
+Müller GmbH,04.04.2023,-2,Deutschland,436.19
+Fischer & Co,04.04.2023,3,Italien,348.58
+Schmidt AG,05.04.2023,1,Deutschland,450.11
+Schmidt AG,05.04.2023,0,Frankreich,217.83
+Müller GmbH,06.04.2023,1,Deutschland,229.85
+Müller GmbH,06.04.2023,0,Spanien,47.18
+Müller GmbH,07.04.2023,1,Frankreich,25.73
+Schmidt AG,07.04.2023,1,Italien,39.73
+Weber KG,08.04.2023,0,Frankreich,176.84
+Schmidt AG,08.04.2023,8,Frankreich,410.48
+Weber KG,09.04.2023,3,Italien,87.63
+Fischer & Co,09.04.2023,-2,Deutschland,103.97
+Fischer & Co,10.04.2023,0,Frankreich,456.49
+Schmidt AG,10.04.2023,0,Deutschland,294.80
+Fischer & Co,11.04.2023,0,Frankreich,403.62
+Fischer & Co,11.04.2023,8,Italien,46.66
+Fischer & Co,12.04.2023,0,Italien,176.22
+Schmidt AG,12.04.2023,8,Spanien,481.04
+Weber KG,13.04.2023,0,Frankreich,17.97
+Fischer & Co,13.04.2023,0,Frankreich,108.29
+Schmidt AG,14.04.2023,1,Deutschland,481.78
+Müller GmbH,14.04.2023,8,Spanien,48.64
+Müller GmbH,15.04.2023,1,Deutschland,105.79
+Müller GmbH,15.04.2023,0,Frankreich,166.36
+Müller GmbH,16.04.2023,0,Spanien,172.40
+Schmidt AG,16.04.2023,0,Frankreich,353.27
+Weber KG,17.04.2023,-2,Spanien,357.97
+Schmidt AG,17.04.2023,0,Italien,272.28
+Weber KG,18.04.2023,1,Frankreich,305.45
+Schmidt AG,18.04.2023,3,Italien,315.56
+Fischer & Co,19.04.2023,1,Italien,160.87
+Schmidt AG,19.04.2023,0,Deutschland,242.27
+Müller GmbH,20.04.2023,1,Deutschland,11.18
+Schmidt AG,20.04.2023,-2,Italien,72.44
+Fischer & Co,21.04.2023,3,Spanien,200.73
+Weber KG,21.04.2023,8,Italien,135.38
+Weber KG,22.04.2023,8,Frankreich,349.39
+Schmidt AG,22.04.2023,3,Italien,477.30
+Fischer & Co,23.04.2023,0,Frankreich,66.98
+Fischer & Co,23.04.2023,0,Spanien,459.73
+Fischer & Co,24.04.2023,3,Italien,316.42
+Müller GmbH,24.04.2023,3,Frankreich,354.74
+Müller GmbH,25.04.2023,0,Spanien,49.78
+Müller GmbH,25.04.2023,0,Spanien,187.45
+Schmidt AG,26.04.2023,0,Spanien,428.77
+Fischer & Co,26.04.2023,0,Italien,250.11
+Müller GmbH,27.04.2023,8,Frankreich,336.53
+Weber KG,27.04.2023,0,Deutschland,49.25
+Fischer & Co,28.04.2023,3,Frankreich,344.28
+Weber KG,28.04.2023,1,Deutschland,381.35
+Müller GmbH,29.04.2023,0,Deutschland,421.61
+Müller GmbH,29.04.2023,1,Frankreich,467.03
+Weber KG,30.04.2023,0,Italien,312.54
+Weber KG,30.04.2023,0,Frankreich,397.01
+Weber KG,01.05.2023,8,Deutschland,124.05
+Fischer & Co,01.05.2023,-2,Italien,480.71
+Schmidt AG,02.05.2023,0,Deutschland,328.00
+Fischer & Co,02.05.2023,3,Frankreich,255.65
+Fischer & Co,03.05.2023,8,Italien,154.80
+Fischer & Co,03.05.2023,8,Deutschland,176.50
+Müller GmbH,04.05.2023,3,Deutschland,273.02
+Müller GmbH,04.05.2023,0,Italien,111.67
+Schmidt AG,05.05.2023,0,Frankreich,229.09
+Weber KG,05.05.2023,1,Spanien,140.13
+Müller GmbH,06.05.2023,-2,Deutschland,413.58
+Weber KG,06.05.2023,0,Spanien,192.90
+Schmidt AG,07.05.2023,8,Spanien,422.68
+Müller GmbH,07.05.2023,3,Frankreich,381.36
+Fischer & Co,08.05.2023,0,Deutschland,14.52
+Fischer & Co,08.05.2023,0,Deutschland,416.50
+Fischer & Co,09.05.2023,0,Frankreich,287.69
+Schmidt AG,09.05.2023,3,Spanien,240.03
+Müller GmbH,10.05.2023,-2,Spanien,155.57
+Müller GmbH,10.05.2023,0,Italien,184.54
+Müller GmbH,11.05.2023,3,Italien,11.64
+Schmidt AG,11.05.2023,1,Spanien,45.20
+Müller GmbH,12.05.2023,0,Frankreich,342.23
+Schmidt AG,12.05.2023,3,Spanien,206.15
+Fischer & Co,13.05.2023,0,Deutschland,37.09
+Müller GmbH,13.05.2023,8,Frankreich,172.42
+Weber KG,14.05.2023,0,Frankreich,427.10
+Weber KG,14.05.2023,0,Italien,24.88
+Schmidt AG,15.05.2023,0,Spanien,362.32
+Schmidt AG,15.05.2023,0,Italien,134.44
+Müller GmbH,16.05.2023,8,Frankreich,209.32
+Weber KG,16.05.2023,0,Italien,258.62
+Weber KG,17.05.2023,3,Deutschland,171.99
+Weber KG,17.05.2023,1,Italien,176.90
+Weber KG,18.05.2023,-2,Frankreich,144.94
+Müller GmbH,18.05.2023,1,Frankreich,251.51
+Schmidt AG,19.05.2023,-2,Italien,67.64
+Schmidt AG,19.05.2023,-2,Frankreich,464.07
+Fischer & Co,20.05.2023,8,Italien,191.15
+Fischer & Co,20.05.2023,0,Italien,248.90
+Weber KG,21.05.2023,0,Spanien,284.99
+Müller GmbH,21.05.2023,-2,Spanien,443.68
+Weber KG,22.05.2023,0,Spanien,321.93
+Müller GmbH,22.05.2023,3,Spanien,86.17
+Fischer & Co,23.05.2023,0,Spanien,166.94
+Weber KG,23.05.2023,1,Frankreich,348.93
+Fischer & Co,24.05.2023,0,Frankreich,393.63
+Fischer & Co,24.05.2023,8,Frankreich,92.24
+Weber KG,25.05.2023,8,Italien,204.16
+Schmidt AG,25.05.2023,1,Spanien,430.53
+Schmidt AG,26.05.2023,-2,Frankreich,409.00
+Müller GmbH,26.05.2023,-2,Spanien,482.77
+Schmidt AG,27.05.2023,0,Italien,236.24
+Müller GmbH,27.05.2023,1,Italien,329.54
+Müller GmbH,28.05.2023,0,Frankreich,433.02
+Weber KG,28.05.2023,-2,Italien,17.71
+Müller GmbH,29.05.2023,1,Frankreich,304.34
+Weber KG,29.05.2023,8,Spanien,37.14
+Weber KG,30.05.2023,0,Italien,323.11
+Müller GmbH,30.05.2023,3,Deutschland,431.77
+Müller GmbH,31.05.2023,3,Spanien,111.50
+Schmidt AG,31.05.2023,1,Spanien,277.03
+Weber KG,01.06.2023,1,Spanien,49.34
+Müller GmbH,01.06.2023,0,Spanien,309.91
+Weber KG,02.06.2023,3,Italien,20.06
+Schmidt AG,02.06.2023,-2,Spanien,427.47
+Weber KG,03.06.2023,0,Italien,328.58
+Weber KG,03.06.2023,0,Spanien,188.27
+Schmidt AG,04.06.2023,0,Frankreich,274.26
+Schmidt AG,04.06.2023,0,Deutschland,223.43
+Schmidt AG,05.06.2023,0,Deutschland,86.50
+Schmidt AG,05.06.2023,1,Italien,184.76
+Müller GmbH,06.06.2023,3,Frankreich,163.52
+Müller GmbH,06.06.2023,3,Spanien,90.34
+Fischer & Co,07.06.2023,0,Italien,325.13
+Müller GmbH,07.06.2023,8,Frankreich,320.20
+Müller GmbH,08.06.2023,1,Frankreich,333.86
+Fischer & Co,08.06.2023,8,Frankreich,243.22
+Fischer & Co,09.06.2023,8,Deutschland,47.69
+Fischer & Co,09.06.2023,0,Frankreich,226.27
+Fischer & Co,10.06.2023,0,Frankreich,203.42
+Weber KG,10.06.2023,0,Spanien,52.83
+Müller GmbH,11.06.2023,-2,Deutschland,358.90
+Schmidt AG,11.06.2023,1,Frankreich,360.91
+Fischer & Co,12.06.2023,3,Spanien,440.42
+Weber KG,12.06.2023,1,Spanien,127.79
+Schmidt AG,13.06.2023,3,Deutschland,45.00
+Müller GmbH,13.06.2023,0,Spanien,346.22
+Fischer & Co,14.06.2023,1,Frankreich,84.25
+Schmidt AG,14.06.2023,0,Deutschland,237.81
+Müller GmbH,15.06.2023,8,Deutschland,16.55

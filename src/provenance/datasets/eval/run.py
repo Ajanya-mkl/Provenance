@@ -1,10 +1,18 @@
 """Evaluate the column mappers: python -m provenance.datasets.eval.run [--limit N] [--fresh].
 
 Each case onboards a small synthetic fixture into a throwaway database in a
-temporary folder (never the real warehouse), then maps it twice: with the
-heuristic mapper (deterministic, always re-run) and with the agent (Groq, via
-llm.py). Agent results are cached in eval/results/cases/<case_id>.json, keyed on
-the fixture, model, prompt and tool schemas; --fresh ignores the cache. Writes
+temporary folder (never the real warehouse) and maps it in three modes:
+
+- heuristic: the deterministic mapper alone (always re-run);
+- agent: the agent always (Groq via llm.py), validated, retried once, falling back
+  to the heuristic;
+- heuristic_first: the heuristic, unless a required field is unmapped, two
+  candidates rank equally or its confidence is below the threshold, in which case
+  the agent decides. An escalated case reuses the agent-mode run rather than
+  calling the model a second time.
+
+Agent results are cached in eval/results/cases/<case_id>.json, keyed on the
+fixture, model, prompt and tool schemas; --fresh ignores the cache. Writes
 eval/results/report.json and docs/mapping_evaluation.md.
 """
 
@@ -25,6 +33,8 @@ from provenance.datasets.mapping_agent import (
     SYSTEM_PROMPT,
     TOOL_SCHEMAS,
     MappingProposal,
+    confidence_threshold,
+    escalation_reasons,
     heuristic_proposal,
     propose_mapping,
 )
@@ -37,18 +47,28 @@ CASES_PATH = EVAL_DIR / "cases.json"
 RESULTS_DIR = EVAL_DIR / "results"
 DOC_PATH = PROJECT_ROOT / "docs" / "mapping_evaluation.md"
 FIELDS = ("entity", "event_date", "outcome", "country", "mappable")
+MODES = ("heuristic", "agent", "heuristic_first")
+MODE_NAMES = {
+    "heuristic": "Heuristic only",
+    "agent": "Agent only",
+    "heuristic_first": "Heuristic-first",
+}
 
 LIMITS = [
-    "Seven cases is a smoke test, not a benchmark: the fixtures are small, synthetic and "
-    "were written by the same people who wrote the heuristic's synonym lists, so the "
-    "heuristic's score is optimistic.",
+    "Eleven cases is a smoke test, not a benchmark. The fixtures are small and synthetic. "
+    "Cases a-g were written alongside the heuristic's synonym lists, so its score there is "
+    "optimistic; cases h-k were written afterwards to be hard for it (abbreviations, mixed "
+    "languages, a misleading name, hours) and the word lists were not tuned to them.",
+    "Case j's expected answer (the column named delivery_date is the event date, because "
+    "its values are always the earlier date) is a judgement from the values, not the name; "
+    "neither mapper sees row values, only each column's min and max.",
     "Every fixture is too small to score (under 50 rows per entity-quarter), so the "
     "scoreable verdict is not evaluated here; it is unit-tested with synthetic counts.",
     "The agent is non-deterministic; cached results reflect the model's behaviour when "
     "each case was first run. Re-run with --fresh to measure again.",
-    "An earlier run, before the validator accepted late_when given as the column's own "
-    "value (e.g. 'no') and confidence as a numeric string, had 4 rejections (one invalid "
-    "JSON, one string confidence, two late_when='no'); every one was fixed on the retry.",
+    "In Phase 10b an early run, before the validator accepted late_when given as the "
+    "column's own value and confidence as a numeric string, had 4 rejections; each was "
+    "fixed on the retry. late_when is now accepted only when it is a value of that column.",
     "The agent never sees text values (only lengths), so it cannot tell a code from a "
     "name or a city from a country by content; the same holds for the heuristic.",
 ]
@@ -111,6 +131,7 @@ def summarize(proposal: MappingProposal) -> dict[str, Any]:
         first = proposal.mapping
     return {
         "source": proposal.source,
+        "decided_by": proposal.decided_by,
         "mapping": proposal.mapping,
         "first_answer": first,
         "mappable": proposal.validation.mappable.ok,
@@ -137,6 +158,7 @@ def run_case(case: dict[str, Any], workdir: Path, *, llm_factory, model: str, fr
     if result.status not in ("gated", "already_registered"):
         raise RuntimeError(f"{case['case_id']}: onboarding {result.status}: {result.problems}")
     context = load_context(paths.db_path, result.dataset_id)
+    expected = case["expected"]
 
     heuristic = summarize(heuristic_proposal(context))
     cache_path = RESULTS_DIR / "cases" / f"{case['case_id']}.json"
@@ -146,7 +168,7 @@ def run_case(case: dict[str, Any], workdir: Path, *, llm_factory, model: str, fr
         stored = json.loads(cache_path.read_text(encoding="utf-8"))
         cached = stored["agent"] if stored.get("key") == key else None
     if cached is None:
-        agent = summarize(propose_mapping(context, llm_factory=llm_factory))
+        agent = summarize(propose_mapping(context, llm_factory=llm_factory, mode="agent"))
         cache_path.parent.mkdir(parents=True, exist_ok=True)
         cache_path.write_text(
             json.dumps({"key": key, "model": model, "agent": agent}, indent=2, default=str),
@@ -154,24 +176,26 @@ def run_case(case: dict[str, Any], workdir: Path, *, llm_factory, model: str, fr
         )
     else:
         agent = cached
-    expected = case["expected"]
+    reasons = escalation_reasons(context)
+    first = {**(agent if reasons else heuristic), "escalation_reasons": reasons}
+
+    def marked(summary: dict[str, Any], with_first: bool) -> dict[str, Any]:
+        out = {**summary, "marks": score(summary["mapping"], summary["mappable"], expected)}
+        if with_first and summary.get("first_answer") is not None:
+            out["first_marks"] = score(
+                summary["first_answer"],
+                _first_mappable(summary["first_answer"], context),
+                expected,
+            )
+        return out
+
     return {
         "case_id": case["case_id"],
         "description": case["description"],
         "cached": cached is not None,
-        "heuristic": {
-            **heuristic,
-            "marks": score(heuristic["mapping"], heuristic["mappable"], expected),
-        },
-        "agent": {
-            **agent,
-            "marks": score(agent["mapping"], agent["mappable"], expected),
-            "first_marks": score(
-                agent["first_answer"], _first_mappable(agent["first_answer"], context), expected
-            )
-            if agent["first_answer"] is not None
-            else None,
-        },
+        "heuristic": marked(heuristic, False),
+        "agent": marked(agent, True),
+        "heuristic_first": marked(first, False),
     }
 
 
@@ -187,68 +211,100 @@ def _accuracy(results: list[dict], mapper: str, marks_key: str = "marks") -> dic
     return table
 
 
+def _all_right(results: list[dict], mapper: str) -> str:
+    return f"{sum(all(r[mapper]['marks'].values()) for r in results)}/{len(results)}"
+
+
 def _tick(marks: dict[str, bool] | None, name: str) -> str:
     if not marks or name not in marks:
         return "-"
     return "yes" if marks[name] else "**no**"
 
 
+def _tokens(summary: dict[str, Any]) -> int:
+    return summary["prompt_tokens"] + summary["completion_tokens"]
+
+
 def render(results: list[dict], model: str) -> str:
-    heuristic, agent = _accuracy(results, "heuristic"), _accuracy(results, "agent")
+    accuracy = {mode: _accuracy(results, mode) for mode in MODES}
     first = _accuracy(results, "agent", "first_marks")
-    fallbacks = sum(r["agent"]["source"] == "heuristic" for r in results)
-    rejections = sum(len(r["agent"]["rejections"]) for r in results)
-    tokens = sum(r["agent"]["prompt_tokens"] + r["agent"]["completion_tokens"] for r in results)
+    escalated = [r for r in results if r["heuristic_first"]["escalation_reasons"]]
     lines = [
         "# Column mapping evaluation",
         "",
         "Generated by `python -m provenance.datasets.eval.run`; do not edit by hand.",
         "",
-        f"Model: `{model}`. Cases: {len(results)} small synthetic fixtures under "
-        "`tests/fixtures/datasets/mapping/` plus two 10a fixtures. Each case is onboarded "
-        "into a temporary database; the real warehouse is never touched.",
+        f"Model: `{model}`. Cases: {len(results)} small synthetic fixtures (under "
+        "`tests/fixtures/datasets/mapping/`, plus two 10a fixtures). Each case is onboarded "
+        "into a temporary database; the real warehouse is never touched. Heuristic-first "
+        f"asks the agent when the heuristic's confidence is below {confidence_threshold()}, "
+        "a required field is unmapped, or two candidates rank equally.",
         "",
-        "## Per-field accuracy",
+        "## Per-field accuracy by mode",
         "",
-        "| Field | Heuristic | Agent (after validation) | Agent first answer |",
-        "|---|---|---|---|",
-        *(f"| {name} | {heuristic[name]} | {agent[name]} | {first[name]} |" for name in FIELDS),
+        "| Field | Heuristic only | Agent only | Heuristic-first | Agent first answer |",
+        "|---|---|---|---|---|",
+        *(
+            f"| {name} | {accuracy['heuristic'][name]} | {accuracy['agent'][name]} | "
+            f"{accuracy['heuristic_first'][name]} | {first[name]} |"
+            for name in FIELDS
+        ),
+        f"| **every field right** | {_all_right(results, 'heuristic')} | "
+        f"{_all_right(results, 'agent')} | {_all_right(results, 'heuristic_first')} | |",
         "",
-        f"Validator rejections of agent answers: {rejections}. Fallbacks to the heuristic: "
-        f"{fallbacks} of {len(results)}. Agent tokens in total: {tokens}.",
+        "| Mode | Agent calls | Validator rejections | Fallbacks to heuristic | Tokens |",
+        "|---|---|---|---|---|",
+        "| Heuristic only | 0 | 0 | 0 | 0 |",
+        f"| Agent only | {len(results)} | "
+        f"{sum(len(r['agent']['rejections']) for r in results)} | "
+        f"{sum(r['agent']['source'] == 'heuristic' for r in results)} | "
+        f"{sum(_tokens(r['agent']) for r in results)} |",
+        f"| Heuristic-first | {len(escalated)} | "
+        f"{sum(len(r['heuristic_first']['rejections']) for r in escalated)} | "
+        f"{sum(r['heuristic_first']['source'] == 'heuristic' for r in escalated)} | "
+        f"{sum(_tokens(r['heuristic_first']) for r in escalated)} |",
         "",
-        '"Agent (after validation)" is what the pipeline would store: the agent\'s answer if '
-        "the validator accepted it (possibly after one retry), otherwise the heuristic's. "
-        '"First answer" is the model\'s own first mapping before any validator feedback.',
+        '"Agent only" is what the pipeline would store with the agent always asked: its '
+        "answer if the validator accepted it (possibly after one retry), otherwise the "
+        "heuristic's. \"Agent first answer\" is the model's own first mapping, before any "
+        "validator feedback.",
         "",
         "## Cases",
         "",
-        "| Case | Mapper | Source | entity | event_date | outcome | country | mappable "
+        "| Case | Mode | Source | entity | event_date | outcome | country | mappable "
         "| Rejections | Tokens | Latency (s) |",
         "|---|---|---|---|---|---|---|---|---|---|---|",
     ]
     for r in results:
-        for mapper in ("heuristic", "agent"):
-            m = r[mapper]
-            tok = m["prompt_tokens"] + m["completion_tokens"]
+        for mode in MODES:
+            m = r[mode]
             lines.append(
-                f"| {r['case_id']} | {mapper} | {m['source']} | "
+                f"| {r['case_id']} | {mode} | {m['source']} | "
                 + " | ".join(_tick(m["marks"], name) for name in FIELDS)
-                + f" | {len(m['rejections'])} | {tok or '-'} | {m['latency_s']} |"
+                + f" | {len(m['rejections'])} | {_tokens(m) or '-'} | {m['latency_s']} |"
             )
+    lines += ["", "## Why heuristic-first asked the agent", ""]
+    lines += [
+        f"- **{r['case_id']}**: " + "; ".join(r["heuristic_first"]["escalation_reasons"])
+        for r in escalated
+    ] or ["- It never did."]
     notes = [
-        f"- **{r['case_id']}** ({r['description']}): agent rejected: "
-        + " / ".join("; ".join(errors) for errors in r["agent"]["rejections"])
+        f"- **{r['case_id']}** ({r['description']}): "
         + (
-            f". Fell back: {r['agent']['fallback_reason']}."
-            if r["agent"]["fallback_reason"]
+            "agent rejected: " + " / ".join("; ".join(e) for e in r["agent"]["rejections"]) + ". "
+            if r["agent"]["rejections"]
             else ""
+        )
+        + (
+            f"Fell back: {r['agent']['fallback_reason']}."
+            if r["agent"]["fallback_reason"]
+            else "Fixed on the retry."
         )
         for r in results
         if r["agent"]["rejections"] or r["agent"]["fallback_reason"]
     ]
     if notes:
-        lines += ["", "## Validator rejections", "", *notes]
+        lines += ["", "## Validator rejections (agent mode)", "", *notes]
     lines += ["", "## Limits", "", *(f"- {limit}" for limit in LIMITS), ""]
     return "\n".join(lines)
 
@@ -276,12 +332,14 @@ def main(argv: list[str] | None = None) -> int:
                 case, workdir, llm_factory=_llm_factory, model=model, fresh=args.fresh
             )
             results.append(outcome)
-            agent = outcome["agent"]
             print(
-                f"{case['case_id']:<20} heuristic {sum(outcome['heuristic']['marks'].values())}"
-                f"/{len(outcome['heuristic']['marks'])}  agent "
-                f"{sum(agent['marks'].values())}/{len(agent['marks'])} ({agent['source']}"
-                f"{', cached' if outcome['cached'] else ''})"
+                f"{case['case_id']:<22}"
+                + "  ".join(
+                    f"{mode} {sum(outcome[mode]['marks'].values())}/{len(outcome[mode]['marks'])}"
+                    for mode in MODES
+                )
+                + f" (agent: {outcome['agent']['source']}"
+                + (", cached)" if outcome["cached"] else ")")
             )
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     (RESULTS_DIR / "report.json").write_text(

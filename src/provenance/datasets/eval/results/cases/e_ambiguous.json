@@ -3,6 +3,7 @@
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
+    "decided_by": "agent",
     "mapping": {
       "entity": "supplier",
       "event_date": {
@@ -43,8 +44,9 @@
           "max_length=7"
         ]
       },
-      "confidence": 1,
-      "notes": ""
+      "confidence": 0.95,
+      "notes": "All required fields successfully mapped using supplier as entity, order_date as event_date, and promised_days/actual_days as a days_pair outcome. Country column mapped to optional field.",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "supplier",
@@ -86,17 +88,18 @@
           "max_length=7"
         ]
       },
-      "confidence": 1,
-      "notes": ""
+      "confidence": 0.95,
+      "notes": "All required fields successfully mapped using supplier as entity, order_date as event_date, and promised_days/actual_days as a days_pair outcome. Country column mapped to optional field.",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'supplier', event_date 'order_date' and a days_pair outcome all map to valid columns",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 7656,
-    "completion_tokens": 1718,
-    "latency_s": 55.104,
+    "prompt_tokens": 7841,
+    "completion_tokens": 1704,
+    "latency_s": 69.218,
     "steps": 7
   }
 }

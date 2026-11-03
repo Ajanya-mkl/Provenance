@@ -42,6 +42,8 @@ EDITABLE_PATHS = (
     "outcome.actual_col",
     "outcome.unit",
     "outcome.late_when",
+    "cancelled.col",
+    "cancelled.value",
 )
 OUTCOME_KEYS = {
     "late_flag": ("kind", "col", "late_when"),
@@ -166,6 +168,8 @@ def record_proposal(
             extra_validation={
                 "fallback_reason": proposal.fallback_reason,
                 "agent_attempt_errors": [attempt["errors"] for attempt in proposal.attempts],
+                "decided_by": proposal.decided_by,
+                "escalation_reasons": proposal.escalation_reasons,
             },
             tokens=(proposal.prompt_tokens, proposal.completion_tokens),
         )
@@ -182,6 +186,7 @@ def record_proposal(
                 "mappable": proposal.validation.mappable.ok,
                 "scoreable": proposal.validation.scoreable.ok,
                 "fallback_reason": proposal.fallback_reason,
+                "decided_by": proposal.decided_by,
                 "superseded": superseded,
             },
         )
@@ -236,6 +241,8 @@ def edit(
     context = load_context(db_path, old["dataset_id"])
     edited = apply_edits(old["proposal"], sets)
     edited["notes"] = f"edited by {reviewer}: " + ", ".join(f"{k}={v}" for k, v in sets.items())
+    # A person's judgement is not a model score: human versions carry no confidence.
+    edited["confidence"] = None
     validation = validate(edited, context, extra_facts=profile_facts(context))
     if not validation.ok:
         raise MappingInvalid(validation.errors)
@@ -248,6 +255,7 @@ def edit(
             source="human",
             validation=validation,
             created_by=reviewer,
+            extra_validation={"decided_by": "human"},
         )
         connection.execute(
             "UPDATE meta.mappings SET status = 'superseded', superseded_by = ? "

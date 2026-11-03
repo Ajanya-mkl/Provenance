@@ -1,0 +1,107 @@
+{
+  "key": "094391660b9a75d0740375fe826daadb6980cf8542006f9f4d096f67977b9084",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "decided_by": "agent",
+    "mapping": {
+      "entity": "Supplier Name",
+      "event_date": {
+        "col": "Ship Date",
+        "format": "%m/%d/%Y"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "transit_hrs_planned",
+        "actual_col": "transit_hrs_actual",
+        "unit": "hours"
+      },
+      "country": "Country Code",
+      "cancelled": null,
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "inferred_type=string"
+        ],
+        "event_date": [
+          "date_format=%m/%d/%Y",
+          "distinct_count=76"
+        ],
+        "outcome.scheduled_col": [
+          "distinct_count=4",
+          "min_value=24",
+          "max_value=96",
+          "inferred_type=int"
+        ],
+        "outcome.actual_col": [
+          "distinct_count=16",
+          "min_value=18",
+          "max_value=126",
+          "inferred_type=int"
+        ],
+        "country": [
+          "distinct_count=6",
+          "inferred_type=string",
+          "min_length=2",
+          "max_length=2"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
+    },
+    "first_answer": {
+      "entity": "Supplier Name",
+      "event_date": {
+        "col": "Ship Date",
+        "format": "%m/%d/%Y"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "transit_hrs_planned",
+        "actual_col": "transit_hrs_actual",
+        "unit": "hours"
+      },
+      "country": "Country Code",
+      "cancelled": null,
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "inferred_type=string"
+        ],
+        "event_date": [
+          "date_format=%m/%d/%Y",
+          "distinct_count=76"
+        ],
+        "outcome.scheduled_col": [
+          "distinct_count=4",
+          "min_value=24",
+          "max_value=96",
+          "inferred_type=int"
+        ],
+        "outcome.actual_col": [
+          "distinct_count=16",
+          "min_value=18",
+          "max_value=126",
+          "inferred_type=int"
+        ],
+        "country": [
+          "distinct_count=6",
+          "inferred_type=string",
+          "min_length=2",
+          "max_length=2"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'Supplier Name', event_date 'Ship Date' and a days_pair outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 4502,
+    "completion_tokens": 1627,
+    "latency_s": 34.351,
+    "steps": 5
+  }
+}

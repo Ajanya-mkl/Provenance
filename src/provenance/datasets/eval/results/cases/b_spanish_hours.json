@@ -3,6 +3,7 @@
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
+    "decided_by": "agent",
     "mapping": {
       "entity": "proveedor",
       "event_date": {
@@ -15,25 +16,38 @@
         "unit": "hours"
       },
       "country": "pais_destino",
+      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=4",
-          "null_pct=0.0"
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=11",
+          "mean_length=14.0",
+          "max_length=15"
         ],
         "event_date": [
-          "date_format=%d/%m/%Y",
-          "null_pct=0.0"
+          "distinct_count=81",
+          "null_pct=0.0",
+          "inferred_type=date",
+          "min_value=2023-03-01",
+          "max_value=2023-05-20",
+          "date_format=%d/%m/%Y"
         ],
         "outcome": [
-          "col=retraso_horas",
-          "unit=hours",
+          "distinct_count=53",
+          "null_pct=0.0",
+          "inferred_type=float",
           "min_value=-5.8",
-          "max_value=31.0",
-          "null_pct=0.0"
+          "max_value=31.0"
         ],
         "country": [
           "distinct_count=4",
-          "null_pct=0.0"
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=4",
+          "mean_length=5.2",
+          "max_length=6"
         ]
       },
       "confidence": 1.0,
@@ -51,25 +65,38 @@
         "unit": "hours"
       },
       "country": "pais_destino",
+      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=4",
-          "null_pct=0.0"
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=11",
+          "mean_length=14.0",
+          "max_length=15"
         ],
         "event_date": [
-          "date_format=%d/%m/%Y",
-          "null_pct=0.0"
+          "distinct_count=81",
+          "null_pct=0.0",
+          "inferred_type=date",
+          "min_value=2023-03-01",
+          "max_value=2023-05-20",
+          "date_format=%d/%m/%Y"
         ],
         "outcome": [
-          "col=retraso_horas",
-          "unit=hours",
+          "distinct_count=53",
+          "null_pct=0.0",
+          "inferred_type=float",
           "min_value=-5.8",
-          "max_value=31.0",
-          "null_pct=0.0"
+          "max_value=31.0"
         ],
         "country": [
           "distinct_count=4",
-          "null_pct=0.0"
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=4",
+          "mean_length=5.2",
+          "max_length=6"
         ]
       },
       "confidence": 1.0,
@@ -80,9 +107,9 @@
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 3373,
-    "completion_tokens": 1020,
-    "latency_s": 5.475,
+    "prompt_tokens": 3447,
+    "completion_tokens": 1325,
+    "latency_s": 6.211,
     "steps": 4
   }
 }

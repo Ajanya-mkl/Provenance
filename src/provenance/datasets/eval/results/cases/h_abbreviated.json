@@ -1,0 +1,125 @@
+{
+  "key": "b2d270681c4ea16d4f7842d490e6f83e699699e9b402c69b04249abc11dad408",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "decided_by": "agent",
+    "mapping": {
+      "entity": "vndr_cd",
+      "event_date": {
+        "col": "dt_shp",
+        "format": "%Y%m%d"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "sch_lt",
+        "actual_col": "act_lt",
+        "unit": "days"
+      },
+      "country": "dest_ctry",
+      "evidence": {
+        "vndr_cd": [
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=6",
+          "min_length=4",
+          "max_length=4"
+        ],
+        "dt_shp": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=81",
+          "min_value=20230202",
+          "max_value=20230423"
+        ],
+        "sch_lt": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=3",
+          "min_value=3",
+          "max_value=7"
+        ],
+        "act_lt": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=8",
+          "min_value=2",
+          "max_value=10"
+        ],
+        "dest_ctry": [
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=6",
+          "min_length=2",
+          "max_length=2"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "",
+      "cancelled": null
+    },
+    "first_answer": {
+      "entity": "vndr_cd",
+      "event_date": {
+        "col": "dt_shp",
+        "format": "%Y%m%d"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "sch_lt",
+        "actual_col": "act_lt",
+        "unit": "days"
+      },
+      "country": "dest_ctry",
+      "evidence": {
+        "vndr_cd": [
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=6",
+          "min_length=4",
+          "max_length=4"
+        ],
+        "dt_shp": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=81",
+          "min_value=20230202",
+          "max_value=20230423"
+        ],
+        "sch_lt": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=3",
+          "min_value=3",
+          "max_value=7"
+        ],
+        "act_lt": [
+          "inferred_type=int",
+          "null_pct=0.0",
+          "distinct_count=8",
+          "min_value=2",
+          "max_value=10"
+        ],
+        "dest_ctry": [
+          "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=6",
+          "min_length=2",
+          "max_length=2"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "",
+      "cancelled": null
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'vndr_cd', event_date 'dt_shp' and a days_pair outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 6180,
+    "completion_tokens": 1629,
+    "latency_s": 44.859,
+    "steps": 6
+  }
+}

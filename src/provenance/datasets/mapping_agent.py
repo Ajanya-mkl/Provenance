@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 import time
 from collections.abc import Callable
@@ -21,13 +22,26 @@ from typing import Any
 
 from provenance.agent.llm import LLMError
 from provenance.datasets.contract import CONTRACT_DESCRIPTION
-from provenance.datasets.heuristic_mapper import heuristic_mapping
+from provenance.datasets.heuristic_mapper import heuristic_assessment, heuristic_mapping
 from provenance.datasets.validator import DatasetContext, ValidationResult, validate
 
 LOGGER = logging.getLogger(__name__)
 MAX_STEPS = 8
 SAMPLE_VALUES = 5
 SAMPLE_CHARS = 30
+MODES = ("heuristic_first", "agent", "heuristic")
+DEFAULT_CONFIDENCE_THRESHOLD = 0.8
+
+
+def confidence_threshold() -> float:
+    """MAPPING_AGENT_CONFIDENCE_THRESHOLD (default 0.8); below it heuristic-first asks the agent."""
+    try:
+        return float(
+            os.environ.get("MAPPING_AGENT_CONFIDENCE_THRESHOLD", DEFAULT_CONFIDENCE_THRESHOLD)
+        )
+    except ValueError:
+        return DEFAULT_CONFIDENCE_THRESHOLD
+
 
 SYSTEM_PROMPT = """\
 You map the columns of an uploaded dataset onto a standard shipment contract.
@@ -158,6 +172,10 @@ class MappingProposal:
     completion_tokens: int = 0
     latency_s: float = 0.0
     steps: int = 0
+    # Which path produced the mapping (heuristic | agent | heuristic_fallback) and why
+    # the agent was asked, if it was.
+    decided_by: str = "heuristic"
+    escalation_reasons: list[str] = field(default_factory=list)
 
 
 def _parse(content: str | None) -> tuple[dict[str, Any] | None, str | None]:
@@ -193,17 +211,65 @@ def heuristic_proposal(context: DatasetContext, reason: str | None = None) -> Ma
     return proposal
 
 
+def escalation_reasons(context: DatasetContext, threshold: float | None = None) -> list[str]:
+    """Why the heuristic's answer is not good enough on its own (empty when it is)."""
+    mapping, close = heuristic_assessment(context)
+    validation = validate(mapping, context)
+    limit = confidence_threshold() if threshold is None else threshold
+    reasons = [f"heuristic left {name} unmapped" for name in validation.unmapped]
+    reasons += [f"heuristic mapping is invalid: {error}" for error in validation.errors]
+    reasons += [f"close candidates for {item}" for item in close]
+    if float(mapping.get("confidence") or 0) < limit:
+        reasons.append(f"heuristic confidence {mapping.get('confidence')} is below {limit}")
+    return reasons
+
+
 def propose_mapping(
     context: DatasetContext,
     *,
     llm_factory: Callable[[], Any] | None = None,
     heuristic_only: bool = False,
+    mode: str = "heuristic_first",
     sample_values: bool = False,
     max_steps: int = MAX_STEPS,
+    threshold: float | None = None,
+) -> MappingProposal:
+    """Propose a mapping.
+
+    heuristic_first (default): the heuristic decides unless a required field is
+    unmapped, two candidates are equally good, or its confidence is below the
+    threshold; then the agent is asked. agent: always ask the agent. heuristic:
+    never. An agent answer is validated, retried once, and falls back to the
+    heuristic; `decided_by` records which path produced the stored mapping.
+    """
+    if mode not in MODES:
+        raise ValueError(f"mode must be one of {MODES}")
+    if heuristic_only or llm_factory is None:
+        mode = "heuristic"
+    reasons: list[str] = []
+    if mode == "heuristic_first":
+        reasons = escalation_reasons(context, threshold)
+        if not reasons:
+            return heuristic_proposal(context)
+    elif mode == "agent":
+        reasons = ["agent mode: the agent is always asked"]
+    if mode == "heuristic":
+        return heuristic_proposal(context)
+    proposal = _agent_proposal(
+        context, llm_factory, sample_values=sample_values, max_steps=max_steps
+    )
+    proposal.escalation_reasons = reasons
+    return proposal
+
+
+def _agent_proposal(
+    context: DatasetContext,
+    llm_factory: Callable[[], Any],
+    *,
+    sample_values: bool,
+    max_steps: int,
 ) -> MappingProposal:
     """Agent proposal, validated; one retry; heuristic fallback."""
-    if heuristic_only or llm_factory is None:
-        return heuristic_proposal(context)
     started = time.perf_counter()
     tools = MappingTools(context, sample_values=sample_values)
     messages: list[dict[str, Any]] = [
@@ -249,6 +315,7 @@ def propose_mapping(
                         completion_tokens=completion_tokens,
                         latency_s=round(time.perf_counter() - started, 3),
                         steps=steps,
+                        decided_by="agent",
                     )
                 errors = validation.errors
             attempts.append({"mapping": mapping, "errors": errors})
@@ -275,4 +342,5 @@ def propose_mapping(
     proposal.prompt_tokens, proposal.completion_tokens = prompt_tokens, completion_tokens
     proposal.latency_s = round(time.perf_counter() - started, 3)
     proposal.steps = steps
+    proposal.decided_by = "heuristic_fallback"
     return proposal

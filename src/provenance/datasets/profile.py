@@ -92,6 +92,7 @@ class ColumnProfile:
     is_mixed_type: bool
     is_mostly_null: bool
     key_like_name: bool
+    null_count: int = 0  # exact; null_pct is rounded and can show 0 for a few empties
 
 
 @dataclass
@@ -342,6 +343,7 @@ def profile_column(name: str, ordinal: int, raw: pd.Series) -> tuple[ColumnProfi
         is_mixed_type=mixed,
         is_mostly_null=mostly_null,
         key_like_name=bool(KEY_NAME.search(name)),
+        null_count=nulls,
     )
     return profile, warnings
 
