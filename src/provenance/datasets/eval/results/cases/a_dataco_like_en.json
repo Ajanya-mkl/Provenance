@@ -1,0 +1,106 @@
+{
+  "key": "37a0b55fdd96d0e18020180cdf9ab86da3060bb6bfbbf2b14e31312c4860ac5b",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "mapping": {
+      "entity": "Product Category",
+      "event_date": {
+        "col": "Order Placed",
+        "format": "%m/%d/%Y %H:%M"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "Planned Transit Days",
+        "actual_col": "Real Transit Days",
+        "unit": "days"
+      },
+      "country": "Ship To Country",
+      "evidence": {
+        "entity": [
+          "distinct_count=5",
+          "inferred_type=string",
+          "null_pct=0.0"
+        ],
+        "event_date": [
+          "date_format=%m/%d/%Y %H:%M",
+          "inferred_type=date",
+          "null_pct=0.0"
+        ],
+        "scheduled_col": [
+          "distinct_count=4",
+          "inferred_type=int",
+          "min_value=2",
+          "max_value=5"
+        ],
+        "actual_col": [
+          "distinct_count=8",
+          "inferred_type=int",
+          "min_value=1",
+          "max_value=8"
+        ],
+        "country": [
+          "distinct_count=6",
+          "inferred_type=string",
+          "null_pct=0.0"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields successfully mapped."
+    },
+    "first_answer": {
+      "entity": "Product Category",
+      "event_date": {
+        "col": "Order Placed",
+        "format": "%m/%d/%Y %H:%M"
+      },
+      "outcome": {
+        "kind": "days_pair",
+        "scheduled_col": "Planned Transit Days",
+        "actual_col": "Real Transit Days",
+        "unit": "days"
+      },
+      "country": "Ship To Country",
+      "evidence": {
+        "entity": [
+          "distinct_count=5",
+          "inferred_type=string",
+          "null_pct=0.0"
+        ],
+        "event_date": [
+          "date_format=%m/%d/%Y %H:%M",
+          "inferred_type=date",
+          "null_pct=0.0"
+        ],
+        "scheduled_col": [
+          "distinct_count=4",
+          "inferred_type=int",
+          "min_value=2",
+          "max_value=5"
+        ],
+        "actual_col": [
+          "distinct_count=8",
+          "inferred_type=int",
+          "min_value=1",
+          "max_value=8"
+        ],
+        "country": [
+          "distinct_count=6",
+          "inferred_type=string",
+          "null_pct=0.0"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields successfully mapped."
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'Product Category', event_date 'Order Placed' and a days_pair outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 4865,
+    "completion_tokens": 1743,
+    "latency_s": 6.941,
+    "steps": 5
+  }
+}

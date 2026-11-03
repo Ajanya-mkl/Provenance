@@ -1,0 +1,64 @@
+{
+  "key": "4b0764717efac95821e987311916df1283e9fe30b73d9a71f213183125c6c7f3",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "mapping": {
+      "entity": "subject",
+      "event_date": {
+        "col": "exam_date",
+        "format": "%d/%m/%Y"
+      },
+      "outcome": null,
+      "country": null,
+      "evidence": {
+        "entity": [
+          "distinct_count=3",
+          "min_length=5",
+          "max_length=7"
+        ],
+        "event_date": [
+          "date_format=%d/%m/%Y",
+          "distinct_count=15",
+          "min_value=2024-05-13",
+          "max_value=2024-05-31"
+        ]
+      },
+      "confidence": 0.8,
+      "notes": "No column representing lateness; cannot map required outcome field."
+    },
+    "first_answer": {
+      "entity": "subject",
+      "event_date": {
+        "col": "exam_date",
+        "format": "%d/%m/%Y"
+      },
+      "outcome": null,
+      "country": null,
+      "evidence": {
+        "entity": [
+          "distinct_count=3",
+          "min_length=5",
+          "max_length=7"
+        ],
+        "event_date": [
+          "date_format=%d/%m/%Y",
+          "distinct_count=15",
+          "min_value=2024-05-13",
+          "max_value=2024-05-31"
+        ]
+      },
+      "confidence": 0.8,
+      "notes": "No column representing lateness; cannot map required outcome field."
+    },
+    "mappable": false,
+    "mappable_reason": "no column fits the required field(s) outcome: No column representing lateness; cannot map required outcome field.",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 5584,
+    "completion_tokens": 1567,
+    "latency_s": 32.25,
+    "steps": 5
+  }
+}

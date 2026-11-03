@@ -1,0 +1,88 @@
+{
+  "key": "7f23a7c9d5684b8799635c2533a3e317b245dd03145048f46aac9d2b21bce4ea",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "mapping": {
+      "entity": "proveedor",
+      "event_date": {
+        "col": "fecha_pedido",
+        "format": "%d/%m/%Y"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "retraso_horas",
+        "unit": "hours"
+      },
+      "country": "pais_destino",
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "null_pct=0.0"
+        ],
+        "event_date": [
+          "date_format=%d/%m/%Y",
+          "null_pct=0.0"
+        ],
+        "outcome": [
+          "col=retraso_horas",
+          "unit=hours",
+          "min_value=-5.8",
+          "max_value=31.0",
+          "null_pct=0.0"
+        ],
+        "country": [
+          "distinct_count=4",
+          "null_pct=0.0"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": ""
+    },
+    "first_answer": {
+      "entity": "proveedor",
+      "event_date": {
+        "col": "fecha_pedido",
+        "format": "%d/%m/%Y"
+      },
+      "outcome": {
+        "kind": "delay_value",
+        "col": "retraso_horas",
+        "unit": "hours"
+      },
+      "country": "pais_destino",
+      "evidence": {
+        "entity": [
+          "distinct_count=4",
+          "null_pct=0.0"
+        ],
+        "event_date": [
+          "date_format=%d/%m/%Y",
+          "null_pct=0.0"
+        ],
+        "outcome": [
+          "col=retraso_horas",
+          "unit=hours",
+          "min_value=-5.8",
+          "max_value=31.0",
+          "null_pct=0.0"
+        ],
+        "country": [
+          "distinct_count=4",
+          "null_pct=0.0"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": ""
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'proveedor', event_date 'fecha_pedido' and a delay_value outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 3373,
+    "completion_tokens": 1020,
+    "latency_s": 5.475,
+    "steps": 4
+  }
+}

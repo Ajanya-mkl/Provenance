@@ -1,0 +1,151 @@
+vendor_name,order_date,delivered_on_time,ship_country,weight_kg
+Globex,2024-02-01,no,Brazil,1.8
+Initech,2024-02-01,no,France,2.8
+Stark Parts,2024-02-02,yes,India,8.0
+Initech,2024-02-02,yes,Brazil,23.1
+Acme Corp,2024-02-02,yes,Mexico,37.8
+Stark Parts,2024-02-03,yes,Japan,3.4
+Initech,2024-02-03,yes,France,12.7
+Stark Parts,2024-02-03,no,Mexico,35.5
+Acme Corp,2024-02-04,yes,Mexico,30.8
+Initech,2024-02-04,yes,Japan,20.1
+Initech,2024-02-04,yes,Brazil,16.4
+Umbrella,2024-02-05,yes,France,1.4
+Stark Parts,2024-02-05,yes,Germany,13.3
+Initech,2024-02-05,yes,India,25.3
+Umbrella,2024-02-06,yes,India,11.5
+Initech,2024-02-06,yes,India,13.7
+Globex,2024-02-06,yes,Mexico,29.9
+Stark Parts,2024-02-07,yes,Japan,8.6
+Initech,2024-02-07,yes,Germany,6.1
+Initech,2024-02-07,yes,Brazil,1.4
+Umbrella,2024-02-08,yes,Brazil,4.2
+Stark Parts,2024-02-08,yes,Mexico,35.3
+Initech,2024-02-08,yes,France,4.8
+Initech,2024-02-09,no,Brazil,38.5
+Globex,2024-02-09,no,Brazil,31.3
+Globex,2024-02-09,yes,Mexico,27.3
+Initech,2024-02-10,yes,India,21.2
+Acme Corp,2024-02-10,yes,Japan,25.6
+Umbrella,2024-02-10,yes,Germany,24.8
+Initech,2024-02-11,no,Japan,25.3
+Stark Parts,2024-02-11,yes,Mexico,33.6
+Umbrella,2024-02-11,no,Japan,19.0
+Umbrella,2024-02-12,yes,Brazil,24.2
+Stark Parts,2024-02-12,yes,France,36.8
+Stark Parts,2024-02-12,no,Brazil,11.7
+Acme Corp,2024-02-13,yes,India,6.5
+Umbrella,2024-02-13,yes,India,29.7
+Initech,2024-02-13,yes,Japan,19.0
+Stark Parts,2024-02-14,no,Mexico,34.8
+Globex,2024-02-14,no,Mexico,9.7
+Globex,2024-02-14,yes,Mexico,20.7
+Initech,2024-02-15,yes,Germany,34.9
+Initech,2024-02-15,yes,France,32.4
+Umbrella,2024-02-15,yes,France,1.1
+Umbrella,2024-02-16,yes,Brazil,11.5
+Globex,2024-02-16,yes,Mexico,22.4
+Umbrella,2024-02-16,yes,Mexico,32.1
+Acme Corp,2024-02-17,yes,Germany,32.6
+Globex,2024-02-17,yes,India,2.0
+Initech,2024-02-17,yes,India,5.1
+Globex,2024-02-18,no,Mexico,34.0
+Stark Parts,2024-02-18,no,Brazil,3.3
+Globex,2024-02-18,yes,Japan,38.8
+Stark Parts,2024-02-19,no,Brazil,1.1
+Initech,2024-02-19,yes,Japan,37.9
+Stark Parts,2024-02-19,yes,Japan,8.8
+Globex,2024-02-20,yes,Japan,23.4
+Acme Corp,2024-02-20,yes,India,5.1
+Initech,2024-02-20,yes,India,8.2
+Acme Corp,2024-02-21,yes,Japan,28.8
+Initech,2024-02-21,no,Germany,6.3
+Initech,2024-02-21,no,India,32.9
+Umbrella,2024-02-22,yes,Brazil,5.8
+Acme Corp,2024-02-22,yes,India,20.8
+Umbrella,2024-02-22,yes,Brazil,23.4
+Initech,2024-02-23,yes,India,38.1
+Acme Corp,2024-02-23,no,Germany,37.4
+Umbrella,2024-02-23,yes,Japan,16.9
+Globex,2024-02-24,no,Japan,3.0
+Umbrella,2024-02-24,yes,India,23.6
+Initech,2024-02-24,yes,Japan,27.9
+Stark Parts,2024-02-25,yes,Mexico,16.8
+Globex,2024-02-25,yes,Brazil,17.1
+Initech,2024-02-25,yes,France,4.6
+Acme Corp,2024-02-26,no,Germany,4.0
+Initech,2024-02-26,yes,India,1.7
+Stark Parts,2024-02-26,yes,Mexico,26.9
+Globex,2024-02-27,no,Mexico,14.8
+Umbrella,2024-02-27,yes,Brazil,27.0
+Stark Parts,2024-02-27,yes,Germany,39.1
+Umbrella,2024-02-28,no,Germany,26.2
+Acme Corp,2024-02-28,yes,Mexico,40.0
+Umbrella,2024-02-28,yes,France,39.6
+Globex,2024-02-29,no,India,33.3
+Stark Parts,2024-02-29,no,Mexico,29.8
+Acme Corp,2024-02-29,yes,Germany,38.4
+Stark Parts,2024-03-01,yes,Japan,32.5
+Umbrella,2024-03-01,yes,Brazil,19.0
+Acme Corp,2024-03-01,yes,India,37.8
+Acme Corp,2024-03-02,yes,India,16.8
+Stark Parts,2024-03-02,yes,Mexico,12.4
+Stark Parts,2024-03-02,yes,Mexico,22.9
+Globex,2024-03-03,yes,France,20.7
+Initech,2024-03-03,yes,Germany,10.2
+Umbrella,2024-03-03,no,Mexico,39.6
+Stark Parts,2024-03-04,no,Germany,22.5
+Umbrella,2024-03-04,yes,Mexico,32.5
+Stark Parts,2024-03-04,yes,Germany,38.8
+Stark Parts,2024-03-05,yes,Brazil,24.9
+Acme Corp,2024-03-05,no,Mexico,9.5
+Acme Corp,2024-03-05,no,Germany,12.1
+Stark Parts,2024-03-06,yes,Brazil,4.9
+Initech,2024-03-06,yes,Brazil,16.9
+Acme Corp,2024-03-06,yes,India,21.7
+Umbrella,2024-03-07,yes,Brazil,8.5
+Stark Parts,2024-03-07,yes,France,39.3
+Acme Corp,2024-03-07,no,Japan,12.3
+Stark Parts,2024-03-08,yes,Germany,15.0
+Umbrella,2024-03-08,no,Brazil,14.7
+Umbrella,2024-03-08,yes,Brazil,5.1
+Initech,2024-03-09,yes,Germany,21.4
+Stark Parts,2024-03-09,yes,Brazil,32.8
+Acme Corp,2024-03-09,yes,Mexico,12.9
+Umbrella,2024-03-10,yes,France,30.1
+Umbrella,2024-03-10,yes,India,16.6
+Acme Corp,2024-03-10,yes,Japan,23.9
+Globex,2024-03-11,yes,France,27.9
+Initech,2024-03-11,yes,France,30.6
+Acme Corp,2024-03-11,yes,Germany,20.2
+Stark Parts,2024-03-12,yes,Mexico,34.3
+Globex,2024-03-12,yes,France,11.2
+Umbrella,2024-03-12,yes,Brazil,4.0
+Stark Parts,2024-03-13,yes,Mexico,16.2
+Globex,2024-03-13,yes,India,1.8
+Globex,2024-03-13,yes,India,25.9
+Acme Corp,2024-03-14,no,Mexico,16.1
+Acme Corp,2024-03-14,yes,India,25.7
+Acme Corp,2024-03-14,yes,France,22.1
+Umbrella,2024-03-15,no,India,27.3
+Acme Corp,2024-03-15,yes,Mexico,17.9
+Globex,2024-03-15,no,Brazil,27.2
+Acme Corp,2024-03-16,no,India,35.9
+Acme Corp,2024-03-16,yes,India,26.8
+Stark Parts,2024-03-16,yes,Japan,5.2
+Initech,2024-03-17,yes,Germany,4.3
+Initech,2024-03-17,yes,Mexico,6.6
+Initech,2024-03-17,no,Brazil,1.7
+Umbrella,2024-03-18,no,Germany,27.1
+Umbrella,2024-03-18,no,Brazil,27.7
+Umbrella,2024-03-18,no,Mexico,22.2
+Globex,2024-03-19,yes,Germany,1.1
+Globex,2024-03-19,yes,Brazil,23.9
+Stark Parts,2024-03-19,no,Brazil,23.2
+Umbrella,2024-03-20,yes,France,6.3
+Umbrella,2024-03-20,yes,Mexico,28.0
+Globex,2024-03-20,yes,India,29.4
+Stark Parts,2024-03-21,yes,India,36.9
+Initech,2024-03-21,no,Germany,28.8
+Umbrella,2024-03-21,yes,France,7.6
+Umbrella,2024-03-22,no,Brazil,19.7

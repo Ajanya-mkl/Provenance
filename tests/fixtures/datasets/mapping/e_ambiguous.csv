@@ -1,0 +1,171 @@
+supplier,order_date,delivery_date,promised_days,actual_days,country,order_value
+Kappa Goods,2023-06-01,2023-06-04,3,3,Mexico,1347.77
+North Mill,2023-06-02,2023-06-13,7,11,Brazil,1830.15
+Kappa Goods,2023-06-02,2023-06-04,3,2,Brazil,842.24
+Orion Components,2023-06-03,2023-06-12,5,9,Germany,3268.39
+Orion Components,2023-06-03,2023-06-12,7,9,Japan,4593.83
+Orion Components,2023-06-04,2023-06-11,7,7,India,4026.26
+Kappa Goods,2023-06-04,2023-06-06,3,2,India,3600.33
+Orion Components,2023-06-05,2023-06-07,3,2,Brazil,3979.61
+North Mill,2023-06-05,2023-06-14,7,9,Japan,882.84
+Kappa Goods,2023-06-06,2023-06-11,5,5,India,1345.71
+Delta Freight Parts,2023-06-06,2023-06-13,7,7,Japan,3660.89
+Kappa Goods,2023-06-07,2023-06-12,3,5,Brazil,3948.26
+Orion Components,2023-06-07,2023-06-14,3,7,Brazil,3231.70
+Kappa Goods,2023-06-08,2023-06-13,5,5,Japan,1831.59
+Kappa Goods,2023-06-08,2023-06-11,3,3,Germany,1231.12
+Delta Freight Parts,2023-06-09,2023-06-15,7,6,France,2213.37
+Delta Freight Parts,2023-06-09,2023-06-14,5,5,Mexico,3274.41
+Orion Components,2023-06-10,2023-06-16,7,6,India,4642.84
+Orion Components,2023-06-10,2023-06-13,3,3,Brazil,3893.29
+Orion Components,2023-06-11,2023-06-15,5,4,Germany,2660.50
+North Mill,2023-06-11,2023-06-15,5,4,Mexico,4326.30
+Kappa Goods,2023-06-12,2023-06-18,7,6,Japan,2678.23
+Orion Components,2023-06-12,2023-06-17,5,5,Germany,2226.86
+Orion Components,2023-06-13,2023-06-17,5,4,Mexico,4797.57
+Kappa Goods,2023-06-13,2023-06-22,5,9,Germany,2093.17
+North Mill,2023-06-14,2023-06-19,3,5,Mexico,2203.73
+Orion Components,2023-06-14,2023-06-21,5,7,France,2751.87
+North Mill,2023-06-15,2023-06-22,3,7,Germany,991.18
+Delta Freight Parts,2023-06-15,2023-06-22,3,7,Germany,2801.30
+Orion Components,2023-06-16,2023-06-25,5,9,India,3858.06
+North Mill,2023-06-16,2023-06-22,7,6,Brazil,397.66
+Delta Freight Parts,2023-06-17,2023-06-22,3,5,India,4453.39
+North Mill,2023-06-17,2023-06-24,3,7,Mexico,1420.17
+Kappa Goods,2023-06-18,2023-06-29,7,11,Germany,4976.85
+Delta Freight Parts,2023-06-18,2023-06-27,5,9,Brazil,4093.00
+Kappa Goods,2023-06-19,2023-06-26,3,7,Mexico,525.95
+Delta Freight Parts,2023-06-19,2023-06-26,7,7,Mexico,2894.55
+Kappa Goods,2023-06-20,2023-06-24,5,4,Mexico,3740.65
+North Mill,2023-06-20,2023-06-29,7,9,Germany,4773.25
+Orion Components,2023-06-21,2023-06-30,7,9,Japan,687.57
+Delta Freight Parts,2023-06-21,2023-06-25,5,4,Japan,2593.20
+Delta Freight Parts,2023-06-22,2023-06-29,5,7,India,266.03
+Kappa Goods,2023-06-22,2023-06-25,3,3,Germany,1892.39
+Kappa Goods,2023-06-23,2023-06-28,5,5,Brazil,1646.16
+Kappa Goods,2023-06-23,2023-06-29,7,6,India,3147.97
+Kappa Goods,2023-06-24,2023-06-29,3,5,Japan,4409.81
+Kappa Goods,2023-06-24,2023-07-01,5,7,Japan,467.27
+Delta Freight Parts,2023-06-25,2023-06-28,3,3,Japan,3060.48
+Kappa Goods,2023-06-25,2023-07-04,7,9,Germany,3301.70
+North Mill,2023-06-26,2023-07-03,3,7,France,2975.40
+Kappa Goods,2023-06-26,2023-07-03,7,7,Mexico,4215.47
+Orion Components,2023-06-27,2023-07-04,5,7,Mexico,3106.27
+Orion Components,2023-06-27,2023-07-02,3,5,Germany,3762.38
+Kappa Goods,2023-06-28,2023-07-02,5,4,France,352.91
+North Mill,2023-06-28,2023-07-03,3,5,France,4890.73
+Orion Components,2023-06-29,2023-07-06,7,7,France,2443.08
+Kappa Goods,2023-06-29,2023-07-08,5,9,France,869.89
+Orion Components,2023-06-30,2023-07-03,3,3,Japan,2594.14
+Orion Components,2023-06-30,2023-07-03,3,3,France,4770.79
+Kappa Goods,2023-07-01,2023-07-06,5,5,Japan,2487.86
+North Mill,2023-07-01,2023-07-06,5,5,France,336.20
+Kappa Goods,2023-07-02,2023-07-11,5,9,France,210.49
+Kappa Goods,2023-07-02,2023-07-07,5,5,Mexico,469.15
+Delta Freight Parts,2023-07-03,2023-07-12,5,9,Japan,1880.88
+Orion Components,2023-07-03,2023-07-08,3,5,Germany,1856.25
+North Mill,2023-07-04,2023-07-15,7,11,France,1935.22
+Delta Freight Parts,2023-07-04,2023-07-13,7,9,India,3169.25
+Delta Freight Parts,2023-07-05,2023-07-12,7,7,Germany,224.61
+Delta Freight Parts,2023-07-05,2023-07-07,3,2,India,202.46
+North Mill,2023-07-06,2023-07-13,3,7,Japan,4112.60
+Orion Components,2023-07-06,2023-07-11,5,5,Japan,1675.89
+Orion Components,2023-07-07,2023-07-12,3,5,Mexico,2265.12
+Orion Components,2023-07-07,2023-07-14,7,7,Germany,2789.04
+Orion Components,2023-07-08,2023-07-19,7,11,Germany,3272.36
+Kappa Goods,2023-07-08,2023-07-15,5,7,Germany,4155.56
+Kappa Goods,2023-07-09,2023-07-16,7,7,India,3062.58
+Orion Components,2023-07-09,2023-07-14,5,5,Germany,2447.64
+Kappa Goods,2023-07-10,2023-07-13,3,3,Japan,3377.21
+North Mill,2023-07-10,2023-07-16,7,6,Mexico,1687.88
+Kappa Goods,2023-07-11,2023-07-18,7,7,France,2713.11
+North Mill,2023-07-11,2023-07-15,5,4,Brazil,202.45
+Delta Freight Parts,2023-07-12,2023-07-23,7,11,France,1436.05
+Orion Components,2023-07-12,2023-07-19,7,7,Mexico,2390.52
+North Mill,2023-07-13,2023-07-18,5,5,India,1323.30
+Orion Components,2023-07-13,2023-07-16,3,3,India,1378.62
+Orion Components,2023-07-14,2023-07-17,3,3,Brazil,3000.93
+North Mill,2023-07-14,2023-07-19,5,5,Germany,4245.52
+Delta Freight Parts,2023-07-15,2023-07-24,5,9,India,2770.63
+Delta Freight Parts,2023-07-15,2023-07-24,7,9,Brazil,4102.07
+Orion Components,2023-07-16,2023-07-25,5,9,Brazil,2275.71
+Delta Freight Parts,2023-07-16,2023-07-27,7,11,India,208.85
+North Mill,2023-07-17,2023-07-24,5,7,Japan,4002.23
+Orion Components,2023-07-17,2023-07-26,7,9,France,1037.16
+Orion Components,2023-07-18,2023-07-27,7,9,Japan,4726.25
+Delta Freight Parts,2023-07-18,2023-07-23,3,5,France,4957.70
+North Mill,2023-07-19,2023-07-21,3,2,Germany,2718.32
+Kappa Goods,2023-07-19,2023-07-28,5,9,France,2825.00
+Orion Components,2023-07-20,2023-07-23,3,3,Mexico,2706.01
+Delta Freight Parts,2023-07-20,2023-07-22,3,2,Brazil,3602.86
+Kappa Goods,2023-07-21,2023-07-26,3,5,France,3835.55
+Delta Freight Parts,2023-07-21,2023-07-27,7,6,Mexico,2373.54
+Delta Freight Parts,2023-07-22,2023-07-27,3,5,Brazil,3296.31
+North Mill,2023-07-22,2023-07-31,5,9,Mexico,1178.08
+North Mill,2023-07-23,2023-07-30,7,7,Germany,3833.26
+North Mill,2023-07-23,2023-07-28,5,5,Japan,1001.53
+Delta Freight Parts,2023-07-24,2023-07-27,3,3,Mexico,1784.73
+Delta Freight Parts,2023-07-24,2023-07-31,7,7,Japan,246.59
+Orion Components,2023-07-25,2023-07-30,3,5,India,4516.08
+Orion Components,2023-07-25,2023-08-01,7,7,Japan,664.35
+Orion Components,2023-07-26,2023-07-28,3,2,Brazil,4406.86
+Kappa Goods,2023-07-26,2023-08-02,7,7,Japan,3274.49
+North Mill,2023-07-27,2023-08-03,5,7,Germany,2995.34
+North Mill,2023-07-27,2023-08-01,5,5,Mexico,1333.44
+Kappa Goods,2023-07-28,2023-08-04,7,7,India,4685.40
+Kappa Goods,2023-07-28,2023-08-03,7,6,Japan,1667.73
+Kappa Goods,2023-07-29,2023-07-31,3,2,Brazil,2981.98
+Orion Components,2023-07-29,2023-08-05,3,7,Mexico,672.82
+Orion Components,2023-07-30,2023-08-08,5,9,France,1717.11
+Delta Freight Parts,2023-07-30,2023-08-06,3,7,Germany,2551.13
+Delta Freight Parts,2023-07-31,2023-08-09,5,9,Brazil,1029.34
+North Mill,2023-07-31,2023-08-06,7,6,France,4337.07
+Delta Freight Parts,2023-08-01,2023-08-04,3,3,Brazil,2392.19
+Kappa Goods,2023-08-01,2023-08-10,5,9,Japan,899.71
+Orion Components,2023-08-02,2023-08-06,5,4,Mexico,823.86
+North Mill,2023-08-02,2023-08-09,3,7,Mexico,1283.49
+Delta Freight Parts,2023-08-03,2023-08-12,7,9,Mexico,3594.91
+North Mill,2023-08-03,2023-08-06,3,3,France,651.54
+Delta Freight Parts,2023-08-04,2023-08-09,5,5,Brazil,649.55
+Delta Freight Parts,2023-08-04,2023-08-06,3,2,Mexico,926.33
+Kappa Goods,2023-08-05,2023-08-14,7,9,Germany,1953.05
+North Mill,2023-08-05,2023-08-16,7,11,Brazil,127.42
+North Mill,2023-08-06,2023-08-10,5,4,Germany,4051.71
+Kappa Goods,2023-08-06,2023-08-11,3,5,India,2755.06
+Delta Freight Parts,2023-08-07,2023-08-14,7,7,Brazil,4020.17
+North Mill,2023-08-07,2023-08-11,5,4,India,1494.08
+North Mill,2023-08-08,2023-08-13,5,5,Japan,3694.27
+Kappa Goods,2023-08-08,2023-08-15,7,7,India,3851.09
+North Mill,2023-08-09,2023-08-16,3,7,Japan,2134.07
+Orion Components,2023-08-09,2023-08-16,7,7,Germany,4212.22
+Delta Freight Parts,2023-08-10,2023-08-17,7,7,India,2078.11
+Delta Freight Parts,2023-08-10,2023-08-16,7,6,Japan,404.52
+Orion Components,2023-08-11,2023-08-22,7,11,Germany,1681.86
+Delta Freight Parts,2023-08-11,2023-08-20,7,9,India,2292.81
+Delta Freight Parts,2023-08-12,2023-08-15,3,3,India,2580.12
+Orion Components,2023-08-12,2023-08-19,7,7,Germany,1963.58
+North Mill,2023-08-13,2023-08-20,7,7,Mexico,104.98
+Orion Components,2023-08-13,2023-08-16,3,3,Brazil,4957.72
+North Mill,2023-08-14,2023-08-20,7,6,Brazil,3608.51
+Delta Freight Parts,2023-08-14,2023-08-19,3,5,Japan,2368.35
+Orion Components,2023-08-15,2023-08-22,5,7,India,2853.25
+Kappa Goods,2023-08-15,2023-08-18,3,3,France,3459.01
+Delta Freight Parts,2023-08-16,2023-08-19,3,3,France,3035.04
+Kappa Goods,2023-08-16,2023-08-22,7,6,Brazil,4238.38
+Orion Components,2023-08-17,2023-08-24,7,7,Japan,385.47
+Delta Freight Parts,2023-08-17,2023-08-19,3,2,Brazil,3414.41
+Kappa Goods,2023-08-18,2023-08-23,5,5,India,4710.63
+Kappa Goods,2023-08-18,2023-08-20,3,2,Germany,594.28
+North Mill,2023-08-19,2023-08-26,7,7,Germany,2704.58
+Orion Components,2023-08-19,2023-08-21,3,2,Mexico,1926.90
+Kappa Goods,2023-08-20,2023-08-27,7,7,France,3228.45
+Orion Components,2023-08-20,2023-08-22,3,2,India,2275.84
+Kappa Goods,2023-08-21,2023-08-28,5,7,Germany,152.74
+Kappa Goods,2023-08-21,2023-08-26,5,5,France,4558.52
+Orion Components,2023-08-22,2023-08-29,3,7,Mexico,2740.83
+Orion Components,2023-08-22,2023-08-31,5,9,Japan,574.72
+North Mill,2023-08-23,2023-08-30,7,7,Brazil,3081.51
+Kappa Goods,2023-08-23,2023-08-28,5,5,Japan,2471.40
+Orion Components,2023-08-24,2023-08-31,5,7,Mexico,4998.19
+North Mill,2023-08-24,2023-08-29,3,5,Japan,4770.36
+Kappa Goods,2023-08-25,2023-08-30,5,5,Mexico,3050.15

@@ -1,0 +1,102 @@
+{
+  "key": "dd6ed0b7dc4b7d8ca5f4453b70ba9fe6ad0e33f58fa64ab1701980614835f836",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "mapping": {
+      "entity": "supplier_code",
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "late_flag",
+        "col": "on_time",
+        "late_when": "false"
+      },
+      "country": "destination_country",
+      "evidence": {
+        "entity": [
+          "distinct_count=12",
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=6",
+          "max_length=6"
+        ],
+        "event_date": [
+          "distinct_count=200",
+          "null_pct=0.0",
+          "inferred_type=date",
+          "date_format=%Y-%m-%d",
+          "min_value=2023-01-02",
+          "max_value=2023-07-20"
+        ],
+        "outcome": [
+          "distinct_count=2",
+          "null_pct=0.0",
+          "inferred_type=bool",
+          "distinct_values=false,true"
+        ],
+        "country": [
+          "distinct_count=8",
+          "null_pct=0.0",
+          "inferred_type=string"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": ""
+    },
+    "first_answer": {
+      "entity": "supplier_code",
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "late_flag",
+        "col": "on_time",
+        "late_when": "false"
+      },
+      "country": "destination_country",
+      "evidence": {
+        "entity": [
+          "distinct_count=12",
+          "null_pct=0.0",
+          "inferred_type=string",
+          "min_length=6",
+          "max_length=6"
+        ],
+        "event_date": [
+          "distinct_count=200",
+          "null_pct=0.0",
+          "inferred_type=date",
+          "date_format=%Y-%m-%d",
+          "min_value=2023-01-02",
+          "max_value=2023-07-20"
+        ],
+        "outcome": [
+          "distinct_count=2",
+          "null_pct=0.0",
+          "inferred_type=bool",
+          "distinct_values=false,true"
+        ],
+        "country": [
+          "distinct_count=8",
+          "null_pct=0.0",
+          "inferred_type=string"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": ""
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'supplier_code', event_date 'order_date' and a late_flag outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 3820,
+    "completion_tokens": 1519,
+    "latency_s": 25.866,
+    "steps": 4
+  }
+}

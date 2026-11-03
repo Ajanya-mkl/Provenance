@@ -1,0 +1,1105 @@
+{
+  "model": "openai/gpt-oss-120b",
+  "results": [
+    {
+      "case_id": "a_dataco_like_en",
+      "description": "DataCo-like, renamed English columns, planned vs real transit days",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "Product Category",
+          "event_date": {
+            "col": "Order Placed",
+            "format": "%m/%d/%Y %H:%M"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "Planned Transit Days",
+            "actual_col": "Real Transit Days",
+            "unit": "days"
+          },
+          "country": "Ship To Country",
+          "evidence": {
+            "event_date": [
+              "date_format=%m/%d/%Y %H:%M",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=5",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "Planned Transit Days: inferred_type=int",
+              "Real Transit Days: inferred_type=int"
+            ],
+            "country": [
+              "distinct_count=6"
+            ]
+          },
+          "confidence": 0.83,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'Product Category', event_date 'Order Placed' and a days_pair outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.008,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "Product Category",
+          "event_date": {
+            "col": "Order Placed",
+            "format": "%m/%d/%Y %H:%M"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "Planned Transit Days",
+            "actual_col": "Real Transit Days",
+            "unit": "days"
+          },
+          "country": "Ship To Country",
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "inferred_type=string",
+              "null_pct=0.0"
+            ],
+            "event_date": [
+              "date_format=%m/%d/%Y %H:%M",
+              "inferred_type=date",
+              "null_pct=0.0"
+            ],
+            "scheduled_col": [
+              "distinct_count=4",
+              "inferred_type=int",
+              "min_value=2",
+              "max_value=5"
+            ],
+            "actual_col": [
+              "distinct_count=8",
+              "inferred_type=int",
+              "min_value=1",
+              "max_value=8"
+            ],
+            "country": [
+              "distinct_count=6",
+              "inferred_type=string",
+              "null_pct=0.0"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": "All required fields successfully mapped."
+        },
+        "first_answer": {
+          "entity": "Product Category",
+          "event_date": {
+            "col": "Order Placed",
+            "format": "%m/%d/%Y %H:%M"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "Planned Transit Days",
+            "actual_col": "Real Transit Days",
+            "unit": "days"
+          },
+          "country": "Ship To Country",
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "inferred_type=string",
+              "null_pct=0.0"
+            ],
+            "event_date": [
+              "date_format=%m/%d/%Y %H:%M",
+              "inferred_type=date",
+              "null_pct=0.0"
+            ],
+            "scheduled_col": [
+              "distinct_count=4",
+              "inferred_type=int",
+              "min_value=2",
+              "max_value=5"
+            ],
+            "actual_col": [
+              "distinct_count=8",
+              "inferred_type=int",
+              "min_value=1",
+              "max_value=8"
+            ],
+            "country": [
+              "distinct_count=6",
+              "inferred_type=string",
+              "null_pct=0.0"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": "All required fields successfully mapped."
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'Product Category', event_date 'Order Placed' and a days_pair outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 4865,
+        "completion_tokens": 1743,
+        "latency_s": 6.941,
+        "steps": 5,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "b_spanish_hours",
+      "description": "Spanish column names, delay in hours, day-first dates",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "proveedor",
+          "event_date": {
+            "col": "fecha_pedido",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": {
+            "kind": "delay_value",
+            "col": "retraso_horas",
+            "unit": "hours"
+          },
+          "country": "pais_destino",
+          "evidence": {
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=4",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "inferred_type=float",
+              "min_value=-5.8",
+              "max_value=31.0"
+            ],
+            "country": [
+              "distinct_count=4"
+            ]
+          },
+          "confidence": 0.88,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'proveedor', event_date 'fecha_pedido' and a delay_value outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.018,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "proveedor",
+          "event_date": {
+            "col": "fecha_pedido",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": {
+            "kind": "delay_value",
+            "col": "retraso_horas",
+            "unit": "hours"
+          },
+          "country": "pais_destino",
+          "evidence": {
+            "entity": [
+              "distinct_count=4",
+              "null_pct=0.0"
+            ],
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "col=retraso_horas",
+              "unit=hours",
+              "min_value=-5.8",
+              "max_value=31.0",
+              "null_pct=0.0"
+            ],
+            "country": [
+              "distinct_count=4",
+              "null_pct=0.0"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": ""
+        },
+        "first_answer": {
+          "entity": "proveedor",
+          "event_date": {
+            "col": "fecha_pedido",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": {
+            "kind": "delay_value",
+            "col": "retraso_horas",
+            "unit": "hours"
+          },
+          "country": "pais_destino",
+          "evidence": {
+            "entity": [
+              "distinct_count=4",
+              "null_pct=0.0"
+            ],
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "col=retraso_horas",
+              "unit=hours",
+              "min_value=-5.8",
+              "max_value=31.0",
+              "null_pct=0.0"
+            ],
+            "country": [
+              "distinct_count=4",
+              "null_pct=0.0"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": ""
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'proveedor', event_date 'fecha_pedido' and a delay_value outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 3373,
+        "completion_tokens": 1020,
+        "latency_s": 5.475,
+        "steps": 4,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "c_iso_on_time",
+      "description": "ISO dates and an on-time flag (inverted polarity)",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "vendor_name",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "delivered_on_time",
+            "late_when": "false"
+          },
+          "country": "ship_country",
+          "evidence": {
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=5",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "distinct_count=2"
+            ],
+            "country": [
+              "distinct_count=6"
+            ]
+          },
+          "confidence": 0.88,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'vendor_name', event_date 'order_date' and a late_flag outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.011,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "vendor_name",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "delivered_on_time",
+            "late_when": "false"
+          },
+          "country": "ship_country",
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "null_pct=0.0",
+              "min_length=6",
+              "max_length=11"
+            ],
+            "event_date": [
+              "null_pct=0.0",
+              "distinct_count=51",
+              "min_value=2024-02-01",
+              "max_value=2024-03-22",
+              "date_format=%Y-%m-%d"
+            ],
+            "outcome": [
+              "inferred_type=bool",
+              "distinct_values=no|yes",
+              "null_pct=0.0"
+            ],
+            "country": [
+              "distinct_count=6",
+              "null_pct=0.0",
+              "min_length=5",
+              "max_length=7"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": "All required fields mapped successfully."
+        },
+        "first_answer": {
+          "entity": "vendor_name",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "delivered_on_time",
+            "late_when": "false"
+          },
+          "country": "ship_country",
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "null_pct=0.0",
+              "min_length=6",
+              "max_length=11"
+            ],
+            "event_date": [
+              "null_pct=0.0",
+              "distinct_count=51",
+              "min_value=2024-02-01",
+              "max_value=2024-03-22",
+              "date_format=%Y-%m-%d"
+            ],
+            "outcome": [
+              "inferred_type=bool",
+              "distinct_values=no|yes",
+              "null_pct=0.0"
+            ],
+            "country": [
+              "distinct_count=6",
+              "null_pct=0.0",
+              "min_length=5",
+              "max_length=7"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": "All required fields mapped successfully."
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'vendor_name', event_date 'order_date' and a late_flag outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 3208,
+        "completion_tokens": 1256,
+        "latency_s": 24.938,
+        "steps": 4,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "d_late_flag_only",
+      "description": "0/1 late flag only, category entity, no country",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "category",
+          "event_date": {
+            "col": "shipped_on",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "is_late",
+            "late_when": "true"
+          },
+          "country": null,
+          "evidence": {
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=5",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "distinct_count=2"
+            ]
+          },
+          "confidence": 0.82,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'category', event_date 'shipped_on' and a late_flag outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.006,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "category",
+          "event_date": {
+            "col": "shipped_on",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "is_late",
+            "late_when": "true"
+          },
+          "country": null,
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "min_length=6",
+              "max_length=16"
+            ],
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "min_value=2022-09-02",
+              "max_value=2023-01-19"
+            ],
+            "outcome": [
+              "distinct_count=2",
+              "min_value=0",
+              "max_value=1"
+            ]
+          },
+          "confidence": 0.9,
+          "notes": "category used as entity (supplier/vendor/category); shipped_on provides shipment date with given format; is_late is a boolean-like int where 1 indicates late, mapped as late_flag with late_when 'true'; no country column present."
+        },
+        "first_answer": {
+          "entity": "category",
+          "event_date": {
+            "col": "shipped_on",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "is_late",
+            "late_when": "true"
+          },
+          "country": null,
+          "evidence": {
+            "entity": [
+              "distinct_count=5",
+              "min_length=6",
+              "max_length=16"
+            ],
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "min_value=2022-09-02",
+              "max_value=2023-01-19"
+            ],
+            "outcome": [
+              "distinct_count=2",
+              "min_value=0",
+              "max_value=1"
+            ]
+          },
+          "confidence": 0.9,
+          "notes": "category used as entity (supplier/vendor/category); shipped_on provides shipment date with given format; is_late is a boolean-like int where 1 indicates late, mapped as late_flag with late_when 'true'; no country column present."
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'category', event_date 'shipped_on' and a late_flag outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 6167,
+        "completion_tokens": 1718,
+        "latency_s": 45.345,
+        "steps": 6,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "e_ambiguous",
+      "description": "Ambiguous: order and delivery dates, promised and actual day counts",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "supplier",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "promised_days",
+            "actual_col": "actual_days",
+            "unit": "days"
+          },
+          "country": "country",
+          "evidence": {
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=4",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "promised_days: inferred_type=int",
+              "actual_days: inferred_type=int"
+            ],
+            "country": [
+              "distinct_count=6"
+            ]
+          },
+          "confidence": 0.9,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'supplier', event_date 'order_date' and a days_pair outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.013,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "supplier",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "promised_days",
+            "actual_col": "actual_days",
+            "unit": "days"
+          },
+          "country": "country",
+          "evidence": {
+            "entity": [
+              "distinct_count=4",
+              "min_length=10",
+              "max_length=19"
+            ],
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "min_value=2023-06-01",
+              "max_value=2023-08-25"
+            ],
+            "outcome.scheduled_col": [
+              "distinct_count=3",
+              "min_value=3",
+              "max_value=7"
+            ],
+            "outcome.actual_col": [
+              "distinct_count=8",
+              "min_value=2",
+              "max_value=11"
+            ],
+            "country": [
+              "distinct_count=6",
+              "min_length=5",
+              "max_length=7"
+            ]
+          },
+          "confidence": 1,
+          "notes": ""
+        },
+        "first_answer": {
+          "entity": "supplier",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "days_pair",
+            "scheduled_col": "promised_days",
+            "actual_col": "actual_days",
+            "unit": "days"
+          },
+          "country": "country",
+          "evidence": {
+            "entity": [
+              "distinct_count=4",
+              "min_length=10",
+              "max_length=19"
+            ],
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "min_value=2023-06-01",
+              "max_value=2023-08-25"
+            ],
+            "outcome.scheduled_col": [
+              "distinct_count=3",
+              "min_value=3",
+              "max_value=7"
+            ],
+            "outcome.actual_col": [
+              "distinct_count=8",
+              "min_value=2",
+              "max_value=11"
+            ],
+            "country": [
+              "distinct_count=6",
+              "min_length=5",
+              "max_length=7"
+            ]
+          },
+          "confidence": 1,
+          "notes": ""
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'supplier', event_date 'order_date' and a days_pair outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 7656,
+        "completion_tokens": 1718,
+        "latency_s": 55.104,
+        "steps": 7,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "f_not_supply_chain",
+      "description": "Student marks (10a fixture): not a shipment dataset",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": null,
+          "event_date": {
+            "col": "exam_date",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": null,
+          "country": null,
+          "evidence": {
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ]
+          },
+          "confidence": 0.2,
+          "notes": "no column is named like a supplier, vendor or category; no column records lateness (a late/on-time flag, a delay, or scheduled and actual durations)"
+        },
+        "first_answer": null,
+        "mappable": false,
+        "mappable_reason": "no column fits the required field(s) entity, outcome: no column is named like a supplier, vendor or category; no column records lateness (a late/on-time flag, a delay, or scheduled and actual durations)",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.003,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "outcome": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "subject",
+          "event_date": {
+            "col": "exam_date",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": null,
+          "country": null,
+          "evidence": {
+            "entity": [
+              "distinct_count=3",
+              "min_length=5",
+              "max_length=7"
+            ],
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "distinct_count=15",
+              "min_value=2024-05-13",
+              "max_value=2024-05-31"
+            ]
+          },
+          "confidence": 0.8,
+          "notes": "No column representing lateness; cannot map required outcome field."
+        },
+        "first_answer": {
+          "entity": "subject",
+          "event_date": {
+            "col": "exam_date",
+            "format": "%d/%m/%Y"
+          },
+          "outcome": null,
+          "country": null,
+          "evidence": {
+            "entity": [
+              "distinct_count=3",
+              "min_length=5",
+              "max_length=7"
+            ],
+            "event_date": [
+              "date_format=%d/%m/%Y",
+              "distinct_count=15",
+              "min_value=2024-05-13",
+              "max_value=2024-05-31"
+            ]
+          },
+          "confidence": 0.8,
+          "notes": "No column representing lateness; cannot map required outcome field."
+        },
+        "mappable": false,
+        "mappable_reason": "no column fits the required field(s) outcome: No column representing lateness; cannot map required outcome field.",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 5584,
+        "completion_tokens": 1567,
+        "latency_s": 32.25,
+        "steps": 5,
+        "marks": {
+          "entity": false,
+          "outcome": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": false,
+          "outcome": true,
+          "mappable": true
+        }
+      }
+    },
+    {
+      "case_id": "g_clean_10a",
+      "description": "10a clean fixture: delay_days and an on_time flag both describe lateness",
+      "cached": true,
+      "heuristic": {
+        "source": "heuristic",
+        "mapping": {
+          "entity": "supplier_code",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "delay_value",
+            "col": "delay_days",
+            "unit": "days"
+          },
+          "country": "destination_country",
+          "evidence": {
+            "event_date": [
+              "date_format=%Y-%m-%d",
+              "type_share_pct=100.0",
+              "null_pct=0.0"
+            ],
+            "entity": [
+              "inferred_type=string",
+              "distinct_count=12",
+              "null_pct=0.0"
+            ],
+            "outcome": [
+              "inferred_type=int",
+              "min_value=0",
+              "max_value=5"
+            ],
+            "country": [
+              "distinct_count=8"
+            ]
+          },
+          "confidence": 0.88,
+          "notes": "matched by column names and profiled types"
+        },
+        "first_answer": null,
+        "mappable": true,
+        "mappable_reason": "entity 'supplier_code', event_date 'order_date' and a delay_value outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "latency_s": 0.007,
+        "steps": 0,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      },
+      "agent": {
+        "source": "agent",
+        "mapping": {
+          "entity": "supplier_code",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "on_time",
+            "late_when": "false"
+          },
+          "country": "destination_country",
+          "evidence": {
+            "entity": [
+              "distinct_count=12",
+              "null_pct=0.0",
+              "inferred_type=string",
+              "min_length=6",
+              "max_length=6"
+            ],
+            "event_date": [
+              "distinct_count=200",
+              "null_pct=0.0",
+              "inferred_type=date",
+              "date_format=%Y-%m-%d",
+              "min_value=2023-01-02",
+              "max_value=2023-07-20"
+            ],
+            "outcome": [
+              "distinct_count=2",
+              "null_pct=0.0",
+              "inferred_type=bool",
+              "distinct_values=false,true"
+            ],
+            "country": [
+              "distinct_count=8",
+              "null_pct=0.0",
+              "inferred_type=string"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": ""
+        },
+        "first_answer": {
+          "entity": "supplier_code",
+          "event_date": {
+            "col": "order_date",
+            "format": "%Y-%m-%d"
+          },
+          "outcome": {
+            "kind": "late_flag",
+            "col": "on_time",
+            "late_when": "false"
+          },
+          "country": "destination_country",
+          "evidence": {
+            "entity": [
+              "distinct_count=12",
+              "null_pct=0.0",
+              "inferred_type=string",
+              "min_length=6",
+              "max_length=6"
+            ],
+            "event_date": [
+              "distinct_count=200",
+              "null_pct=0.0",
+              "inferred_type=date",
+              "date_format=%Y-%m-%d",
+              "min_value=2023-01-02",
+              "max_value=2023-07-20"
+            ],
+            "outcome": [
+              "distinct_count=2",
+              "null_pct=0.0",
+              "inferred_type=bool",
+              "distinct_values=false,true"
+            ],
+            "country": [
+              "distinct_count=8",
+              "null_pct=0.0",
+              "inferred_type=string"
+            ]
+          },
+          "confidence": 1.0,
+          "notes": ""
+        },
+        "mappable": true,
+        "mappable_reason": "entity 'supplier_code', event_date 'order_date' and a late_flag outcome all map to valid columns",
+        "scoreable": false,
+        "rejections": [],
+        "fallback_reason": null,
+        "prompt_tokens": 3820,
+        "completion_tokens": 1519,
+        "latency_s": 25.866,
+        "steps": 4,
+        "marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        },
+        "first_marks": {
+          "entity": true,
+          "event_date": true,
+          "outcome": true,
+          "country": true,
+          "mappable": true
+        }
+      }
+    }
+  ]
+}

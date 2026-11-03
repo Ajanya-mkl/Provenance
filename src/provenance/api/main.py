@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import json
 import os
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,6 +28,7 @@ from provenance.agent.llm import DEFAULT_MODEL
 from provenance.agent.store import table_exists, verify_audit_log
 from provenance.agent.tools.investigation_tools import InvestigationTools, parse_quarter
 from provenance.api import queries
+from provenance.api.datasets_routes import register_dataset_routes
 from provenance.db import connect_read_only
 from provenance.risk_engine.scorer import DEFAULT_DB_PATH
 
@@ -53,7 +54,17 @@ def _locked(_: Request, error: duckdb.IOException) -> JSONResponse:
     )
 
 
-def create_app(db_path: str | Path | None = None, results_dir: Path = RESULTS_DIR) -> FastAPI:
+def _default_llm_factory() -> Any:
+    from provenance.agent.llm import GroqLLM
+
+    return GroqLLM.from_env()
+
+
+def create_app(
+    db_path: str | Path | None = None,
+    results_dir: Path = RESULTS_DIR,
+    mapping_llm_factory: Callable[[], Any] | None = _default_llm_factory,
+) -> FastAPI:
     database = Path(db_path or os.environ.get("PROVENANCE_DUCKDB_PATH", DEFAULT_DB_PATH))
     app = FastAPI(title="Provenance console API", version="0.1.0")
     app.add_middleware(
@@ -63,6 +74,8 @@ def create_app(db_path: str | Path | None = None, results_dir: Path = RESULTS_DI
         allow_headers=["Content-Type"],
     )
     app.add_exception_handler(duckdb.IOException, _locked)
+    # Phase 10b: datasets and column mappings (writes only via mapping_store).
+    register_dataset_routes(app, database, mapping_llm_factory)
 
     @contextmanager
     def read() -> Iterator[duckdb.DuckDBPyConnection]:

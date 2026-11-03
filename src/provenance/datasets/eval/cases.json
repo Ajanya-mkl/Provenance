@@ -1,0 +1,83 @@
+[
+  {
+    "case_id": "a_dataco_like_en",
+    "fixture": "tests/fixtures/datasets/mapping/a_dataco_like_en.csv",
+    "description": "DataCo-like, renamed English columns, planned vs real transit days",
+    "expected": {
+      "entity": "Product Category",
+      "event_date": {"col": "Order Placed", "format": "%m/%d/%Y %H:%M"},
+      "outcome": [{"kind": "days_pair", "scheduled_col": "Planned Transit Days",
+                   "actual_col": "Real Transit Days", "unit": "days"}],
+      "country": "Ship To Country",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "b_spanish_hours",
+    "fixture": "tests/fixtures/datasets/mapping/b_spanish_hours.csv",
+    "description": "Spanish column names, delay in hours, day-first dates",
+    "expected": {
+      "entity": "proveedor",
+      "event_date": {"col": "fecha_pedido", "format": "%d/%m/%Y"},
+      "outcome": [{"kind": "delay_value", "col": "retraso_horas", "unit": "hours"}],
+      "country": "pais_destino",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "c_iso_on_time",
+    "fixture": "tests/fixtures/datasets/mapping/c_iso_on_time.csv",
+    "description": "ISO dates and an on-time flag (inverted polarity)",
+    "expected": {
+      "entity": "vendor_name",
+      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
+      "outcome": [{"kind": "late_flag", "col": "delivered_on_time", "late_when": "false"}],
+      "country": "ship_country",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "d_late_flag_only",
+    "fixture": "tests/fixtures/datasets/mapping/d_late_flag_only.csv",
+    "description": "0/1 late flag only, category entity, no country",
+    "expected": {
+      "entity": "category",
+      "event_date": {"col": "shipped_on", "format": "%Y-%m-%d"},
+      "outcome": [{"kind": "late_flag", "col": "is_late", "late_when": "true"}],
+      "country": null,
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "e_ambiguous",
+    "fixture": "tests/fixtures/datasets/mapping/e_ambiguous.csv",
+    "description": "Ambiguous: order and delivery dates, promised and actual day counts",
+    "expected": {
+      "entity": "supplier",
+      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
+      "outcome": [{"kind": "days_pair", "scheduled_col": "promised_days",
+                   "actual_col": "actual_days", "unit": "days"}],
+      "country": "country",
+      "mappable": true
+    }
+  },
+  {
+    "case_id": "f_not_supply_chain",
+    "fixture": "tests/fixtures/datasets/student_marks.csv",
+    "description": "Student marks (10a fixture): not a shipment dataset",
+    "expected": {"entity": null, "outcome": [null], "mappable": false}
+  },
+  {
+    "case_id": "g_clean_10a",
+    "fixture": "tests/fixtures/datasets/shipments_clean.csv",
+    "description": "10a clean fixture: delay_days and an on_time flag both describe lateness",
+    "expected": {
+      "entity": "supplier_code",
+      "event_date": {"col": "order_date", "format": "%Y-%m-%d"},
+      "outcome": [{"kind": "delay_value", "col": "delay_days", "unit": "days"},
+                  {"kind": "late_flag", "col": "on_time", "late_when": "false"}],
+      "country": "destination_country",
+      "mappable": true
+    }
+  }
+]

@@ -327,3 +327,44 @@ USASpending or World Bank.
   a column name can only appear in SQL if the profile recorded it, quoted with
   embedded quotes doubled; all values (names, paths) are bound parameters, and
   file names under `data/datasets/` are generated, never user-supplied.
+
+## Phase 10b: column mapping
+
+A gated dataset is mapped onto the standard shipment contract
+(`datasets/contract.py`): required `entity` (supplier, vendor or category),
+`event_date` (column + strftime format) and `outcome` (one of `late_flag` with
+`late_when`, `days_pair` scheduled/actual, or `delay_value`, in days or hours);
+optional `country`. Run `python -m provenance.datasets.map <dataset_id>
+[--heuristic-only]`, then `--edit <id> --set field=value --by NAME`,
+`--approve <id> --by NAME` or `--reject <id> --by NAME --reason ...`; the API
+exposes the same under `/api/datasets/{id}/mapping`.
+
+- **Two mappers, one shape.** The agent (`mapping_agent.py`, Groq through
+  `llm.py`) has three read-only tools: `get_contract`, `get_dataset_profile`,
+  `get_column_profile`. It sees names, types, null %, distinct counts and
+  numeric/date ranges; for text columns only length statistics, never values,
+  unless `sample_values` is explicitly on. It returns mapping JSON only, never
+  SQL or code. The heuristic (`heuristic_mapper.py`) matches names (English
+  plus common Spanish, German and French words) and profile types
+  deterministically.
+- **Deterministic validator** (`validator.py`): columns exist and are used
+  once, types fit roles, the date format parses at least 95% of the column,
+  a late flag is boolean-like with a polarity consistent with its name and
+  with any numeric delay in the data, and every number in `evidence` appears
+  in the profile or the agent's tool results (the `grounding.py` check). A
+  required field set to null is a valid "no column fits" answer: not
+  mappable, with the reason. A rejected agent answer gets one retry with the
+  validator's messages, then the heuristic takes over (`source='heuristic'`).
+- **Verdicts.** Mappable: every required field maps to a valid column.
+  Scoreable: mappable, at least 3 quarters in which some entity has 50 rows,
+  and most entities with about 50 rows per active quarter.
+- **Approval** (`mapping_store.py`, writes through `registry.writer`):
+  `meta.mappings` keeps every version (`proposed | approved | rejected |
+  superseded`, source `agent | heuristic | human`). A human edit is
+  re-validated before it is written, becomes a new `human` version and
+  supersedes the old one; nothing is overwritten. Only approving a mappable
+  mapping, with a reviewer name, moves the dataset to `mapped`. Propose, edit,
+  approve and reject each append to the hash-chained audit log.
+- **Evaluation**: `python -m provenance.datasets.eval.run [--limit N]
+  [--fresh]` runs both mappers on synthetic fixtures in temporary databases;
+  results are in `docs/mapping_evaluation.md`.

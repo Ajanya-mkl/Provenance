@@ -1,0 +1,98 @@
+{
+  "key": "61f19859d35ce2e4a4af1a3d635c47f96e8be2e0c5e5b2d3781a1880e7969906",
+  "model": "openai/gpt-oss-120b",
+  "agent": {
+    "source": "agent",
+    "mapping": {
+      "entity": "vendor_name",
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "late_flag",
+        "col": "delivered_on_time",
+        "late_when": "false"
+      },
+      "country": "ship_country",
+      "evidence": {
+        "entity": [
+          "distinct_count=5",
+          "null_pct=0.0",
+          "min_length=6",
+          "max_length=11"
+        ],
+        "event_date": [
+          "null_pct=0.0",
+          "distinct_count=51",
+          "min_value=2024-02-01",
+          "max_value=2024-03-22",
+          "date_format=%Y-%m-%d"
+        ],
+        "outcome": [
+          "inferred_type=bool",
+          "distinct_values=no|yes",
+          "null_pct=0.0"
+        ],
+        "country": [
+          "distinct_count=6",
+          "null_pct=0.0",
+          "min_length=5",
+          "max_length=7"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
+    },
+    "first_answer": {
+      "entity": "vendor_name",
+      "event_date": {
+        "col": "order_date",
+        "format": "%Y-%m-%d"
+      },
+      "outcome": {
+        "kind": "late_flag",
+        "col": "delivered_on_time",
+        "late_when": "false"
+      },
+      "country": "ship_country",
+      "evidence": {
+        "entity": [
+          "distinct_count=5",
+          "null_pct=0.0",
+          "min_length=6",
+          "max_length=11"
+        ],
+        "event_date": [
+          "null_pct=0.0",
+          "distinct_count=51",
+          "min_value=2024-02-01",
+          "max_value=2024-03-22",
+          "date_format=%Y-%m-%d"
+        ],
+        "outcome": [
+          "inferred_type=bool",
+          "distinct_values=no|yes",
+          "null_pct=0.0"
+        ],
+        "country": [
+          "distinct_count=6",
+          "null_pct=0.0",
+          "min_length=5",
+          "max_length=7"
+        ]
+      },
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
+    },
+    "mappable": true,
+    "mappable_reason": "entity 'vendor_name', event_date 'order_date' and a late_flag outcome all map to valid columns",
+    "scoreable": false,
+    "rejections": [],
+    "fallback_reason": null,
+    "prompt_tokens": 3208,
+    "completion_tokens": 1256,
+    "latency_s": 24.938,
+    "steps": 4
+  }
+}

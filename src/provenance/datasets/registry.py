@@ -23,8 +23,11 @@ from provenance.datasets.gen_suite import Rule
 from provenance.datasets.profile import DatasetProfile
 from provenance.db import connect_read_only
 
-STATUSES = ("uploaded", "profiled", "gated", "quarantined", "failed")
-FINAL_STATUSES = ("gated", "quarantined")
+# "mapped" (Phase 10b) is reached only through an approved column mapping.
+STATUSES = ("uploaded", "profiled", "gated", "quarantined", "failed", "mapped")
+MAPPING_SOURCES = ("agent", "heuristic", "human")
+MAPPING_STATUSES = ("proposed", "approved", "rejected", "superseded")
+FINAL_STATUSES = ("gated", "quarantined", "mapped")
 MAX_NAME_CHARS = 100
 
 _DDL = (
@@ -67,6 +70,31 @@ _DDL = (
         is_mixed_type BOOLEAN NOT NULL,
         is_mostly_null BOOLEAN NOT NULL,
         PRIMARY KEY (dataset_id, ordinal)
+    )
+    """,
+    f"""
+    CREATE TABLE IF NOT EXISTS meta.mappings (
+        mapping_id VARCHAR PRIMARY KEY,
+        dataset_id VARCHAR NOT NULL,
+        version INTEGER NOT NULL,
+        proposal JSON NOT NULL,
+        source VARCHAR NOT NULL
+            CHECK (source IN ({", ".join(f"'{source}'" for source in MAPPING_SOURCES)})),
+        status VARCHAR NOT NULL
+            CHECK (status IN ({", ".join(f"'{status}'" for status in MAPPING_STATUSES)})),
+        mappable BOOLEAN NOT NULL,
+        scoreable BOOLEAN NOT NULL,
+        reasons JSON NOT NULL,
+        validation JSON NOT NULL,
+        created_by VARCHAR NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL,
+        prompt_tokens INTEGER,
+        completion_tokens INTEGER,
+        decided_by VARCHAR,
+        reason VARCHAR,
+        decided_at TIMESTAMPTZ,
+        superseded_by VARCHAR,
+        UNIQUE (dataset_id, version)
     )
     """,
 )
@@ -253,3 +281,41 @@ def set_status(
             dataset_id,
         ],
     )
+
+
+def get_dataset(db_path: str | Path, dataset_id: str) -> dict[str, Any] | None:
+    """One dataset with its profiled columns, generated rules and gate report."""
+    if not Path(db_path).exists():
+        return None
+    with connect_read_only(db_path) as connection:
+        if not _has_registry(connection):
+            return None
+        row = connection.execute(
+            """
+            SELECT dataset_id, name, source_filename, status, row_count, column_count,
+                   schema_name, encoding, delimiter, created_at, updated_at, status_reason,
+                   profile_warnings, suite, gate_report
+            FROM meta.datasets WHERE dataset_id = ?
+            """,
+            [dataset_id],
+        ).fetchone()
+        if row is None:
+            return None
+        keys = (
+            "dataset_id", "name", "source_filename", "status", "row_count", "column_count",
+            "schema_name", "encoding", "delimiter", "created_at", "updated_at",
+            "status_reason", "profile_warnings", "suite", "gate_report",
+        )  # fmt: skip
+        dataset = dict(zip(keys, row, strict=True))
+        for key in ("profile_warnings", "suite", "gate_report"):
+            if isinstance(dataset[key], str):
+                dataset[key] = json.loads(dataset[key])
+        columns = connection.execute(
+            "SELECT * FROM meta.dataset_columns WHERE dataset_id = ? ORDER BY ordinal",
+            [dataset_id],
+        )
+        names = [description[0] for description in columns.description]
+        dataset["columns"] = [
+            dict(zip(names, values, strict=True)) for values in columns.fetchall()
+        ]
+    return dataset
