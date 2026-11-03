@@ -16,6 +16,7 @@ from provenance.dags.ingestion_assets import (
     usaspending_contracts,
     worldbank_lpi,
 )
+from provenance.dags.onboarding import onboard_dataset_job
 from provenance.dags.run_risk_scoring import supplier_risk_scoring_asset
 from provenance.dags.silver_assets import dbt_resource, silver_dbt_assets
 from provenance.dags.trigger_agent_investigation import (
@@ -101,6 +102,7 @@ defs = Definitions(
         provenance_full_pipeline,
         implicit_global_asset_job,
         agent_investigation_job,
+        onboard_dataset_job,
     ],
     schedules=[provenance_full_pipeline_schedule],
     sensors=[agent_investigation_sensor],

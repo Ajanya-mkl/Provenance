@@ -283,3 +283,47 @@ exact ordered columns (read from the gate's own suite), the strict
 integer columns, and `Order Country` names missing from `country_iso3_map`.
 It returns a pass/fail result with a readable list of problems; the
 `dataco_shipments` asset runs it first and fails with that list.
+
+## Phase 10a: dataset onboarding
+
+`src/provenance/datasets/` onboards any CSV next to the flagship DataCo
+pipeline, which it does not touch: pre-checks → profile → generated quality
+suite → gate → generic bronze. Run it with
+`python -m provenance.datasets.onboard file.csv --name "My data"` (`--list`
+shows the registry) or the Dagster job `onboard_dataset` (run config
+`csv_path`, `dataset_name`; `duckdb_writer` tag; a lock error retries). The
+job is an op job, not an asset selection, so it never re-ingests DataCo,
+USASpending or World Bank.
+
+- **Pre-checks and profile** (`profile.py`): only `.csv/.tsv/.txt`, at most
+  50 MB and 200 columns by default; binary content, blank or duplicate header
+  names are refused before anything is written. Encoding is UTF-8 with a
+  Latin-1 fallback; the delimiter is the one that splits the first lines into
+  a consistent column count. Every cell is read as text, types (int, float,
+  bool, date with its format, string) are inferred from at least 80% of
+  non-empty values, and statistics are rounded so the same bytes always give
+  the same profile. Only a 5-row preview of the data is kept.
+- **Generated suite** (`gen_suite.py`): built in code as a Great Expectations
+  suite. Hard rules quarantine: columns present (as a set), no empty values
+  where there were none, fully typed columns keep their type, the identifier
+  column stays unique (an id-like name with at least 90% distinct values, or
+  the first fully unique column), dates parse with the detected format.
+  Tolerance rules warn: up to 1% empty values, mixed-type columns, numeric
+  values within the profiled range padded by 10% (never below 0 when the data
+  never was; identifiers get no range). The report states each rule, why it
+  exists and its result.
+- **Registry and writer** (`registry.py`): `meta.datasets` (status
+  `uploaded → profiled → gated | quarantined | failed`, one row per file
+  SHA-256; a second upload of the same bytes is reported as already
+  registered) and `meta.dataset_columns`. All writes go through one
+  connection and transaction, like the agent's `store.py`.
+- **Generic bronze** (`bronze.py`): each dataset gets schema
+  `ds_<first 12 hex of the file hash>`; `bronze_raw` holds every column as
+  text plus `_batch_id, _source, _source_file, _loaded_at`, from parquet under
+  `data/datasets/<id>/`. A failed gate moves the batch to
+  `data/quarantine/datasets/<id>/` with its report, writes a `dq_failure`
+  event and a hash-chained audit entry, and creates no bronze table.
+- **Safety** (`identifiers.py`): schema names are generated and validated;
+  a column name can only appear in SQL if the profile recorded it, quoted with
+  embedded quotes doubled; all values (names, paths) are bound parameters, and
+  file names under `data/datasets/` are generated, never user-supplied.
