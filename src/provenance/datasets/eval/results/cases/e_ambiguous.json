@@ -1,5 +1,5 @@
 {
-  "key": "b0668bf4268a0a40edf37769ae666ad606d1c81ef75a54d75398cd3937265239",
+  "key": "8416f6701508e6aa10e381c8dbcb0347aa057b816668ff9f72a37c2e9d89029c",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -19,33 +19,48 @@
       "country": "country",
       "evidence": {
         "entity": [
+          "inferred_type=string",
+          "null_pct=0.0",
           "distinct_count=4",
           "min_length=10",
+          "mean_length=14.0",
           "max_length=19"
         ],
         "event_date": [
-          "date_format=%Y-%m-%d",
+          "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=86",
           "min_value=2023-06-01",
-          "max_value=2023-08-25"
+          "max_value=2023-08-25",
+          "date_format=%Y-%m-%d"
         ],
-        "outcome.scheduled_col": [
+        "scheduled_col": [
+          "inferred_type=int",
+          "null_pct=0.0",
           "distinct_count=3",
           "min_value=3",
-          "max_value=7"
+          "max_value=7",
+          "type_share_pct=100.0"
         ],
-        "outcome.actual_col": [
+        "actual_col": [
+          "inferred_type=int",
+          "null_pct=0.0",
           "distinct_count=8",
           "min_value=2",
-          "max_value=11"
+          "max_value=11",
+          "type_share_pct=100.0"
         ],
         "country": [
+          "inferred_type=string",
+          "null_pct=0.0",
           "distinct_count=6",
           "min_length=5",
+          "mean_length=5.8",
           "max_length=7"
         ]
       },
-      "confidence": 0.95,
-      "notes": "All required fields successfully mapped using supplier as entity, order_date as event_date, and promised_days/actual_days as a days_pair outcome. Country column mapped to optional field.",
+      "confidence": 1.0,
+      "notes": "",
       "cancelled": null
     },
     "first_answer": {
@@ -63,33 +78,48 @@
       "country": "country",
       "evidence": {
         "entity": [
+          "inferred_type=string",
+          "null_pct=0.0",
           "distinct_count=4",
           "min_length=10",
+          "mean_length=14.0",
           "max_length=19"
         ],
         "event_date": [
-          "date_format=%Y-%m-%d",
+          "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=86",
           "min_value=2023-06-01",
-          "max_value=2023-08-25"
+          "max_value=2023-08-25",
+          "date_format=%Y-%m-%d"
         ],
-        "outcome.scheduled_col": [
+        "scheduled_col": [
+          "inferred_type=int",
+          "null_pct=0.0",
           "distinct_count=3",
           "min_value=3",
-          "max_value=7"
+          "max_value=7",
+          "type_share_pct=100.0"
         ],
-        "outcome.actual_col": [
+        "actual_col": [
+          "inferred_type=int",
+          "null_pct=0.0",
           "distinct_count=8",
           "min_value=2",
-          "max_value=11"
+          "max_value=11",
+          "type_share_pct=100.0"
         ],
         "country": [
+          "inferred_type=string",
+          "null_pct=0.0",
           "distinct_count=6",
           "min_length=5",
+          "mean_length=5.8",
           "max_length=7"
         ]
       },
-      "confidence": 0.95,
-      "notes": "All required fields successfully mapped using supplier as entity, order_date as event_date, and promised_days/actual_days as a days_pair outcome. Country column mapped to optional field.",
+      "confidence": 1.0,
+      "notes": "",
       "cancelled": null
     },
     "mappable": true,
@@ -97,9 +127,9 @@
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 7841,
-    "completion_tokens": 1704,
-    "latency_s": 69.218,
+    "prompt_tokens": 8185,
+    "completion_tokens": 1961,
+    "latency_s": 56.976,
     "steps": 7
   }
 }

@@ -50,8 +50,10 @@ Rules:
 1. Call get_contract and get_dataset_profile first; use get_column_profile for detail.
 2. Use column names exactly as the tools list them. Never invent a column.
 3. Each column may fill only one role. An entity is a supplier, vendor or category
-   name or code, not a row identifier. event_date is the order or shipment date;
-   copy its date_format from the profile.
+   name or code, not a row identifier. event_date is the order or creation date:
+   when a dataset has both an order/creation date and a ship or delivery date,
+   choose the order/creation date. Copy its date_format from the profile; a date
+   stored as a number like 20230201 has the format %Y%m%d.
 4. For a late_flag, late_when is the value that means late: a column meaning
    "on time" maps with late_when "false".
 5. In evidence, quote facts exactly as the tools showed them, as "key=value"

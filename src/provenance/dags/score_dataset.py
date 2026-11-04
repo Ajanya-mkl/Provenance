@@ -58,6 +58,7 @@ def score_dataset_op(context: OpExecutionContext) -> Output:
             config["dataset_id"],
             bounds_mode=config["bounds_mode"],
             refreeze=config["refreeze"],
+            trigger="dagster",
         )
     except duckdb.IOException as error:
         # The scoring run is one transaction, so nothing was half-written.

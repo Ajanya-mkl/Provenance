@@ -1,5 +1,5 @@
 {
-  "key": "094391660b9a75d0740375fe826daadb6980cf8542006f9f4d096f67977b9084",
+  "key": "0610783ad8a908124c52eefdfeb36d5f0b68cef585f22677235f7ad6e5bb6366",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -17,37 +17,44 @@
         "unit": "hours"
       },
       "country": "Country Code",
-      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=4",
-          "inferred_type=string"
+          "null_pct=0.0",
+          "min_length=7",
+          "mean_length=10.4",
+          "max_length=14"
         ],
         "event_date": [
-          "date_format=%m/%d/%Y",
-          "distinct_count=76"
+          "distinct_count=76",
+          "null_pct=0.0",
+          "min_value=2024-01-02",
+          "max_value=2024-03-17",
+          "date_format=%m/%d/%Y"
         ],
-        "outcome.scheduled_col": [
+        "scheduled_col": [
           "distinct_count=4",
+          "null_pct=0.0",
           "min_value=24",
-          "max_value=96",
-          "inferred_type=int"
+          "max_value=96"
         ],
-        "outcome.actual_col": [
+        "actual_col": [
           "distinct_count=16",
+          "null_pct=0.0",
           "min_value=18",
-          "max_value=126",
-          "inferred_type=int"
+          "max_value=126"
         ],
         "country": [
           "distinct_count=6",
-          "inferred_type=string",
+          "null_pct=0.0",
           "min_length=2",
+          "mean_length=2.0",
           "max_length=2"
         ]
       },
-      "confidence": 1.0,
-      "notes": "All required fields mapped successfully."
+      "confidence": 1,
+      "notes": "All required fields mapped.",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "Supplier Name",
@@ -62,46 +69,57 @@
         "unit": "hours"
       },
       "country": "Country Code",
-      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=4",
-          "inferred_type=string"
+          "null_pct=0.0",
+          "min_length=7",
+          "mean_length=10.4",
+          "max_length=14"
         ],
         "event_date": [
-          "date_format=%m/%d/%Y",
-          "distinct_count=76"
+          "distinct_count=76",
+          "null_pct=0.0",
+          "min_value=2024-01-02",
+          "max_value=2024-03-17",
+          "date_format=%m/%d/%Y"
         ],
-        "outcome.scheduled_col": [
+        "scheduled_col": [
           "distinct_count=4",
+          "null_pct=0.0",
           "min_value=24",
-          "max_value=96",
-          "inferred_type=int"
+          "max_value=96"
         ],
-        "outcome.actual_col": [
+        "actual_col": [
           "distinct_count=16",
+          "null_pct=0.0",
           "min_value=18",
-          "max_value=126",
-          "inferred_type=int"
+          "max_value=126"
         ],
         "country": [
           "distinct_count=6",
-          "inferred_type=string",
+          "null_pct=0.0",
           "min_length=2",
+          "mean_length=2.0",
           "max_length=2"
         ]
       },
-      "confidence": 1.0,
-      "notes": "All required fields mapped successfully."
+      "confidence": 1,
+      "notes": "All required fields mapped.",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'Supplier Name', event_date 'Ship Date' and a days_pair outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [],
+    "rejections": [
+      [
+        "Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON."
+      ]
+    ],
     "fallback_reason": null,
-    "prompt_tokens": 4502,
-    "completion_tokens": 1627,
-    "latency_s": 34.351,
+    "prompt_tokens": 4930,
+    "completion_tokens": 2284,
+    "latency_s": 37.793,
     "steps": 5
   }
 }

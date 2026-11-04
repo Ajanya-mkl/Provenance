@@ -4,7 +4,11 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  LabelList,
   Legend,
+  Line,
+  LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -13,7 +17,7 @@ import {
 import type { TooltipContentProps } from "recharts";
 
 import { factorLabel, percent, score as fmtScore } from "../lib/format";
-import type { FlagSummary, MarketMix, ScoreFactor, Tier } from "../lib/types";
+import type { DatasetScore, FlagSummary, MarketMix, ScoreFactor, Tier } from "../lib/types";
 import { DataTable, TierBadge } from "./ui";
 
 const TIER_COLOR: Record<Tier, string> = {
@@ -279,6 +283,108 @@ export function MarketMixChart({ mix }: { mix: MarketMix }) {
           percent(market.share, 1),
           percent(market.previous_share, 1),
           market.share_change == null ? "–" : `${(market.share_change * 100).toFixed(1)} pts`,
+        ])}
+      />
+    </figure>
+  );
+}
+
+const ENTITY_SLOTS = 5;
+
+/**
+ * Each entity's score over its scored quarters, one line per entity (categorical
+ * slots in fixed order, by entity name, so a colour follows its entity). More than
+ * five entities: the five with the highest latest score are drawn, all are in the
+ * table. Tier thresholds are dashed reference lines.
+ */
+export function EntityScoreChart({
+  scores,
+  thresholds = { medium: 0.38, high: 0.68 },
+}: {
+  scores: DatasetScore[];
+  thresholds?: { medium: number; high: number };
+}) {
+  const reduce = useReducedMotion();
+  const quarters = [...new Set(scores.map((row) => row.quarter))].sort();
+  const names = new Map(scores.map((row) => [row.entity_key, row.entity_name ?? row.entity_key]));
+  const latest = new Map<string, number>();
+  for (const row of [...scores].sort((a, b) => a.quarter.localeCompare(b.quarter))) latest.set(row.entity_key, row.score);
+  const entities = [...names.keys()].sort((a, b) => names.get(a)!.localeCompare(names.get(b)!));
+  const drawn = [...entities]
+    .sort((a, b) => (latest.get(b) ?? 0) - (latest.get(a) ?? 0))
+    .slice(0, ENTITY_SLOTS)
+    .sort((a, b) => names.get(a)!.localeCompare(names.get(b)!));
+  const data = quarters.map((quarter) => {
+    const row: Record<string, number | string> = { quarter };
+    for (const score of scores) if (score.quarter === quarter) row[score.entity_key] = Number(score.score.toFixed(3));
+    return row;
+  });
+  const lastQuarter = quarters.at(-1);
+  return (
+    <figure>
+      <div
+        role="img"
+        aria-label={`Line chart of risk score per quarter for ${drawn.length} entities. ${drawn
+          .map((key) => `${names.get(key)}: ${fmtScore(latest.get(key))} in the latest quarter`)
+          .join(", ")}.`}
+        className="h-[300px]"
+      >
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={data} margin={{ top: 12, right: 112, bottom: 0, left: -20 }}>
+            <CartesianGrid vertical={false} stroke="var(--line)" />
+            <XAxis dataKey="quarter" tick={axisTick} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 1]} ticks={[0, 0.25, 0.5, 0.75, 1]} tick={axisTick} axisLine={false} tickLine={false} />
+            <ReferenceLine y={thresholds.medium} stroke="var(--ink-3)" strokeDasharray="4 4" label={{ value: "medium", position: "insideTopLeft", fill: "var(--ink-3)", fontSize: 11 }} />
+            <ReferenceLine y={thresholds.high} stroke="var(--ink-3)" strokeDasharray="4 4" label={{ value: "high", position: "insideTopLeft", fill: "var(--ink-3)", fontSize: 11 }} />
+            <Tooltip cursor={{ stroke: "var(--ink-3)", strokeWidth: 1 }} content={<ChartTooltip />} />
+            {drawn.map((key, index) => (
+              <Line
+                key={key}
+                type="monotone"
+                dataKey={key}
+                name={names.get(key)}
+                stroke={`var(--entity-${index + 1})`}
+                strokeWidth={2}
+                dot={{ r: 4, strokeWidth: 2, stroke: "var(--ground)" }}
+                activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--ground)" }}
+                connectNulls
+                isAnimationActive={!reduce}
+                animationDuration={500}
+              >
+                {/* Direct label at the line's end: identity never rests on colour alone. */}
+                <LabelList
+                  dataKey={key}
+                  content={({ x, y, index: point }) =>
+                    data[Number(point)]?.quarter === lastQuarter && x != null && y != null ? (
+                      <text x={Number(x) + 10} y={Number(y) + 4} fontSize={12} fill="var(--ink-2)">
+                        {String(names.get(key)).slice(0, 16)}
+                      </text>
+                    ) : null
+                  }
+                />
+              </Line>
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+      <figcaption className="mt-3 flex flex-wrap gap-4 text-[13px] text-ink-2">
+        {drawn.map((key, index) => (
+          <span key={key} className="inline-flex items-center gap-2">
+            <span aria-hidden className="h-0.5 w-4 rounded-full" style={{ background: `var(--entity-${index + 1})` }} />
+            {names.get(key)}
+          </span>
+        ))}
+        {entities.length > drawn.length && <span className="text-ink-3">+{entities.length - drawn.length} more in the table</span>}
+      </figcaption>
+      <DataTable
+        caption="Risk score per entity and quarter"
+        columns={["Entity", ...quarters]}
+        rows={entities.map((key) => [
+          names.get(key)!,
+          ...quarters.map((quarter) => {
+            const row = scores.find((score) => score.entity_key === key && score.quarter === quarter);
+            return row ? `${fmtScore(row.score)} ${row.tier}` : "–";
+          }),
         ])}
       />
     </figure>

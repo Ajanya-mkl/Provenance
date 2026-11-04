@@ -1,5 +1,5 @@
 {
-  "key": "57c700c61cabdf2df4285e86fd4967849b35c506560969c51e906f66137be2d3",
+  "key": "63708cff772d4345c9eadbe1798c0d8b43172164b8626b5e17bb725d7d6a9a88",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -16,30 +16,26 @@
         "late_when": "true"
       },
       "country": null,
+      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=5",
-          "null_pct=0.0",
           "min_length=6",
           "max_length=16"
         ],
         "event_date": [
-          "distinct_count=140",
-          "null_pct=0.0",
           "date_format=%Y-%m-%d",
           "min_value=2022-09-02",
           "max_value=2023-01-19"
         ],
         "outcome": [
           "distinct_count=2",
-          "null_pct=0.0",
           "min_value=0",
           "max_value=1"
         ]
       },
-      "confidence": 1,
-      "notes": "",
-      "cancelled": null
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
     },
     "first_answer": {
       "entity": "category",
@@ -53,39 +49,35 @@
         "late_when": "true"
       },
       "country": null,
+      "cancelled": null,
       "evidence": {
         "entity": [
           "distinct_count=5",
-          "null_pct=0.0",
           "min_length=6",
           "max_length=16"
         ],
         "event_date": [
-          "distinct_count=140",
-          "null_pct=0.0",
           "date_format=%Y-%m-%d",
           "min_value=2022-09-02",
           "max_value=2023-01-19"
         ],
         "outcome": [
           "distinct_count=2",
-          "null_pct=0.0",
           "min_value=0",
           "max_value=1"
         ]
       },
-      "confidence": 1,
-      "notes": "",
-      "cancelled": null
+      "confidence": 1.0,
+      "notes": "All required fields mapped successfully."
     },
     "mappable": true,
     "mappable_reason": "entity 'category', event_date 'shipped_on' and a late_flag outcome all map to valid columns",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 5527,
-    "completion_tokens": 1907,
-    "latency_s": 47.692,
-    "steps": 6
+    "prompt_tokens": 3463,
+    "completion_tokens": 1248,
+    "latency_s": 34.465,
+    "steps": 4
   }
 }

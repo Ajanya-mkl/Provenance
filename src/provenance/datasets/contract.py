@@ -47,7 +47,10 @@ MOST_ENTITIES = 0.5
 CONTRACT_DESCRIPTION: dict[str, Any] = {
     "required": {
         "entity": "the column naming who is scored: supplier, vendor or product category",
-        "event_date": "the shipment or order date column, with its strftime format",
+        "event_date": (
+            "the date the shipment was ordered or created, with its strftime format; "
+            "when both exist, prefer the order or creation date over ship or delivery dates"
+        ),
         "outcome": "how lateness is recorded, as exactly one of the outcome kinds",
     },
     "optional": {

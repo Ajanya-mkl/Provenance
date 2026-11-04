@@ -1,5 +1,5 @@
 {
-  "key": "4b0764717efac95821e987311916df1283e9fe30b73d9a71f213183125c6c7f3",
+  "key": "86ac5af05df46b42c6fd01a7174df20c29a745b9284636937b220d2482c4ba9a",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -15,20 +15,18 @@
       "evidence": {
         "entity": [
           "distinct_count=3",
-          "inferred_type=string",
           "min_length=5",
           "max_length=7"
         ],
         "event_date": [
-          "inferred_type=date",
           "distinct_count=15",
           "date_format=%d/%m/%Y",
           "min_value=2024-05-13",
           "max_value=2024-05-31"
         ]
       },
-      "confidence": 0.9,
-      "notes": "No column representing lateness (late_flag, days_pair, or delay_value) is present; therefore outcome is set to null.",
+      "confidence": 0.6,
+      "notes": "No column captures lateness information required for the outcome field; therefore outcome is set to null.",
       "cancelled": null
     },
     "first_answer": {
@@ -42,30 +40,28 @@
       "evidence": {
         "entity": [
           "distinct_count=3",
-          "inferred_type=string",
           "min_length=5",
           "max_length=7"
         ],
         "event_date": [
-          "inferred_type=date",
           "distinct_count=15",
           "date_format=%d/%m/%Y",
           "min_value=2024-05-13",
           "max_value=2024-05-31"
         ]
       },
-      "confidence": 0.9,
-      "notes": "No column representing lateness (late_flag, days_pair, or delay_value) is present; therefore outcome is set to null.",
+      "confidence": 0.6,
+      "notes": "No column captures lateness information required for the outcome field; therefore outcome is set to null.",
       "cancelled": null
     },
     "mappable": false,
-    "mappable_reason": "no column fits the required field(s) outcome: No column representing lateness (late_flag, days_pair, or delay_value) is present; therefore outcome is set to null.",
+    "mappable_reason": "no column fits the required field(s) outcome: No column captures lateness information required for the outcome field; therefore outcome is set to null.",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 4625,
-    "completion_tokens": 1350,
-    "latency_s": 9.658,
-    "steps": 5
+    "prompt_tokens": 2413,
+    "completion_tokens": 632,
+    "latency_s": 25.179,
+    "steps": 3
   }
 }

@@ -30,3 +30,11 @@ select = ["E", "F", "I", "UP"]
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: slow tests that need local data (the DataCo CSV and warehouse); deselected by default, run with `pytest -m integration`",
+]
+# A normal `pytest -q` skips integration tests; `pytest -m integration` runs only them.
+addopts = "-m 'not integration'"

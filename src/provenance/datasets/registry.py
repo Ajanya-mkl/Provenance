@@ -28,6 +28,8 @@ STATUSES = ("uploaded", "profiled", "gated", "quarantined", "failed", "mapped")
 MAPPING_SOURCES = ("agent", "heuristic", "human")
 MAPPING_STATUSES = ("proposed", "approved", "rejected", "superseded")
 FINAL_STATUSES = ("gated", "quarantined", "mapped")
+RUN_STATUSES = ("queued", "running", "succeeded", "failed")
+RUN_STAGES = ("silver", "metrics", "scoring", "flags")
 MAX_NAME_CHARS = 100
 
 _DDL = (
@@ -95,6 +97,23 @@ _DDL = (
         decided_at TIMESTAMPTZ,
         superseded_by VARCHAR,
         UNIQUE (dataset_id, version)
+    )
+    """,
+    # Scoring runs (Phase 10c-2): one row per run, from the console, the CLI or
+    # Dagster. While a run holds the writer its live stage is in a status file
+    # (datasets.runs); the row's final state is written with the scores.
+    f"""
+    CREATE TABLE IF NOT EXISTS meta.runs (
+        run_id VARCHAR PRIMARY KEY,
+        dataset_id VARCHAR NOT NULL,
+        stage VARCHAR,
+        status VARCHAR NOT NULL
+            CHECK (status IN ({", ".join(f"'{status}'" for status in RUN_STATUSES)})),
+        trigger VARCHAR NOT NULL,
+        started_at TIMESTAMPTZ NOT NULL,
+        finished_at TIMESTAMPTZ,
+        error VARCHAR,
+        summary JSON
     )
     """,
     # Scoring rules frozen at a dataset's first scoring (Phase 10c): normalisation
@@ -187,11 +206,31 @@ def list_datasets(db_path: str | Path) -> list[dict[str, Any]]:
             FROM meta.datasets ORDER BY created_at
             """
         ).fetchall()
+        scored = _scored_datasets(connection)
     columns = (
         "dataset_id", "name", "status", "row_count", "column_count", "schema_name",
         "source_filename", "created_at",
     )  # fmt: skip
-    return [dict(zip(columns, row, strict=True)) for row in rows]
+    datasets = [dict(zip(columns, row, strict=True)) for row in rows]
+    for dataset in datasets:
+        # 'scored' is shown, not stored: a scored dataset stays 'mapped' so it can be
+        # re-scored, and the status CHECK of older registries stays valid.
+        dataset["display_status"] = (
+            "scored"
+            if dataset["status"] == "mapped" and dataset["dataset_id"] in scored
+            else dataset["status"]
+        )
+    return datasets
+
+
+def _scored_datasets(connection: duckdb.DuckDBPyConnection) -> set[str]:
+    if not connection.execute(
+        "SELECT 1 FROM information_schema.tables "
+        "WHERE table_schema = 'meta' AND table_name = 'dataset_rules'"
+    ).fetchone():
+        return set()
+    rows = connection.execute("SELECT DISTINCT dataset_id FROM meta.dataset_rules").fetchall()
+    return {row[0] for row in rows}
 
 
 def register(
@@ -385,3 +424,116 @@ def freeze_rules(
             _now(),
         ],
     )
+
+
+# --- scoring runs ------------------------------------------------------------------
+
+
+def create_run(
+    connection: duckdb.DuckDBPyConnection,
+    run_id: str,
+    dataset_id: str,
+    *,
+    trigger: str,
+    status: str = "queued",
+) -> None:
+    connection.execute(
+        "INSERT INTO meta.runs (run_id, dataset_id, stage, status, trigger, started_at) "
+        "VALUES (?, ?, NULL, ?, ?, ?)",
+        [run_id, dataset_id, status, trigger, _now()],
+    )
+
+
+def finish_run(
+    connection: duckdb.DuckDBPyConnection,
+    run_id: str,
+    *,
+    status: str,
+    stage: str | None,
+    error: str | None = None,
+    summary: dict[str, Any] | None = None,
+) -> None:
+    if status not in RUN_STATUSES:
+        raise ValueError(f"Unknown run status {status!r}")
+    connection.execute(
+        "UPDATE meta.runs SET status = ?, stage = ?, error = ?, summary = ?::JSON, "
+        "finished_at = ? WHERE run_id = ?",
+        [
+            status,
+            stage,
+            error,
+            json.dumps(summary, default=str) if summary is not None else None,
+            _now(),
+            run_id,
+        ],
+    )
+
+
+def _runs_table(connection: duckdb.DuckDBPyConnection) -> bool:
+    return bool(
+        connection.execute(
+            "SELECT 1 FROM information_schema.tables "
+            "WHERE table_schema = 'meta' AND table_name = 'runs'"
+        ).fetchone()
+    )
+
+
+RUN_COLUMNS = (
+    "run_id", "dataset_id", "stage", "status", "trigger", "started_at", "finished_at",
+    "error", "summary",
+)  # fmt: skip
+
+
+def _run_dict(row: tuple) -> dict[str, Any]:
+    run = dict(zip(RUN_COLUMNS, row, strict=True))
+    if isinstance(run["summary"], str):
+        run["summary"] = json.loads(run["summary"])
+    return run
+
+
+def get_run_in(connection: duckdb.DuckDBPyConnection, run_id: str) -> dict[str, Any] | None:
+    """A run row read on the caller's (writer) connection."""
+    row = connection.execute(
+        f"SELECT {', '.join(RUN_COLUMNS)} FROM meta.runs WHERE run_id = ?", [run_id]
+    ).fetchone()
+    return _run_dict(row) if row else None
+
+
+def get_run(db_path: str | Path, run_id: str) -> dict[str, Any] | None:
+    if not Path(db_path).exists():
+        return None
+    with connect_read_only(db_path) as connection:
+        if not _runs_table(connection):
+            return None
+        row = connection.execute(
+            f"SELECT {', '.join(RUN_COLUMNS)} FROM meta.runs WHERE run_id = ?", [run_id]
+        ).fetchone()
+    return _run_dict(row) if row else None
+
+
+def open_runs(db_path: str | Path) -> list[dict[str, Any]]:
+    """Runs not yet finished (queued or running), oldest first."""
+    if not Path(db_path).exists():
+        return []
+    with connect_read_only(db_path) as connection:
+        if not _runs_table(connection):
+            return []
+        rows = connection.execute(
+            f"SELECT {', '.join(RUN_COLUMNS)} FROM meta.runs "
+            "WHERE status IN ('queued', 'running') ORDER BY started_at"
+        ).fetchall()
+    return [_run_dict(row) for row in rows]
+
+
+def latest_run(
+    connection: duckdb.DuckDBPyConnection, dataset_id: str, *, succeeded: bool = False
+) -> dict[str, Any] | None:
+    if not _runs_table(connection):
+        return None
+    row = connection.execute(
+        f"SELECT {', '.join(RUN_COLUMNS)} FROM meta.runs WHERE dataset_id = ? "
+        + ("AND status = 'succeeded' " if succeeded else "")
+        + "ORDER BY started_at DESC LIMIT 1",
+        [dataset_id],
+    ).fetchone()
+    return _run_dict(row) if row else None

@@ -71,6 +71,12 @@
   --factor-country_risk: #199e70;
   --series-muted: #6f8899;
   --series-primary: #3fa7d6;
+  /* Entity series, categorical slots 1-5 (validated: dark, adjacent pairs, all pass). */
+  --entity-1: #3987e5;
+  --entity-2: #d95926;
+  --entity-3: #199e70;
+  --entity-4: #c98500;
+  --entity-5: #d55181;
 }
 
 :root[data-theme="light"] {
@@ -110,6 +116,12 @@
   --factor-country_risk: #1baf7a;
   --series-muted: #9fb2bf;
   --series-primary: #1c7293;
+  /* Light steps; below 3:1 on the ground, so lines carry direct labels and a table. */
+  --entity-1: #2a78d6;
+  --entity-2: #eb6834;
+  --entity-3: #1baf7a;
+  --entity-4: #eda100;
+  --entity-5: #e87ba4;
 }
 
 /* ---------------------------------------------------------------------------

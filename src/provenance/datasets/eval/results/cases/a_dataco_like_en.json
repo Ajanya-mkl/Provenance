@@ -1,5 +1,5 @@
 {
-  "key": "37a0b55fdd96d0e18020180cdf9ab86da3060bb6bfbbf2b14e31312c4860ac5b",
+  "key": "e79864e70cc4ff88a645a55f3663846910dd6d99c65db00f260c9af8c6e30067",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -20,38 +20,32 @@
       "cancelled": null,
       "evidence": {
         "entity": [
-          "column=Product Category",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=5"
+          "distinct_count=5",
+          "null_pct=0.0"
         ],
-        "event_date": [
-          "column=Order Placed",
-          "inferred_type=date",
+        "event_date.col": [
           "null_pct=0.0",
           "date_format=%m/%d/%Y %H:%M"
         ],
-        "scheduled_col": [
-          "column=Planned Transit Days",
-          "inferred_type=int",
+        "event_date.format": [
+          "date_format=%m/%d/%Y %H:%M"
+        ],
+        "outcome.scheduled_col": [
           "null_pct=0.0",
-          "distinct_count=4",
           "min_value=2",
           "max_value=5"
         ],
-        "actual_col": [
-          "column=Real Transit Days",
-          "inferred_type=int",
+        "outcome.actual_col": [
           "null_pct=0.0",
-          "distinct_count=8",
           "min_value=1",
           "max_value=8"
         ],
+        "outcome.unit": [
+          "unit=days"
+        ],
         "country": [
-          "column=Ship To Country",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=6"
+          "distinct_count=6",
+          "null_pct=0.0"
         ]
       },
       "confidence": 1.0,
@@ -73,38 +67,32 @@
       "cancelled": null,
       "evidence": {
         "entity": [
-          "column=Product Category",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=5"
+          "distinct_count=5",
+          "null_pct=0.0"
         ],
-        "event_date": [
-          "column=Order Placed",
-          "inferred_type=date",
+        "event_date.col": [
           "null_pct=0.0",
           "date_format=%m/%d/%Y %H:%M"
         ],
-        "scheduled_col": [
-          "column=Planned Transit Days",
-          "inferred_type=int",
+        "event_date.format": [
+          "date_format=%m/%d/%Y %H:%M"
+        ],
+        "outcome.scheduled_col": [
           "null_pct=0.0",
-          "distinct_count=4",
           "min_value=2",
           "max_value=5"
         ],
-        "actual_col": [
-          "column=Real Transit Days",
-          "inferred_type=int",
+        "outcome.actual_col": [
           "null_pct=0.0",
-          "distinct_count=8",
           "min_value=1",
           "max_value=8"
         ],
+        "outcome.unit": [
+          "unit=days"
+        ],
         "country": [
-          "column=Ship To Country",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=6"
+          "distinct_count=6",
+          "null_pct=0.0"
         ]
       },
       "confidence": 1.0,
@@ -113,11 +101,15 @@
     "mappable": true,
     "mappable_reason": "entity 'Product Category', event_date 'Order Placed' and a days_pair outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [],
+    "rejections": [
+      [
+        "Your reply did not contain a JSON object. Reply with only the mapping JSON."
+      ]
+    ],
     "fallback_reason": null,
-    "prompt_tokens": 3624,
-    "completion_tokens": 1280,
-    "latency_s": 6.419,
+    "prompt_tokens": 3763,
+    "completion_tokens": 2097,
+    "latency_s": 8.127,
     "steps": 4
   }
 }

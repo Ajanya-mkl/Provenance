@@ -3,6 +3,7 @@
 // reject decisions in memory for the session.
 import { ApiError, mockVariant } from "../lib/api";
 import type { Approvals, AuditEntry } from "../lib/types";
+import { mockDatasetFetch } from "./datasetsMock";
 import fixtures from "./fixtures.json";
 
 type Route = { status: number; body: unknown };
@@ -94,6 +95,8 @@ export async function mockFetch<T>(path: string, init?: RequestInit): Promise<T>
     }
     servedOnce.add(path);
   }
+  const dataset = mockDatasetFetch(path, init);
+  if (dataset !== undefined) return clone(dataset) as T;
   if (init?.method === "POST") return decide(path, init) as T;
   if (path === "/api/approvals") return clone(approvalsState()) as T;
 

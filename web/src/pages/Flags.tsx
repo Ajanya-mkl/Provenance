@@ -3,8 +3,10 @@ import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 
 import { Sheet } from "../components/Dialogs";
+import { DatasetSelect } from "../components/Shell";
 import { ConfidenceBadge, EmptyState, ErrorState, LoadingBlock, PageHeader, Segmented, TierChange } from "../components/ui";
 import { api } from "../lib/api";
+import { useDataset } from "../lib/dataset";
 import { factorLabel, score, supplierLabel } from "../lib/format";
 import type { FlagSummary } from "../lib/types";
 import { useApi } from "../lib/useApi";
@@ -66,7 +68,8 @@ export function FlagsPage() {
   const [tier, setTier] = useState<TierFilter>("all");
   const [confidence, setConfidence] = useState<ConfidenceFilter>("all");
   const [query, setQuery] = useState("");
-  const flags = useApi("flags", () => api.flags());
+  const { selected, selectedName, isDataco } = useDataset();
+  const flags = useApi(`flags:${selected}`, () => api.flags({ dataset: selected }));
   const open = params.get("open");
 
   const filtered = useMemo(() => {
@@ -94,9 +97,10 @@ export function FlagsPage() {
         title="Flags"
         meta={
           flags.data
-            ? `${flags.data.count} supplier-quarter tier changes from the rule engine. Select one to see why.`
+            ? `${isDataco ? "" : `${selectedName} · `}${flags.data.count} ${isDataco ? "supplier" : "entity"}-quarter tier changes from the rule engine. Select one to see why.`
             : "Supplier-quarter tier changes from the rule engine."
         }
+        actions={<DatasetSelect className="w-[220px] lg:hidden" />}
       />
       <div className="mb-5 flex flex-wrap items-center gap-3">
         <Segmented<TierFilter>

@@ -312,3 +312,12 @@ def test_evaluation_is_404_until_a_report_exists(db, tmp_path):
         encoding="utf-8",
     )
     assert client.get("/api/evaluation").json()["metrics"] == {"grounded_rate": 0.5}
+
+
+def test_dataco_is_the_default_and_dataset_dataco_returns_the_same_data(client):
+    # Phase 10c-2: ?dataset= selects an onboarded dataset; DataCo answers are unchanged.
+    for path in ("/api/flags", f"/api/flags/{_path(EVENT_ID)}"):
+        assert client.get(path).json() == client.get(f"{path}?dataset=dataco").json()
+    assert client.get("/api/flags?dataset=dataco").json()["items"][0]["event_id"] == EVENT_ID
+    assert "dataset_id" not in client.get(f"/api/flags/{_path(EVENT_ID)}").json()
+    assert client.get("/api/flags?dataset=not-an-id").status_code == 404

@@ -28,6 +28,8 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -59,6 +61,28 @@ BOUNDS_MODES = ("dataset", "flagship")
 LOW_PERCENTILE, HIGH_PERCENTILE = 0.05, 0.95
 RESTORE_POINT_SCHEMA = "_restore_point"  # provenance.dags.restore_point.SCHEMA
 FACTOR_ORDER = ("late_rate", "delay_stddev", "country_risk")
+FACTOR_LABELS = {
+    "late_rate": "Late rate",
+    "delay_stddev": "Delay variability",
+    "country_risk": "Country risk",
+}
+
+
+def factor_report(rules: dict[str, Any], base_rules: dict[str, Any]) -> list[dict[str, Any]]:
+    """Every factor, used or not: why it was left out and the weight actually used."""
+    base = rules.get("base_weights") or base_rules["weights"]
+    excluded = rules.get("excluded_factors") or {}
+    return [
+        {
+            "name": name,
+            "label": FACTOR_LABELS[name],
+            "used": name in rules["weights"],
+            "reason": excluded.get(name),
+            "base_weight": float(base[name]),
+            "weight": float(rules["weights"].get(name, 0.0)),
+        }
+        for name in FACTOR_ORDER
+    ]
 
 
 class ScoringRefused(RuntimeError):
@@ -85,6 +109,8 @@ class DatasetScoring:
     excluded_factors: dict[str, str] = field(default_factory=dict)
     weights: dict[str, float] = field(default_factory=dict)
     bounds: dict[str, dict[str, float]] = field(default_factory=dict)
+    factors: list[dict[str, Any]] = field(default_factory=list)
+    run_id: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -106,6 +132,8 @@ class DatasetScoring:
             "excluded_factors": self.excluded_factors,
             "weights": self.weights,
             "bounds": self.bounds,
+            "factors": self.factors,
+            "run_id": self.run_id,
         }
 
 
@@ -160,7 +188,7 @@ def _create_score_tables(connection: duckdb.DuckDBPyConnection, schema: str) -> 
     )
 
 
-def _approved_mapping(db_path: str | Path, dataset_id: str) -> dict[str, Any]:
+def approved_mapping(db_path: str | Path, dataset_id: str) -> dict[str, Any]:
     dataset = registry.get_dataset(db_path, dataset_id)
     if dataset is None:
         raise ScoringRefused(f"Unknown dataset {dataset_id!r}.")
@@ -239,12 +267,23 @@ def score_dataset(
     refreeze: bool = False,
     min_country_match: float = country_module.DEFAULT_MIN_MATCH_RATE,
     rules_path: str | Path = DEFAULT_RULES_PATH,
+    progress: Callable[[str], None] | None = None,
+    run_id: str | None = None,
+    trigger: str = "cli",
 ) -> DatasetScoring:
+    """Score one dataset in one transaction; `progress(stage)` reports each stage.
+
+    The run is recorded in meta.runs (succeeded, with its summary) in the same
+    transaction as the scores, so a run row says 'succeeded' only when its
+    results are there. A refusal or error rolls everything back; the caller
+    records the failure.
+    """
+    report_stage = progress or (lambda _stage: None)
     if not DATASET_ID_PATTERN.match(str(dataset_id)):
         raise ScoringRefused("Dataset ids are 12 lowercase hex characters.")
     if bounds_mode not in BOUNDS_MODES:
         raise ScoringRefused(f"bounds_mode must be one of {BOUNDS_MODES}.")
-    found = _approved_mapping(db_path, dataset_id)
+    found = approved_mapping(db_path, dataset_id)
     mapping_record = found["mapping"]
     mapping = mapping_record["proposal"]
     schema = schema_for(dataset_id)
@@ -263,6 +302,7 @@ def score_dataset(
             )
         ensure_agent_tables(connection)
         ensure_agent_events_table(connection)
+        report_stage("silver")
         silver = build_silver(
             connection,
             schema=schema,
@@ -272,6 +312,7 @@ def score_dataset(
         )
         if silver.rows_out == 0:
             raise ScoringRefused("No row of the dataset parsed into the canonical table.")
+        report_stage("metrics")
         metrics_rows = build_quarter_metrics(connection, schema)
 
         excluded: dict[str, str] = {}
@@ -291,6 +332,17 @@ def score_dataset(
         mart_rows = build_mart(connection, schema, use_country=use_country)
 
         quoted = quote_schema(schema)
+        report_stage("scoring")
+        for name in FACTOR_ORDER:
+            if name in excluded:
+                continue
+            present = connection.execute(
+                f"SELECT count({name}) FROM {quoted}.mart_risk"
+            ).fetchone()[0]
+            if mart_rows and not present:
+                excluded[name] = (
+                    f"{FACTOR_LABELS[name].lower()} not used: no eligible row has a value"
+                )
         eligible_quarters, entities = connection.execute(
             f"SELECT count(DISTINCT quarter), count(DISTINCT entity_key) FROM {quoted}.mart_risk"
         ).fetchone()
@@ -333,6 +385,9 @@ def score_dataset(
                 version=version,
             )
             rules["excluded_factors"] = excluded
+            rules["base_weights"] = {
+                name: float(weight) for name, weight in base_rules["weights"].items()
+            }
             registry.freeze_rules(
                 connection,
                 dataset_id,
@@ -367,6 +422,7 @@ def score_dataset(
         quarter = current_quarter_for(scores, rules)
 
         _create_score_tables(connection, schema)
+        report_stage("flags")
         flags_added, events_added, superseded, resolved = write_scores_and_flags(
             connection, scores, rules, target, excluded_factors=excluded
         )
@@ -389,6 +445,19 @@ def score_dataset(
             excluded_factors=excluded,
             weights=rules["weights"],
             bounds=rules["normalization_bounds"],
+            factors=factor_report({**rules, "excluded_factors": excluded}, base_rules),
+            run_id=run_id or str(uuid.uuid4()),
+        )
+        if registry.get_run_in(connection, result.run_id) is None:
+            registry.create_run(
+                connection, result.run_id, dataset_id, trigger=trigger, status="running"
+            )
+        registry.finish_run(
+            connection,
+            result.run_id,
+            status="succeeded",
+            stage="flags",
+            summary=result.as_dict(),
         )
         append_audit(
             connection,
@@ -397,7 +466,7 @@ def score_dataset(
             {
                 key: value
                 for key, value in result.as_dict().items()
-                if key not in ("silver", "bounds", "weights")
+                if key not in ("silver", "bounds", "weights", "factors")
             }
             | {"rows_in": silver.rows_in, "rows_rejected": sum(silver.rejected.values())},
         )
@@ -434,8 +503,12 @@ def render(result: DatasetScoring) -> str:
     )
     for name, bounds in result.bounds.items():
         lines.append(f"  bounds {name}: {round(bounds['min'], 4)} .. {round(bounds['max'], 4)}")
-    for name, reason in result.excluded_factors.items():
-        lines.append(f"  left out {name}: {reason} (confidence lowered)")
+    for factor in result.factors:
+        if not factor["used"]:
+            lines.append(
+                f"  left out {factor['name']} (base weight {factor['base_weight']}): "
+                f"{factor['reason']} (confidence lowered)"
+            )
     lines.append(
         f"  scores: {result.scores_written} through {result.quarter}; flags added "
         f"{result.flags_added}; events added {result.events_added}, superseded "

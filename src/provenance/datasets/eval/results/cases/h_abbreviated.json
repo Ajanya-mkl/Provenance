@@ -1,5 +1,5 @@
 {
-  "key": "b2d270681c4ea16d4f7842d490e6f83e699699e9b402c69b04249abc11dad408",
+  "key": "9ef71f8dfd629b527541c88bbadd18c4b7db054b0d047b2ea8852bcc0d3150e6",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -7,7 +7,7 @@
     "mapping": {
       "entity": "vndr_cd",
       "event_date": {
-        "col": "dt_shp",
+        "col": "dt_ord",
         "format": "%Y%m%d"
       },
       "outcome": {
@@ -17,51 +17,46 @@
         "unit": "days"
       },
       "country": "dest_ctry",
+      "cancelled": null,
       "evidence": {
-        "vndr_cd": [
-          "inferred_type=string",
-          "null_pct=0.0",
+        "entity": [
           "distinct_count=6",
           "min_length=4",
-          "max_length=4"
+          "max_length=4",
+          "null_pct=0.0"
         ],
-        "dt_shp": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "event_date": [
           "distinct_count=81",
-          "min_value=20230202",
-          "max_value=20230423"
+          "min_value=20230201",
+          "max_value=20230422",
+          "null_pct=0.0"
         ],
-        "sch_lt": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "scheduled_col": [
           "distinct_count=3",
           "min_value=3",
-          "max_value=7"
+          "max_value=7",
+          "null_pct=0.0"
         ],
-        "act_lt": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "actual_col": [
           "distinct_count=8",
           "min_value=2",
-          "max_value=10"
+          "max_value=10",
+          "null_pct=0.0"
         ],
-        "dest_ctry": [
-          "inferred_type=string",
-          "null_pct=0.0",
+        "country": [
           "distinct_count=6",
           "min_length=2",
-          "max_length=2"
+          "max_length=2",
+          "null_pct=0.0"
         ]
       },
-      "confidence": 1.0,
-      "notes": "",
-      "cancelled": null
+      "confidence": 1,
+      "notes": "All required fields mapped; no cancelled column present."
     },
     "first_answer": {
       "entity": "vndr_cd",
       "event_date": {
-        "col": "dt_shp",
+        "col": "dt_ord",
         "format": "%Y%m%d"
       },
       "outcome": {
@@ -71,55 +66,54 @@
         "unit": "days"
       },
       "country": "dest_ctry",
+      "cancelled": null,
       "evidence": {
-        "vndr_cd": [
-          "inferred_type=string",
-          "null_pct=0.0",
+        "entity": [
           "distinct_count=6",
           "min_length=4",
-          "max_length=4"
+          "max_length=4",
+          "null_pct=0.0"
         ],
-        "dt_shp": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "event_date": [
           "distinct_count=81",
-          "min_value=20230202",
-          "max_value=20230423"
+          "min_value=20230201",
+          "max_value=20230422",
+          "null_pct=0.0"
         ],
-        "sch_lt": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "scheduled_col": [
           "distinct_count=3",
           "min_value=3",
-          "max_value=7"
+          "max_value=7",
+          "null_pct=0.0"
         ],
-        "act_lt": [
-          "inferred_type=int",
-          "null_pct=0.0",
+        "actual_col": [
           "distinct_count=8",
           "min_value=2",
-          "max_value=10"
+          "max_value=10",
+          "null_pct=0.0"
         ],
-        "dest_ctry": [
-          "inferred_type=string",
-          "null_pct=0.0",
+        "country": [
           "distinct_count=6",
           "min_length=2",
-          "max_length=2"
+          "max_length=2",
+          "null_pct=0.0"
         ]
       },
-      "confidence": 1.0,
-      "notes": "",
-      "cancelled": null
+      "confidence": 1,
+      "notes": "All required fields mapped; no cancelled column present."
     },
     "mappable": true,
-    "mappable_reason": "entity 'vndr_cd', event_date 'dt_shp' and a days_pair outcome all map to valid columns",
+    "mappable_reason": "entity 'vndr_cd', event_date 'dt_ord' and a days_pair outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [],
+    "rejections": [
+      [
+        "Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON."
+      ]
+    ],
     "fallback_reason": null,
-    "prompt_tokens": 6180,
-    "completion_tokens": 1629,
-    "latency_s": 44.859,
+    "prompt_tokens": 6689,
+    "completion_tokens": 2354,
+    "latency_s": 52.411,
     "steps": 6
   }
 }

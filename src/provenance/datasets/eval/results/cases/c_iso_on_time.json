@@ -1,5 +1,5 @@
 {
-  "key": "61f19859d35ce2e4a4af1a3d635c47f96e8be2e0c5e5b2d3781a1880e7969906",
+  "key": "83b7bb2531139255d1d3a1dd3b8348817abd0f4ac4d53334f342e76b826543cf",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -16,45 +16,26 @@
         "late_when": "false"
       },
       "country": "ship_country",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "column=vendor_name",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=5",
           "min_length=6",
-          "mean_length=8.3",
           "max_length=11"
         ],
         "event_date": [
-          "column=order_date",
-          "inferred_type=date",
-          "null_pct=0.0",
-          "distinct_count=51",
+          "date_format=%Y-%m-%d",
           "min_value=2024-02-01",
-          "max_value=2024-03-22",
-          "date_format=%Y-%m-%d"
+          "max_value=2024-03-22"
         ],
         "outcome": [
-          "column=delivered_on_time",
-          "inferred_type=bool",
-          "null_pct=0.0",
+          "distinct_values=[\"no\",\"yes\"]",
           "distinct_count=2",
-          "distinct_values=[\"no\",\"yes\"]"
-        ],
-        "country": [
-          "column=ship_country",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=6",
-          "min_length=5",
-          "mean_length=5.8",
-          "max_length=7"
+          "inferred_type=bool"
         ]
       },
       "confidence": 1.0,
-      "notes": ""
+      "notes": "",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "vendor_name",
@@ -68,54 +49,35 @@
         "late_when": "false"
       },
       "country": "ship_country",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "column=vendor_name",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=5",
           "min_length=6",
-          "mean_length=8.3",
           "max_length=11"
         ],
         "event_date": [
-          "column=order_date",
-          "inferred_type=date",
-          "null_pct=0.0",
-          "distinct_count=51",
+          "date_format=%Y-%m-%d",
           "min_value=2024-02-01",
-          "max_value=2024-03-22",
-          "date_format=%Y-%m-%d"
+          "max_value=2024-03-22"
         ],
         "outcome": [
-          "column=delivered_on_time",
-          "inferred_type=bool",
-          "null_pct=0.0",
+          "distinct_values=[\"no\",\"yes\"]",
           "distinct_count=2",
-          "distinct_values=[\"no\",\"yes\"]"
-        ],
-        "country": [
-          "column=ship_country",
-          "inferred_type=string",
-          "null_pct=0.0",
-          "distinct_count=6",
-          "min_length=5",
-          "mean_length=5.8",
-          "max_length=7"
+          "inferred_type=bool"
         ]
       },
       "confidence": 1.0,
-      "notes": ""
+      "notes": "",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'vendor_name', event_date 'order_date' and a late_flag outcome all map to valid columns",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 3282,
-    "completion_tokens": 1263,
-    "latency_s": 30.903,
+    "prompt_tokens": 3565,
+    "completion_tokens": 1031,
+    "latency_s": 25.079,
     "steps": 4
   }
 }

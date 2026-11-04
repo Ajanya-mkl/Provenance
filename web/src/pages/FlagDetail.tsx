@@ -15,7 +15,7 @@ import {
 } from "../components/ui";
 import { api } from "../lib/api";
 import { FACTOR_PLAIN, factorLabel, score, signed, supplierLabel } from "../lib/format";
-import type { FlagDetail } from "../lib/types";
+import type { FlagDetail, ScoreBreakdown } from "../lib/types";
 import { useApi } from "../lib/useApi";
 
 /** The pipeline's top factor in plain words, honest about the direction it moved. */
@@ -39,9 +39,73 @@ function TopFactorSentence({ flag }: { flag: FlagDetail }) {
   );
 }
 
+function ExcludedNote({ breakdown }: { breakdown: ScoreBreakdown }) {
+  const excluded = Object.entries(breakdown.excluded_factors ?? {});
+  if (!excluded.length) return null;
+  return (
+    <ul className="mt-4 space-y-1 text-[13px] text-ink-2">
+      {excluded.map(([name, reason]) => (
+        <li key={name}>
+          <span className="font-semibold text-ink">{factorLabel(name)} left out:</span> {reason}. The other weights
+          were renormalised.
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** An onboarded dataset's flag: its own score breakdown and scored quarters. */
+function DatasetPanels({ flag, wide }: { flag: FlagDetail; wide: boolean }) {
+  const dataset = flag.dataset_id ?? "";
+  const key = flag.supplier_key;
+  const breakdown = useApi(`score:${dataset}:${key}:${flag.quarter}`, () => api.score(key, flag.quarter, dataset));
+  const history = useApi(`history:${dataset}:${key}`, () => api.datasetHistory(key, dataset));
+  return (
+    <div className={`grid gap-6 ${wide ? "xl:grid-cols-2" : ""}`}>
+      <Panel variant={wide ? "lite" : "flat"} title="Score breakdown" description="Weighted factors that add up to the score.">
+        {breakdown.error ? (
+          <ErrorState error={breakdown.error} onRetry={breakdown.reload} />
+        ) : breakdown.data ? (
+          <>
+            <FactorStack factors={breakdown.data.factors} total={breakdown.data.score} />
+            <ExcludedNote breakdown={breakdown.data} />
+            <p className="mt-4 text-[13px] text-ink-3">
+              Rules {breakdown.data.rules_version}. Scores are comparable within this dataset only.
+            </p>
+          </>
+        ) : (
+          <LoadingBlock rows={3} label="Loading score breakdown" />
+        )}
+      </Panel>
+      <Panel variant={wide ? "lite" : "flat"} title="Scored quarters" description="This entity's tier in its latest scored quarters.">
+        {history.error ? (
+          <ErrorState error={history.error} onRetry={history.reload} />
+        ) : history.data ? (
+          <ul className="space-y-2 text-[14px]">
+            {history.data.scored_quarters.map((row) => (
+              <li key={row.quarter} className="flex items-center justify-between gap-3">
+                <span className="tabular text-ink-2">{row.quarter}</span>
+                <span className="tabular font-semibold">{score(row.score)}</span>
+                <span className="w-24 text-right capitalize text-ink-2">{row.tier}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <LoadingBlock rows={3} label="Loading history" />
+        )}
+        <p className="mt-4 text-[13px] text-ink-3">
+          Destination markets are DataCo-only: the shipment contract has no market column.
+        </p>
+      </Panel>
+    </div>
+  );
+}
+
 export function FlagDetailBody({ eventId, wide = false }: { eventId: string; wide?: boolean }) {
   const flag = useApi(`flag:${eventId}`, () => api.flag(eventId));
-  const key = flag.data?.supplier_key;
+  // A dataset flag ('ds_<id>:...') reads its own dataset; the DataCo panels do not apply.
+  const isDataset = eventId.startsWith("ds_");
+  const key = isDataset ? undefined : flag.data?.supplier_key;
   const quarter = flag.data?.quarter;
   const history = useApi(key ? `history:${key}` : null, () => api.history(key!));
   const breakdown = useApi(key ? `score:${key}:${quarter}` : null, () => api.score(key!, quarter!));
@@ -77,6 +141,9 @@ export function FlagDetailBody({ eventId, wide = false }: { eventId: string; wid
         </div>
       </div>
 
+      {isDataset ? (
+        <DatasetPanels flag={data} wide={wide} />
+      ) : (
       <div className={`grid gap-6 ${wide ? "xl:grid-cols-2" : ""}`}>
         <Panel variant={wide ? "lite" : "flat"} title="Score breakdown" description="Weighted factors that add up to the score.">
           {breakdown.error ? (
@@ -123,6 +190,7 @@ export function FlagDetailBody({ eventId, wide = false }: { eventId: string; wid
           )}
         </Panel>
       </div>
+      )}
     </div>
   );
 }

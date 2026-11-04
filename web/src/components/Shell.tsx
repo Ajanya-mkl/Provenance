@@ -1,5 +1,6 @@
 import {
   ClipboardCheck,
+  Database,
   FileSearch,
   Hourglass,
   Flag,
@@ -11,9 +12,11 @@ import {
   Workflow,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useId } from "react";
 import { NavLink } from "react-router";
 
-import { api, isMock } from "../lib/api";
+import { api, DATACO, isMock } from "../lib/api";
+import { useDataset } from "../lib/dataset";
 import { useSettings } from "../lib/settings";
 import type { ThemeChoice } from "../lib/settings";
 import { useApi, usePipelineBusy } from "../lib/useApi";
@@ -35,6 +38,7 @@ const NAV = [
   { to: "/investigations", label: "Investigations", Icon: FileSearch, end: false },
   { to: "/approvals", label: "Approvals", Icon: ClipboardCheck, end: false },
   { to: "/pipeline", label: "Pipeline", Icon: Workflow, end: false },
+  { to: "/datasets", label: "Datasets", Icon: Database, end: false },
 ];
 
 const THEMES: { value: ThemeChoice; label: string; Icon: typeof Sun }[] = [
@@ -51,6 +55,32 @@ function BrandMark() {
       <rect x="7" y="12" width="17" height="5" rx="2.5" fill="var(--color-mint)" />
       <rect x="10" y="19" width="14" height="5" rx="2.5" fill="var(--color-amber)" />
     </svg>
+  );
+}
+
+/** Which data Overview and Flags show: DataCo, or a scored dataset. */
+export function DatasetSelect({ className = "" }: { className?: string }) {
+  const id = useId();
+  const { selected, setSelected, choices } = useDataset();
+  return (
+    <div className={className}>
+      <label htmlFor={id} className="mb-1 block px-1 text-[12px] font-medium text-ink-3">
+        Showing data from
+      </label>
+      <select
+        id={id}
+        value={selected}
+        onChange={(event) => setSelected(event.target.value)}
+        className="glass-pill w-full appearance-none px-3 py-2 text-[13px] font-medium text-ink outline-none"
+      >
+        <option value={DATACO}>DataCo (flagship)</option>
+        {choices.map((item) => (
+          <option key={item.dataset_id} value={item.dataset_id}>
+            {item.name}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 }
 
@@ -97,6 +127,8 @@ function Rail({ pending }: { pending: number | undefined }) {
           </li>
         ))}
       </ul>
+
+      <DatasetSelect className="mt-6 max-lg:hidden" />
 
       <div className="mt-auto flex flex-col gap-3">
         {mock && (
@@ -203,6 +235,19 @@ function BusyBanner() {
   );
 }
 
+function Footer() {
+  const { isDataco, selectedName } = useDataset();
+  return (
+    <footer className="mt-16 max-w-[80ch] text-[12px] leading-relaxed text-ink-3">
+      {isDataco
+        ? "Data comes from the DataCo supply-chain benchmark, which is likely synthetic; suppliers are product categories, not companies."
+        : `Overview and Flags show the onboarded dataset “${selectedName}”. Its scores use its own frozen bounds and are comparable within this dataset only.`}{" "}
+      The rule-based score is the source of truth: the agent explains it and never overrides it, and nothing it
+      proposes takes effect without a named human approval. The console has no login and serves localhost only.
+    </footer>
+  );
+}
+
 export function Shell({ children, pending }: { children: ReactNode; pending: number | undefined }) {
   return (
     <div className="noise">
@@ -218,12 +263,7 @@ export function Shell({ children, pending }: { children: ReactNode; pending: num
         <main id="main" className="min-w-0 flex-1 px-2 pt-6 pb-16 sm:px-4 lg:px-6">
           <BusyBanner />
           {children}
-          <footer className="mt-16 max-w-[80ch] text-[12px] leading-relaxed text-ink-3">
-            Data comes from the DataCo supply-chain benchmark, which is likely synthetic; suppliers
-            are product categories, not companies. The rule-based score is the source of truth: the
-            agent explains it and never overrides it, and nothing it proposes takes effect without a
-            named human approval.
-          </footer>
+          <Footer />
         </main>
       </div>
     </div>

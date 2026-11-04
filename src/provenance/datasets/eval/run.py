@@ -69,8 +69,15 @@ LIMITS = [
     "In Phase 10b an early run, before the validator accepted late_when given as the "
     "column's own value and confidence as a numeric string, had 4 rejections; each was "
     "fixed on the retry. late_when is now accepted only when it is a value of that column.",
+    "Phase 10c-2 changed both mappers after these cases were written: the heuristic now "
+    "finds a country column by its values (at least 80% recognised countries, any of seven "
+    "languages) and reads YYYYMMDD integer dates and the abbreviations 'ord'/'shp'; the "
+    "contract and prompt now prefer the order date over ship or delivery dates. The gains on "
+    "h_abbreviated and i_mixed_languages are therefore fixes for known cases, not independent "
+    "evidence; the entity abbreviation 'vndr_cd' was deliberately left to the agent.",
     "The agent never sees text values (only lengths), so it cannot tell a code from a "
-    "name or a city from a country by content; the same holds for the heuristic.",
+    "name by content. The heuristic's country check does read values, but only to count "
+    "how many are country names; nothing it reads is sent to the model.",
 ]
 
 
@@ -291,7 +298,9 @@ def render(results: list[dict], model: str) -> str:
     notes = [
         f"- **{r['case_id']}** ({r['description']}): "
         + (
-            "agent rejected: " + " / ".join("; ".join(e) for e in r["agent"]["rejections"]) + ". "
+            "agent rejected: "
+            + " / ".join("; ".join(e) for e in r["agent"]["rejections"]).rstrip(".")
+            + ". "
             if r["agent"]["rejections"]
             else ""
         )

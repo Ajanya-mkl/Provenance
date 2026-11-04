@@ -111,6 +111,16 @@ class DatasetContext:
     columns: dict[str, dict[str, Any]]
     frame: pd.DataFrame
 
+    def country_match(self, name: str) -> float:
+        """Share of a text column's non-empty rows whose value is a recognised country."""
+        cache = self.__dict__.setdefault("_country_match", {})
+        if name not in cache:
+            from provenance.datasets.country import normalise
+
+            counts = self.frame[name].dropna().astype(str).value_counts()
+            cache[name] = round(normalise(counts.items()).match_rate, 4)
+        return cache[name]
+
     def facts(self) -> dict[str, Any]:
         """Every number the mapper may quote: the profile, as the tools show it."""
         facts: dict[str, Any] = {"row_count": self.row_count, "column_count": len(self.columns)}
@@ -125,6 +135,8 @@ class DatasetContext:
             if share is not None:
                 facts[name]["type_share"] = share
                 facts[name]["type_share_pct"] = round(100 * share, 2)
+            if column["inferred_type"] == "string":
+                facts[name]["country_match_pct"] = round(100 * self.country_match(name), 2)
         return facts
 
 

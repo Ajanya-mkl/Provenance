@@ -15,6 +15,8 @@ export interface Health {
 
 export interface FlagSummary {
   event_id: string;
+  /** Set for an onboarded dataset's flag; absent for DataCo. */
+  dataset_id?: string;
   supplier_key: string;
   supplier_name: string | null;
   quarter: string;
@@ -40,6 +42,7 @@ export interface FlagList {
 
 export interface FlagDetail {
   event_id: string;
+  dataset_id?: string;
   investigation_status: string;
   supplier_key: string;
   supplier_name: string | null;
@@ -89,6 +92,9 @@ export interface ScoreBreakdown {
   rules_version: string;
   factors: ScoreFactor[];
   previous_scored_quarter: { quarter: string; score: number; tier: Tier } | null;
+  /** A dataset may leave factors out; name -> reason. */
+  excluded_factors?: Record<string, string>;
+  dataset_id?: string;
   quarter_metrics?: {
     shipment_count: number;
     late_rate: number;
@@ -205,4 +211,227 @@ export interface Evaluation {
   model: string;
   case_count: number;
   metrics: Record<string, number | null>;
+}
+
+// ---------------------------------------------------------------------------
+// Onboarded datasets (Phase 10c-2): src/provenance/api/datasets_routes.py.
+
+export type DatasetStatus = "uploaded" | "profiled" | "gated" | "quarantined" | "failed" | "mapped" | "scored";
+
+export interface DatasetItem {
+  dataset_id: string;
+  name: string;
+  status: Exclude<DatasetStatus, "scored">;
+  display_status: DatasetStatus;
+  row_count: number | null;
+  column_count: number | null;
+  schema_name: string;
+  source_filename: string;
+  created_at: string;
+}
+
+export interface DatasetColumn {
+  column_name: string;
+  ordinal: number;
+  inferred_type: "string" | "int" | "float" | "bool" | "date";
+  type_share: number | null;
+  null_pct: number;
+  distinct_count: number;
+  min_value: string | null;
+  max_value: string | null;
+  is_candidate_key: boolean;
+  looks_like_date: boolean;
+  date_format: string | null;
+  is_mixed_type: boolean;
+  is_mostly_null: boolean;
+}
+
+export interface GeneratedRule {
+  rule_id: string;
+  column: string | null;
+  check: string;
+  expectation: string;
+  severity: "hard" | "tolerance";
+  why: string;
+}
+
+export interface GateRuleResult {
+  rule_id: string;
+  column: string | null;
+  check: string;
+  severity: "hard" | "tolerance";
+  why: string;
+  success: boolean;
+  detail: string;
+}
+
+export interface DatasetDetail {
+  dataset_id: string;
+  name: string;
+  source_filename: string;
+  status: DatasetItem["status"];
+  display_status: DatasetStatus;
+  row_count: number | null;
+  column_count: number | null;
+  schema_name: string;
+  encoding: string | null;
+  delimiter: string | null;
+  created_at: string;
+  updated_at: string;
+  status_reason: string | null;
+  profile_warnings: string[] | null;
+  suite: GeneratedRule[] | null;
+  gate_report: { passed: boolean; results: GateRuleResult[] } | null;
+  columns: DatasetColumn[];
+}
+
+export interface UploadReport {
+  status: "gated" | "quarantined" | "rejected" | "already_registered" | "failed";
+  dataset_id: string | null;
+  message: string;
+  problems: string[];
+  rows_loaded: number;
+  profile: {
+    row_count: number;
+    column_count: number;
+    encoding: string;
+    delimiter: string;
+    warnings: string[];
+  } | null;
+  gate: {
+    passed: boolean;
+    hard_failures: number;
+    warnings: number;
+    rules: GateRuleResult[];
+  } | null;
+  quarantine_path: string | null;
+}
+
+export type OutcomeKind = "late_flag" | "days_pair" | "delay_value";
+
+export interface ContractMapping {
+  entity: string | null;
+  event_date: { col: string; format: string } | null;
+  outcome: {
+    kind: OutcomeKind;
+    col?: string;
+    scheduled_col?: string;
+    actual_col?: string;
+    unit?: "days" | "hours";
+    late_when?: "true" | "false";
+  } | null;
+  country: string | null;
+  cancelled: { col: string; value: string } | null;
+  evidence: Record<string, string[]>;
+  confidence: number | null;
+  notes: string;
+}
+
+export type DecisionPath = "heuristic" | "agent" | "heuristic_fallback" | "human";
+
+export interface MappingRecord {
+  mapping_id: string;
+  dataset_id: string;
+  version: number;
+  proposal: ContractMapping;
+  source: "agent" | "heuristic" | "human";
+  status: "proposed" | "approved" | "rejected" | "superseded";
+  mappable: boolean;
+  scoreable: boolean;
+  reasons: { mappable: string; scoreable: string };
+  validation: {
+    ok: boolean;
+    errors: string[];
+    decided_by?: DecisionPath;
+    escalation_reasons?: string[];
+    fallback_reason?: string | null;
+    agent_attempt_errors?: string[][];
+  };
+  created_by: string;
+  created_at: string;
+  prompt_tokens: number | null;
+  completion_tokens: number | null;
+  decided_by: string | null;
+  reason: string | null;
+  decided_at: string | null;
+  superseded_by: string | null;
+}
+
+export interface MappingState {
+  current: MappingRecord | null;
+  history: MappingRecord[];
+}
+
+export type StageName = "silver" | "metrics" | "scoring" | "flags";
+export type StageStatus = "pending" | "running" | "done" | "failed";
+
+export interface RunState {
+  run_id: string;
+  dataset_id: string;
+  status: "queued" | "running" | "succeeded" | "failed";
+  stage: StageName | null;
+  error: string | null;
+  started_at: string | null;
+  finished_at?: string | null;
+  stages: { name: StageName; status: StageStatus }[];
+}
+
+export interface FactorReport {
+  name: "late_rate" | "delay_stddev" | "country_risk";
+  label: string;
+  used: boolean;
+  reason: string | null;
+  base_weight: number;
+  weight: number;
+}
+
+export interface DatasetScore {
+  entity_key: string;
+  entity_name: string | null;
+  quarter: string;
+  quarter_start: string;
+  score: number;
+  tier: Tier;
+  confidence: Confidence;
+}
+
+export interface DatasetResults {
+  dataset_id: string;
+  rules_version: string;
+  bounds_mode: "dataset" | "flagship";
+  frozen_at: string | null;
+  comparability_note: string;
+  last_run: { run_id: string; trigger: string; finished_at: string | null } | null;
+  counts: {
+    rows_in: number;
+    rows_out: number;
+    rows_rejected: number;
+    entities: number;
+    quarters: number;
+    scores: number;
+    active_flags: number;
+    high_in_latest: number;
+    latest_quarter: string | null;
+  };
+  rejects: { reason: string; rows: number }[];
+  country: {
+    used: boolean | null;
+    reason: string | null;
+    rows_with_country?: number;
+    matched_rows?: number;
+    match_rate?: number;
+    unmatched_distinct?: number;
+    top_unmatched?: { value: string; rows: number }[];
+  } | null;
+  factors: FactorReport[];
+  bounds: Record<string, { min: number; max: number }>;
+  scores: DatasetScore[];
+  flags: FlagSummary[];
+}
+
+export interface DatasetHistory {
+  supplier_key: string;
+  supplier_name: string | null;
+  dataset_id: string;
+  scored_quarters: { quarter: string; tier: Tier; score: number }[];
 }

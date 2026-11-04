@@ -3,9 +3,10 @@
 Lookup order for each distinct value: the flagship seed's Spanish name exactly
 as DataCo spells it (so the generic path agrees with the flagship), then an ISO3
 code, an ISO2 code, and finally a name (Spanish seed names, the seed's English
-names, World Bank names and a few common aliases) compared without case, accents
-or punctuation. World Bank aggregates (regions, income groups) never match.
-Everything is read from the dbt seed CSVs; nothing here touches the warehouse.
+names, World Bank names, a few common aliases, then country names in English,
+German, French, Spanish, Italian, Portuguese and Dutch from Babel's CLDR data)
+compared without case, accents or punctuation. World Bank aggregates (regions,
+income groups) never match. Nothing here touches the warehouse.
 """
 
 from __future__ import annotations
@@ -18,8 +19,11 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from pathlib import Path
 
+from babel import Locale
+
 SEEDS = Path(__file__).resolve().parents[1] / "transform" / "seeds"
 DEFAULT_MIN_MATCH_RATE = 0.8
+NAME_LOCALES = ("en", "de", "fr", "es", "it", "pt", "nl")
 
 # English forms the World Bank spells differently.
 ALIASES = {
@@ -115,6 +119,11 @@ def lookup() -> CountryLookup:
             names.setdefault(name_key(row["country_name"].split(",")[0]), row["iso3"])
     for alias, iso3 in ALIASES.items():
         names.setdefault(name_key(alias), iso3)
+    # Localized names last, so they never override the seed or the World Bank.
+    for locale in NAME_LOCALES:
+        for code, name in Locale(locale).territories.items():
+            if code in iso2:
+                names.setdefault(name_key(name), iso2[code])
     return CountryLookup(seed_exact, frozenset(iso3_codes), iso2, names)
 
 

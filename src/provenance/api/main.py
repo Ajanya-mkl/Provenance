@@ -1,9 +1,16 @@
-"""Read-only API for the Provenance console: uvicorn provenance.api.main:app --port 8000.
+"""Read-only API for the Provenance console: python -m provenance.api (127.0.0.1:8000).
 
 Every GET opens DuckDB read-only. Approve and reject are the only writes, and
 they go through provenance.agent.approval (which writes through store.writer());
 this module holds no write SQL. Nothing from .env is returned except the model
 name and the approval mode the health check reports.
+
+There is no login. The API binds to localhost only and refuses requests from
+any other address; never expose the console or this API to a network.
+
+Flag and supplier endpoints read DataCo by default; ?dataset=<id> reads an
+onboarded dataset's tables instead (Phase 10c-2). A dataset event id
+('ds_<id>:...') always resolves to its own dataset.
 """
 
 from __future__ import annotations
@@ -26,9 +33,15 @@ from provenance.agent import approval
 from provenance.agent.eval.eval_runner import RESULTS_DIR
 from provenance.agent.llm import DEFAULT_MODEL
 from provenance.agent.store import table_exists, verify_audit_log
-from provenance.agent.tools.investigation_tools import InvestigationTools, parse_quarter
-from provenance.api import queries
+from provenance.agent.tools.investigation_tools import (
+    InvestigationTools,
+    dataset_id_for_event,
+    parse_quarter,
+)
+from provenance.api import dataset_queries, queries
 from provenance.api.datasets_routes import register_dataset_routes
+from provenance.datasets.identifiers import DATASET_ID_PATTERN
+from provenance.datasets.onboard import Paths
 from provenance.db import connect_read_only
 from provenance.risk_engine.scorer import DEFAULT_DB_PATH
 
@@ -36,6 +49,8 @@ CONSOLE_ORIGIN = "http://localhost:5173"
 TIERS = ("low", "medium", "high")
 CONFIDENCES = ("full", "low")
 AUDIT_LIMIT = 200
+# Loopback only; "testclient" is FastAPI's in-process test client.
+LOCAL_CLIENTS = frozenset({"127.0.0.1", "::1", "localhost", "testclient"})
 
 
 class Decision(BaseModel):
@@ -60,13 +75,34 @@ def _default_llm_factory() -> Any:
     return GroqLLM.from_env()
 
 
+def _dataset_param(dataset: str | None) -> str | None:
+    """?dataset= is a 12-hex dataset id; empty or 'dataco' means the flagship."""
+    if dataset in (None, "", "dataco"):
+        return None
+    if not DATASET_ID_PATTERN.match(dataset):
+        raise HTTPException(status_code=404, detail="No such dataset.")
+    return dataset
+
+
 def create_app(
     db_path: str | Path | None = None,
     results_dir: Path = RESULTS_DIR,
     mapping_llm_factory: Callable[[], Any] | None = _default_llm_factory,
+    paths: Paths | None = None,
 ) -> FastAPI:
     database = Path(db_path or os.environ.get("PROVENANCE_DUCKDB_PATH", DEFAULT_DB_PATH))
     app = FastAPI(title="Provenance console API", version="0.1.0")
+
+    @app.middleware("http")
+    async def localhost_only(request: Request, call_next):
+        # No login: anything not from this machine is refused outright.
+        host = request.client.host if request.client else None
+        if host not in LOCAL_CLIENTS:
+            return JSONResponse(
+                status_code=403, content={"detail": "The console API only serves localhost."}
+            )
+        return await call_next(request)
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[CONSOLE_ORIGIN],
@@ -75,15 +111,20 @@ def create_app(
     )
     app.add_exception_handler(duckdb.IOException, _locked)
     # Phase 10b: datasets and column mappings (writes only via mapping_store).
-    register_dataset_routes(app, database, mapping_llm_factory)
+    register_dataset_routes(app, database, mapping_llm_factory, paths)
 
     @contextmanager
     def read() -> Iterator[duckdb.DuckDBPyConnection]:
         with connect_read_only(database) as connection:
             yield connection
 
-    def tool(method: str, *args: Any) -> dict[str, Any]:
-        with InvestigationTools(database) as tools:
+    def tool(method: str, *args: Any, dataset_id: str | None = None) -> dict[str, Any]:
+        toolbox = (
+            InvestigationTools(database, dataset_id=dataset_id)
+            if dataset_id
+            else InvestigationTools(database)
+        )
+        with toolbox as tools:
             result = getattr(tools, method)(*args)
         if "error" in result:
             raise HTTPException(status_code=404, detail=result["error"])
@@ -109,7 +150,9 @@ def create_app(
         tier: str | None = Query(None),
         quarter: str | None = Query(None),
         confidence: str | None = Query(None),
+        dataset: str | None = Query(None),
     ) -> dict[str, Any]:
+        dataset_id = _dataset_param(dataset)
         if tier is not None and tier not in TIERS:
             raise HTTPException(status_code=400, detail=f"tier must be one of {TIERS}")
         if confidence is not None and confidence not in CONFIDENCES:
@@ -120,27 +163,43 @@ def create_app(
             if parsed is None:
                 raise HTTPException(status_code=400, detail="quarter must look like 2017-Q1")
         with read() as connection:
-            items = queries.list_flags(connection, tier, parsed, confidence)
+            if dataset_id:
+                items = dataset_queries.list_dataset_flags(
+                    connection, dataset_id, tier, parsed, confidence
+                )
+            else:
+                items = queries.list_flags(connection, tier, parsed, confidence)
         return {"items": items, "count": len(items)}
 
     @app.get("/api/flags/{event_id}")
     def flag(event_id: str) -> dict[str, Any]:
-        result = tool("get_flag", event_id)
+        dataset_id = dataset_id_for_event(event_id)
+        result = tool("get_flag", event_id, dataset_id=dataset_id)
         with read() as connection:
-            result["supplier_name"] = queries.supplier_name(connection, result["supplier_key"])
+            result["supplier_name"] = (
+                dataset_queries.entity_name(connection, dataset_id, result["supplier_key"])
+                if dataset_id
+                else queries.supplier_name(connection, result["supplier_key"])
+            )
+        if dataset_id:
+            result["dataset_id"] = dataset_id
         return result
 
     @app.get("/api/suppliers/{supplier_key}/history")
-    def history(supplier_key: str) -> dict[str, Any]:
-        return tool("get_supplier_history", supplier_key)
+    def history(supplier_key: str, dataset: str | None = Query(None)) -> dict[str, Any]:
+        return tool("get_supplier_history", supplier_key, dataset_id=_dataset_param(dataset))
 
     @app.get("/api/suppliers/{supplier_key}/score/{quarter}")
-    def score(supplier_key: str, quarter: str) -> dict[str, Any]:
-        return tool("get_score_breakdown", supplier_key, quarter)
+    def score(supplier_key: str, quarter: str, dataset: str | None = Query(None)) -> dict[str, Any]:
+        return tool(
+            "get_score_breakdown", supplier_key, quarter, dataset_id=_dataset_param(dataset)
+        )
 
     @app.get("/api/suppliers/{supplier_key}/markets/{quarter}")
-    def markets(supplier_key: str, quarter: str) -> dict[str, Any]:
-        return tool("get_market_mix", supplier_key, quarter)
+    def markets(
+        supplier_key: str, quarter: str, dataset: str | None = Query(None)
+    ) -> dict[str, Any]:
+        return tool("get_market_mix", supplier_key, quarter, dataset_id=_dataset_param(dataset))
 
     @app.get("/api/investigations/{event_id}")
     def investigation(event_id: str) -> dict[str, Any]:

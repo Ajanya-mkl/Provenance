@@ -1,5 +1,5 @@
 {
-  "key": "dd6ed0b7dc4b7d8ca5f4453b70ba9fe6ad0e33f58fa64ab1701980614835f836",
+  "key": "bf010fe8994bafddfd9b4fc331268da931e9f35b9d9f0d4a6f5ab43ce8f84fc8",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -18,37 +18,31 @@
       "country": "destination_country",
       "evidence": {
         "entity": [
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=12",
+          "null_pct=0.0",
           "min_length=6",
-          "mean_length=6.0",
           "max_length=6"
         ],
         "event_date": [
-          "inferred_type=date",
-          "null_pct=0.0",
           "distinct_count=200",
+          "null_pct=0.0",
           "min_value=2023-01-02",
           "max_value=2023-07-20",
           "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "inferred_type=bool",
-          "null_pct=0.0",
           "distinct_count=2",
-          "distinct_values=false|true"
+          "null_pct=0.0",
+          "distinct_values=[\"false\",\"true\"]"
         ],
         "country": [
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=8",
+          "null_pct=0.0",
           "min_length=5",
-          "mean_length=6.0",
           "max_length=7"
         ]
       },
-      "confidence": 1,
+      "confidence": 1.0,
       "notes": "",
       "cancelled": null
     },
@@ -66,52 +60,42 @@
       "country": "destination_country",
       "evidence": {
         "entity": [
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=12",
+          "null_pct=0.0",
           "min_length=6",
-          "mean_length=6.0",
           "max_length=6"
         ],
         "event_date": [
-          "inferred_type=date",
-          "null_pct=0.0",
           "distinct_count=200",
+          "null_pct=0.0",
           "min_value=2023-01-02",
           "max_value=2023-07-20",
           "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "inferred_type=bool",
-          "null_pct=0.0",
           "distinct_count=2",
-          "distinct_values=false|true"
+          "null_pct=0.0",
+          "distinct_values=[\"false\",\"true\"]"
         ],
         "country": [
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=8",
+          "null_pct=0.0",
           "min_length=5",
-          "mean_length=6.0",
           "max_length=7"
         ]
       },
-      "confidence": 1,
+      "confidence": 1.0,
       "notes": "",
       "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'supplier_code', event_date 'order_date' and a late_flag outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [
-      [
-        "Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON."
-      ]
-    ],
+    "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 5565,
-    "completion_tokens": 2003,
-    "latency_s": 39.435,
-    "steps": 5
+    "prompt_tokens": 3973,
+    "completion_tokens": 1411,
+    "latency_s": 26.879,
+    "steps": 4
   }
 }

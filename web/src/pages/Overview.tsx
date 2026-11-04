@@ -3,13 +3,16 @@ import { Link } from "react-router";
 
 import { ActivityFeed, KpiTile } from "../components/blocks";
 import { QuarterChart } from "../components/charts";
+import { DatasetSelect } from "../components/Shell";
 import { EmptyState, ErrorState, LoadingBlock, PageHeader, Panel } from "../components/ui";
 import { api } from "../lib/api";
+import { useDataset } from "../lib/dataset";
 import { usePending } from "../lib/pending";
 import { useApi } from "../lib/useApi";
 
 export function OverviewPage() {
-  const flags = useApi("flags", () => api.flags());
+  const { selected, selectedName, isDataco } = useDataset();
+  const flags = useApi(`flags:${selected}`, () => api.flags({ dataset: selected }));
   const audit = useApi("audit", api.audit);
   const evaluation = useApi("evaluation", api.evaluation);
   const { pending, loading: pendingLoading } = usePending();
@@ -26,9 +29,10 @@ export function OverviewPage() {
         title="Overview"
         meta={
           flags.data
-            ? `${items.length} risk flags across ${new Set(items.map((flag) => flag.quarter)).size} quarters · latest ${latest ?? "–"}`
+            ? `${isDataco ? "" : `${selectedName} · `}${items.length} risk flags across ${new Set(items.map((flag) => flag.quarter)).size} quarters · latest ${latest ?? "–"}`
             : "Supplier risk at a glance"
         }
+        actions={<DatasetSelect className="w-[220px] lg:hidden" />}
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -89,7 +93,9 @@ export function OverviewPage() {
           ) : items.length ? (
             <QuarterChart flags={items} />
           ) : (
-            <EmptyState title="No flags yet">Run the pipeline to score a quarter.</EmptyState>
+            <EmptyState title="No flags yet">
+              {isDataco ? "Run the pipeline to score a quarter." : "No entity's tier rose and held in this dataset."}
+            </EmptyState>
           )}
         </Panel>
 

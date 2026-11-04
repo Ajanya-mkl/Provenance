@@ -1,5 +1,5 @@
 {
-  "key": "7f23a7c9d5684b8799635c2533a3e317b245dd03145048f46aac9d2b21bce4ea",
+  "key": "0f355933ee64cfda05057ae3290cec34cca6d728ef73eea0c2293b2b7ef48875",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -16,42 +16,46 @@
         "unit": "hours"
       },
       "country": "pais_destino",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "distinct_count=4",
-          "null_pct=0.0",
+          "column=proveedor",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
           "min_length=11",
           "mean_length=14.0",
           "max_length=15"
         ],
         "event_date": [
-          "distinct_count=81",
-          "null_pct=0.0",
+          "column=fecha_pedido",
           "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=81",
           "min_value=2023-03-01",
           "max_value=2023-05-20",
           "date_format=%d/%m/%Y"
         ],
         "outcome": [
-          "distinct_count=53",
-          "null_pct=0.0",
+          "column=retraso_horas",
           "inferred_type=float",
+          "null_pct=0.0",
+          "distinct_count=53",
           "min_value=-5.8",
           "max_value=31.0"
         ],
         "country": [
-          "distinct_count=4",
-          "null_pct=0.0",
+          "column=pais_destino",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
           "min_length=4",
           "mean_length=5.2",
           "max_length=6"
         ]
       },
       "confidence": 1.0,
-      "notes": ""
+      "notes": "All required fields mapped: entity from proveedor, event_date from fecha_pedido, outcome as delay_value using retraso_horas (hours). Optional country mapped to pais_destino.",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "proveedor",
@@ -65,51 +69,55 @@
         "unit": "hours"
       },
       "country": "pais_destino",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "distinct_count=4",
-          "null_pct=0.0",
+          "column=proveedor",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
           "min_length=11",
           "mean_length=14.0",
           "max_length=15"
         ],
         "event_date": [
-          "distinct_count=81",
-          "null_pct=0.0",
+          "column=fecha_pedido",
           "inferred_type=date",
+          "null_pct=0.0",
+          "distinct_count=81",
           "min_value=2023-03-01",
           "max_value=2023-05-20",
           "date_format=%d/%m/%Y"
         ],
         "outcome": [
-          "distinct_count=53",
-          "null_pct=0.0",
+          "column=retraso_horas",
           "inferred_type=float",
+          "null_pct=0.0",
+          "distinct_count=53",
           "min_value=-5.8",
           "max_value=31.0"
         ],
         "country": [
-          "distinct_count=4",
-          "null_pct=0.0",
+          "column=pais_destino",
           "inferred_type=string",
+          "null_pct=0.0",
+          "distinct_count=4",
           "min_length=4",
           "mean_length=5.2",
           "max_length=6"
         ]
       },
       "confidence": 1.0,
-      "notes": ""
+      "notes": "All required fields mapped: entity from proveedor, event_date from fecha_pedido, outcome as delay_value using retraso_horas (hours). Optional country mapped to pais_destino.",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'proveedor', event_date 'fecha_pedido' and a delay_value outcome all map to valid columns",
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 3447,
-    "completion_tokens": 1325,
-    "latency_s": 6.211,
+    "prompt_tokens": 3675,
+    "completion_tokens": 1186,
+    "latency_s": 10.181,
     "steps": 4
   }
 }

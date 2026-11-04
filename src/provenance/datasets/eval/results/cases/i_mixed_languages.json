@@ -1,5 +1,5 @@
 {
-  "key": "d6584debd9f45a36137b14125c1a6d09e7addaff70bd02474cac6f99eef113bb",
+  "key": "6a56073bb23936a29415e41eec67a16b7d48f4dd819d08487817bfd102518ef3",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -29,8 +29,7 @@
           "max_value=2023-06-15"
         ],
         "outcome": [
-          "col=retard_jours",
-          "inferred_type=int",
+          "distinct_count=5",
           "min_value=-2",
           "max_value=8"
         ],
@@ -40,8 +39,8 @@
           "max_length=11"
         ]
       },
-      "confidence": 0.97,
-      "notes": "",
+      "confidence": 1,
+      "notes": "event_date uses shipping date as no order/creation date column present",
       "cancelled": null
     },
     "first_answer": {
@@ -69,8 +68,7 @@
           "max_value=2023-06-15"
         ],
         "outcome": [
-          "col=retard_jours",
-          "inferred_type=int",
+          "distinct_count=5",
           "min_value=-2",
           "max_value=8"
         ],
@@ -80,8 +78,8 @@
           "max_length=11"
         ]
       },
-      "confidence": 0.97,
-      "notes": "",
+      "confidence": 1,
+      "notes": "event_date uses shipping date as no order/creation date column present",
       "cancelled": null
     },
     "mappable": true,
@@ -89,9 +87,9 @@
     "scoreable": false,
     "rejections": [],
     "fallback_reason": null,
-    "prompt_tokens": 5837,
-    "completion_tokens": 1544,
-    "latency_s": 52.804,
-    "steps": 6
+    "prompt_tokens": 3577,
+    "completion_tokens": 1271,
+    "latency_s": 15.411,
+    "steps": 4
   }
 }

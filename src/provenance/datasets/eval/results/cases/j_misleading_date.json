@@ -1,5 +1,5 @@
 {
-  "key": "9134da55c27cd27d25799dc0f0195151d3793fad771f2180587b7720b9e315d2",
+  "key": "f6f4639ae47eb7b276da5ef46965c7dc49d23d7606fd86526e27b36762b2074c",
   "model": "openai/gpt-oss-120b",
   "agent": {
     "source": "agent",
@@ -16,46 +16,38 @@
         "unit": "days"
       },
       "country": "country",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "column=supplier",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_length=7",
           "mean_length=8.1",
           "max_length=9"
         ],
         "event_date": [
-          "column=delivery_date",
-          "inferred_type=date",
-          "null_pct=0.0",
           "distinct_count=81",
-          "date_format=%Y-%m-%d",
+          "null_pct=0.0",
           "min_value=2023-05-01",
-          "max_value=2023-07-20"
+          "max_value=2023-07-20",
+          "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "column=delay_days",
-          "inferred_type=int",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_value=-1",
           "max_value=5"
         ],
         "country": [
-          "column=country",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_length=5",
           "mean_length=5.9",
           "max_length=7"
         ]
       },
-      "confidence": 0.9,
-      "notes": "supplier used as entity; delivery_date chosen as event_date (shipment/order date) with its format; delay_days provides numeric delay, mapping to delay_value outcome; country column mapped; no cancelled indicator present."
+      "confidence": 1.0,
+      "notes": "",
+      "cancelled": null
     },
     "first_answer": {
       "entity": "supplier",
@@ -69,55 +61,51 @@
         "unit": "days"
       },
       "country": "country",
-      "cancelled": null,
       "evidence": {
         "entity": [
-          "column=supplier",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_length=7",
           "mean_length=8.1",
           "max_length=9"
         ],
         "event_date": [
-          "column=delivery_date",
-          "inferred_type=date",
-          "null_pct=0.0",
           "distinct_count=81",
-          "date_format=%Y-%m-%d",
+          "null_pct=0.0",
           "min_value=2023-05-01",
-          "max_value=2023-07-20"
+          "max_value=2023-07-20",
+          "date_format=%Y-%m-%d"
         ],
         "outcome": [
-          "column=delay_days",
-          "inferred_type=int",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_value=-1",
           "max_value=5"
         ],
         "country": [
-          "column=country",
-          "inferred_type=string",
-          "null_pct=0.0",
           "distinct_count=4",
+          "null_pct=0.0",
           "min_length=5",
           "mean_length=5.9",
           "max_length=7"
         ]
       },
-      "confidence": 0.9,
-      "notes": "supplier used as entity; delivery_date chosen as event_date (shipment/order date) with its format; delay_days provides numeric delay, mapping to delay_value outcome; country column mapped; no cancelled indicator present."
+      "confidence": 1.0,
+      "notes": "",
+      "cancelled": null
     },
     "mappable": true,
     "mappable_reason": "entity 'supplier', event_date 'delivery_date' and a delay_value outcome all map to valid columns",
     "scoreable": false,
-    "rejections": [],
+    "rejections": [
+      [
+        "Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON."
+      ]
+    ],
     "fallback_reason": null,
-    "prompt_tokens": 5867,
-    "completion_tokens": 1870,
-    "latency_s": 47.114,
-    "steps": 6
+    "prompt_tokens": 4906,
+    "completion_tokens": 2374,
+    "latency_s": 36.791,
+    "steps": 5
   }
 }

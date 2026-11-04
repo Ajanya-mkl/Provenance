@@ -573,3 +573,62 @@ def test_cancelled_must_name_a_value_the_column_contains(context):
     assert any("would mark nothing" in error for error in missing.errors)
     assert any("cancelled must be null" in error for error in malformed.errors)
     assert ("cancelled", "on_time") in contract.used_columns(ok.mapping)
+
+
+# --- Phase 10c-2: country by values, order-date preference ------------------------
+
+
+def _fixture_context(tmp_path, name):
+    paths = Paths(tmp_path / "w.duckdb", tmp_path / "datasets", tmp_path / "quarantine")
+    path = FIXTURES / "mapping" / f"{name}.csv" if not Path(name).suffix else Path(name)
+    result = onboard(path, Path(name).stem, paths=paths)
+    assert result.status == "gated", result.problems
+    return load_context(paths.db_path, result.dataset_id)
+
+
+def test_country_is_found_by_its_values_without_the_llm(tmp_path):
+    # 'Zielland' is not a country word the heuristic knows; its values are German
+    # country names (Deutschland, Frankreich, Spanien, Italien).
+    context = _fixture_context(tmp_path, "i_mixed_languages")
+    proposal = propose_mapping(context, llm_factory=_never_called)
+
+    assert proposal.source == "heuristic" and proposal.decided_by == "heuristic"
+    assert proposal.mapping["country"] == "Zielland"
+    assert "country_match_pct=100.0" in proposal.mapping["evidence"]["country"]
+    assert proposal.validation.ok, proposal.validation.errors  # the rate is a grounded fact
+    assert "found by its values" in proposal.mapping["notes"]
+
+
+def test_a_text_column_that_is_not_countries_is_not_taken_as_country(context):
+    assert context.country_match("supplier_code") == 0.0
+    assert heuristic_mapping(context)["country"] == "destination_country"  # by its name
+
+
+def test_order_date_is_preferred_over_ship_date_with_compact_dates(tmp_path):
+    context = _fixture_context(tmp_path, "h_abbreviated")
+    mapping = heuristic_mapping(context)
+
+    assert mapping["event_date"] == {"col": "dt_ord", "format": "%Y%m%d"}
+    assert validate(mapping, context).errors == []
+
+
+def test_order_date_wins_even_when_the_ship_date_comes_first(tmp_path):
+    rows = ["supplier,ship_date,order_date,delay_days"]
+    rows += [
+        f"S{i % 3},2023-02-{1 + i % 27:02d},2023-01-{1 + i % 27:02d},{i % 4 - 1}" for i in range(60)
+    ]
+    path = tmp_path / "ship_first.csv"
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    mapping = heuristic_mapping(_fixture_context(tmp_path, str(path)))
+
+    assert mapping["event_date"]["col"] == "order_date"
+
+
+def test_the_contract_and_prompt_state_the_order_date_preference():
+    from provenance.datasets.mapping_agent import SYSTEM_PROMPT
+
+    assert (
+        "prefer the order or creation date"
+        in contract.CONTRACT_DESCRIPTION["required"]["event_date"]
+    )
+    assert "choose the order/creation date" in SYSTEM_PROMPT

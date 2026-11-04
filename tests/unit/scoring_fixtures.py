@@ -38,6 +38,8 @@ def make_shipments_csv(
     unmatched_country_share: float = 0.0,
     days_short: int = 0,
     cancelled_share: float = 0.0,
+    suppliers: tuple[str, ...] = SUPPLIERS,
+    rows_per_day: int = ROWS_PER_DAY,
     seed: int = 7,
 ) -> Path:
     """outcome: days_pair_hours | days_pair_days | delay_days | late_flag_on_time | late_flag.
@@ -62,9 +64,9 @@ def make_shipments_csv(
     day, number = first, 0
     while day < end:
         progress = (day - first).days / max((end - first).days, 1)
-        for slot in range(ROWS_PER_DAY):
+        for slot in range(rows_per_day):
             number += 1
-            supplier = SUPPLIERS[number % len(SUPPLIERS)]
+            supplier = suppliers[number % len(suppliers)]
             # Ember Textiles gets steadily later and more erratic.
             worse = supplier == "Ember Textiles" and progress > 0.45
             late_chance = 0.75 if worse else 0.35 + 0.1 * (slot % 2)

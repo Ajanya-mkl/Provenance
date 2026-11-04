@@ -11,6 +11,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import pandas as pd
+
 from provenance.datasets.validator import (
     ACTUAL_WORDS,
     FALSY,
@@ -63,6 +65,9 @@ DATE_WORDS = {
         "purchase",
         "placed",
         "compra",
+        "ord",
+        "created",
+        "creation",
     ),
     2: (
         "ship",
@@ -74,6 +79,7 @@ DATE_WORDS = {
         "versanddatum",
         "expedition",
         "dispatch",
+        "shp",
     ),
     1: ("date", "fecha", "datum", "dt", "day"),
 }
@@ -88,6 +94,9 @@ LATE_DATE_WORDS = (
     "recibido",
 )
 COUNTRY_WORDS = ("country", "pais", "land", "pays", "nation", "nacion", "staat")
+COUNTRY_MIN_MATCH = 0.8  # a text column whose values are this often countries is one
+COMPACT_DATE_FORMAT = "%Y%m%d"
+DATE_PARSE_SHARE = 0.95
 HOUR_WORDS = (
     "hour",
     "hours",
@@ -118,6 +127,15 @@ def _fact(column: dict[str, Any], *keys: str) -> list[str]:
     return facts
 
 
+def _compact_date(context: DatasetContext, name: str) -> bool:
+    """An integer column of 8-digit YYYYMMDD dates (named like a date)."""
+    values = context.frame[name].dropna().astype(str)
+    if not len(values) or not values.str.fullmatch(r"\d{8}").all():
+        return False
+    parsed = pd.to_datetime(values, format=COMPACT_DATE_FORMAT, errors="coerce")
+    return float(parsed.notna().mean()) >= DATE_PARSE_SHARE
+
+
 def _bool_like(context: DatasetContext, name: str) -> bool:
     values = {str(v).lower() for v in context.frame[name].dropna().unique()}
     return 0 < len(values) <= 2 and values <= (TRUTHY | FALSY)
@@ -140,14 +158,24 @@ def heuristic_assessment(context: DatasetContext) -> tuple[dict[str, Any], list[
     def numeric(name: str) -> bool:
         return columns[name]["inferred_type"] in ("int", "float") and not _bool_like(context, name)
 
-    # event_date: a real date column, order dates first, delivery dates last.
-    dates = [
-        name
+    # event_date: a real date column, order (creation) dates first, then ship
+    # dates, delivery dates last. A date-named integer column of YYYYMMDD counts.
+    formats = {
+        name: columns[name]["date_format"]
         for name in order
         if columns[name]["looks_like_date"]
         and columns[name]["date_format"]
-        and (columns[name]["type_share"] or 0) >= 0.95
-    ]
+        and (columns[name]["type_share"] or 0) >= DATE_PARSE_SHARE
+    }
+    for name in order:
+        if (
+            name not in formats
+            and columns[name]["inferred_type"] == "int"
+            and _score(name, DATE_WORDS) > 0
+            and _compact_date(context, name)
+        ):
+            formats[name] = COMPACT_DATE_FORMAT
+    dates = [name for name in order if name in formats]
     event_date = None
     if dates:
         ranked = sorted(
@@ -161,10 +189,10 @@ def heuristic_assessment(context: DatasetContext) -> tuple[dict[str, Any], list[
         rank = lambda n: _score(n, DATE_WORDS) - 2 * has_word(n, LATE_DATE_WORDS)  # noqa: E731
         if len(ranked) > 1 and rank(ranked[1]) == rank(best):
             close.append(f"event_date: {best!r} and {ranked[1]!r} rank equally")
-        event_date = {"col": best, "format": columns[best]["date_format"]}
+        event_date = {"col": best, "format": formats[best]}
         used.add(best)
         evidence["event_date"] = [
-            f"date_format={columns[best]['date_format']}",
+            *([f"date_format={formats[best]}"] if columns[best]["date_format"] else []),
             *_fact(columns[best], "type_share", "null_pct"),
         ]
         confidences.append(0.9 if _score(best, DATE_WORDS) >= 2 else 0.6)
@@ -272,6 +300,24 @@ def heuristic_assessment(context: DatasetContext) -> tuple[dict[str, Any], list[
     )
     if country:
         evidence["country"] = _fact(columns[country], "distinct_count")
+    else:
+        # No country-like name: a text column whose values are mostly countries.
+        rates = {
+            n: context.country_match(n)
+            for n in order
+            if n not in used and n != entity and columns[n]["inferred_type"] == "string"
+        }
+        best_country = max(rates, key=lambda n: (rates[n], -order.index(n)), default=None)
+        if best_country is not None and rates[best_country] >= COUNTRY_MIN_MATCH:
+            country = best_country
+            evidence["country"] = [
+                f"country_match_pct={round(100 * rates[best_country], 2)}",
+                *_fact(columns[country], "distinct_count"),
+            ]
+            notes.append(
+                f"country found by its values: {round(100 * rates[best_country], 1)}% of "
+                f"{country!r} are recognised countries"
+            )
 
     required_found = sum(value is not None for value in (entity, event_date, outcome))
     confidence = round(sum(confidences) / 3, 2) if required_found else 0.0

@@ -9,17 +9,17 @@ Model: `openai/gpt-oss-120b`. Cases: 11 small synthetic fixtures (under `tests/f
 | Field | Heuristic only | Agent only | Heuristic-first | Agent first answer |
 |---|---|---|---|---|
 | entity | 10/11 | 10/11 | 10/11 | 10/11 |
-| event_date | 8/10 | 9/10 | 9/10 | 9/10 |
+| event_date | 9/10 | 10/10 | 10/10 | 10/10 |
 | outcome | 10/11 | 11/11 | 11/11 | 11/11 |
-| country | 8/10 | 10/10 | 9/10 | 10/10 |
+| country | 10/10 | 10/10 | 10/10 | 10/10 |
 | mappable | 10/11 | 11/11 | 11/11 | 11/11 |
-| **every field right** | 8/11 | 9/11 | 8/11 | |
+| **every field right** | 9/11 | 10/11 | 10/11 | |
 
 | Mode | Agent calls | Validator rejections | Fallbacks to heuristic | Tokens |
 |---|---|---|---|---|
 | Heuristic only | 0 | 0 | 0 | 0 |
-| Agent only | 11 | 1 | 0 | 73799 |
-| Heuristic-first | 3 | 0 | 0 | 21521 |
+| Agent only | 11 | 4 | 0 | 66988 |
+| Heuristic-first | 3 | 2 | 0 | 19368 |
 
 "Agent only" is what the pipeline would store with the agent always asked: its answer if the validator accepted it (possibly after one retry), otherwise the heuristic's. "Agent first answer" is the model's own first mapping, before any validator feedback.
 
@@ -27,49 +27,52 @@ Model: `openai/gpt-oss-120b`. Cases: 11 small synthetic fixtures (under `tests/f
 
 | Case | Mode | Source | entity | event_date | outcome | country | mappable | Rejections | Tokens | Latency (s) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| a_dataco_like_en | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.016 |
-| a_dataco_like_en | agent | agent | yes | yes | yes | yes | yes | 0 | 4904 | 6.419 |
-| a_dataco_like_en | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.016 |
+| a_dataco_like_en | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.089 |
+| a_dataco_like_en | agent | agent | yes | yes | yes | yes | yes | 1 | 5860 | 8.127 |
+| a_dataco_like_en | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.089 |
 | b_spanish_hours | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.01 |
-| b_spanish_hours | agent | agent | yes | yes | yes | yes | yes | 0 | 4772 | 6.211 |
+| b_spanish_hours | agent | agent | yes | yes | yes | yes | yes | 0 | 4861 | 10.181 |
 | b_spanish_hours | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.01 |
-| c_iso_on_time | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.006 |
-| c_iso_on_time | agent | agent | yes | yes | yes | yes | yes | 0 | 4545 | 30.903 |
-| c_iso_on_time | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.006 |
-| d_late_flag_only | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.005 |
-| d_late_flag_only | agent | agent | yes | yes | yes | yes | yes | 0 | 7434 | 47.692 |
-| d_late_flag_only | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.005 |
-| e_ambiguous | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
-| e_ambiguous | agent | agent | yes | yes | yes | yes | yes | 0 | 9545 | 69.218 |
-| e_ambiguous | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
-| f_not_supply_chain | heuristic | heuristic | yes | - | yes | - | yes | 0 | - | 0.004 |
-| f_not_supply_chain | agent | agent | **no** | - | yes | - | yes | 0 | 5975 | 9.658 |
-| f_not_supply_chain | heuristic_first | agent | **no** | - | yes | - | yes | 0 | 5975 | 9.658 |
-| g_clean_10a | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.008 |
-| g_clean_10a | agent | agent | yes | yes | yes | yes | yes | 1 | 7568 | 39.435 |
-| g_clean_10a | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.008 |
-| h_abbreviated | heuristic | heuristic | **no** | **no** | **no** | **no** | **no** | 0 | - | 0.01 |
-| h_abbreviated | agent | agent | yes | **no** | yes | yes | yes | 0 | 7809 | 44.859 |
-| h_abbreviated | heuristic_first | agent | yes | **no** | yes | yes | yes | 0 | 7809 | 44.859 |
-| i_mixed_languages | heuristic | heuristic | yes | yes | yes | **no** | yes | 0 | - | 0.007 |
-| i_mixed_languages | agent | agent | yes | yes | yes | yes | yes | 0 | 7381 | 52.804 |
-| i_mixed_languages | heuristic_first | heuristic | yes | yes | yes | **no** | yes | 0 | - | 0.007 |
-| j_misleading_date | heuristic | heuristic | yes | **no** | yes | yes | yes | 0 | - | 0.028 |
-| j_misleading_date | agent | agent | yes | yes | yes | yes | yes | 0 | 7737 | 47.114 |
-| j_misleading_date | heuristic_first | agent | yes | yes | yes | yes | yes | 0 | 7737 | 47.114 |
-| k_hours | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.019 |
-| k_hours | agent | agent | yes | yes | yes | yes | yes | 0 | 6129 | 34.351 |
-| k_hours | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.019 |
+| c_iso_on_time | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
+| c_iso_on_time | agent | agent | yes | yes | yes | yes | yes | 0 | 4596 | 25.079 |
+| c_iso_on_time | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
+| d_late_flag_only | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.006 |
+| d_late_flag_only | agent | agent | yes | yes | yes | yes | yes | 0 | 4711 | 34.465 |
+| d_late_flag_only | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.006 |
+| e_ambiguous | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.01 |
+| e_ambiguous | agent | agent | yes | yes | yes | yes | yes | 0 | 10146 | 56.976 |
+| e_ambiguous | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.01 |
+| f_not_supply_chain | heuristic | heuristic | yes | - | yes | - | yes | 0 | - | 0.005 |
+| f_not_supply_chain | agent | agent | **no** | - | yes | - | yes | 0 | 3045 | 25.179 |
+| f_not_supply_chain | heuristic_first | agent | **no** | - | yes | - | yes | 0 | 3045 | 25.179 |
+| g_clean_10a | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.016 |
+| g_clean_10a | agent | agent | yes | yes | yes | yes | yes | 0 | 5384 | 26.879 |
+| g_clean_10a | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.016 |
+| h_abbreviated | heuristic | heuristic | **no** | yes | **no** | yes | **no** | 0 | - | 0.014 |
+| h_abbreviated | agent | agent | yes | yes | yes | yes | yes | 1 | 9043 | 52.411 |
+| h_abbreviated | heuristic_first | agent | yes | yes | yes | yes | yes | 1 | 9043 | 52.411 |
+| i_mixed_languages | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.008 |
+| i_mixed_languages | agent | agent | yes | yes | yes | yes | yes | 0 | 4848 | 15.411 |
+| i_mixed_languages | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.008 |
+| j_misleading_date | heuristic | heuristic | yes | **no** | yes | yes | yes | 0 | - | 0.013 |
+| j_misleading_date | agent | agent | yes | yes | yes | yes | yes | 1 | 7280 | 36.791 |
+| j_misleading_date | heuristic_first | agent | yes | yes | yes | yes | yes | 1 | 7280 | 36.791 |
+| k_hours | heuristic | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
+| k_hours | agent | agent | yes | yes | yes | yes | yes | 1 | 7214 | 37.793 |
+| k_hours | heuristic_first | heuristic | yes | yes | yes | yes | yes | 0 | - | 0.007 |
 
 ## Why heuristic-first asked the agent
 
 - **f_not_supply_chain**: heuristic left entity unmapped; heuristic left outcome unmapped; heuristic confidence 0.2 is below 0.8
-- **h_abbreviated**: heuristic left entity unmapped; heuristic left event_date unmapped; heuristic left outcome unmapped; heuristic confidence 0.0 is below 0.8
+- **h_abbreviated**: heuristic left entity unmapped; heuristic left outcome unmapped; heuristic confidence 0.3 is below 0.8
 - **j_misleading_date**: close candidates for event_date: 'arrival_dt' and 'delivery_date' rank equally; heuristic confidence 0.78 is below 0.8
 
 ## Validator rejections (agent mode)
 
-- **g_clean_10a** (10a clean fixture: delay_days and an on_time flag both describe lateness): agent rejected: Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON.. Fixed on the retry.
+- **a_dataco_like_en** (DataCo-like, renamed English columns, planned vs real transit days): agent rejected: Your reply did not contain a JSON object. Reply with only the mapping JSON. Fixed on the retry.
+- **h_abbreviated** (Abbreviated names: vndr_cd, dt_ord, dt_shp, sch_lt, act_lt, dest_ctry): agent rejected: Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON. Fixed on the retry.
+- **j_misleading_date** (Misleading name: 'delivery_date' holds the order date (always the earlier date)): agent rejected: Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON. Fixed on the retry.
+- **k_hours** (Planned and actual transit in hours, US dates, ISO2 country codes): agent rejected: Your reply was not valid JSON (Expecting ',' delimiter). Reply with only the mapping JSON. Fixed on the retry.
 
 ## Limits
 
@@ -78,4 +81,5 @@ Model: `openai/gpt-oss-120b`. Cases: 11 small synthetic fixtures (under `tests/f
 - Every fixture is too small to score (under 50 rows per entity-quarter), so the scoreable verdict is not evaluated here; it is unit-tested with synthetic counts.
 - The agent is non-deterministic; cached results reflect the model's behaviour when each case was first run. Re-run with --fresh to measure again.
 - In Phase 10b an early run, before the validator accepted late_when given as the column's own value and confidence as a numeric string, had 4 rejections; each was fixed on the retry. late_when is now accepted only when it is a value of that column.
-- The agent never sees text values (only lengths), so it cannot tell a code from a name or a city from a country by content; the same holds for the heuristic.
+- Phase 10c-2 changed both mappers after these cases were written: the heuristic now finds a country column by its values (at least 80% recognised countries, any of seven languages) and reads YYYYMMDD integer dates and the abbreviations 'ord'/'shp'; the contract and prompt now prefer the order date over ship or delivery dates. The gains on h_abbreviated and i_mixed_languages are therefore fixes for known cases, not independent evidence; the entity abbreviation 'vndr_cd' was deliberately left to the agent.
+- The agent never sees text values (only lengths), so it cannot tell a code from a name by content. The heuristic's country check does read values, but only to count how many are country names; nothing it reads is sent to the model.
