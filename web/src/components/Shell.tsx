@@ -38,7 +38,7 @@ const NAV = [
   { to: "/investigations", label: "Investigations", Icon: FileSearch, end: false },
   { to: "/approvals", label: "Approvals", Icon: ClipboardCheck, end: false },
   { to: "/pipeline", label: "Pipeline", Icon: Workflow, end: false },
-  { to: "/datasets", label: "Datasets", Icon: Database, end: false },
+  { to: "/datasets", label: "Datasets & pipelines", Icon: Database, end: false },
 ];
 
 const THEMES: { value: ThemeChoice; label: string; Icon: typeof Sun }[] = [

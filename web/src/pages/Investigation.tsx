@@ -1,6 +1,7 @@
-import { BadgeCheck, ChevronRight, FileSearch, History, OctagonX, Terminal } from "lucide-react";
+import { BadgeCheck, ChevronRight, FileSearch, History, OctagonX } from "lucide-react";
 import { Link, useParams } from "react-router";
 
+import { AgentInvestigate, GroundedBadge, NotGroundedBanner } from "../components/AgentInvestigate";
 import { ReceiptScope, ReceiptText, SourcesRow } from "../components/Receipts";
 import {
   ConfidenceBadge,
@@ -15,47 +16,6 @@ import { api } from "../lib/api";
 import { ACTION_LABELS, TOOL_LABELS, dateTime, factorLabel, score, supplierLabel } from "../lib/format";
 import type { Investigation } from "../lib/types";
 import { useApi } from "../lib/useApi";
-
-function GroundedBadge({ investigation }: { investigation: Investigation }) {
-  const numbers = investigation.report?.summary_spans.filter((span) => span.kind === "number").length ?? 0;
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full bg-tier-low/15 px-3.5 py-1.5 text-[14px] font-semibold text-tier-low">
-      <BadgeCheck aria-hidden size={17} />
-      GROUNDED
-      <span className="font-normal text-ink-2">
-        · every number traces to a tool result{numbers ? ` (${numbers} in the summary)` : ""}
-      </span>
-    </div>
-  );
-}
-
-function NotGroundedBanner({ investigation }: { investigation: Investigation }) {
-  return (
-    <div
-      role="alert"
-      className="flex gap-4 rounded-[20px] bg-danger/15 p-5 shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--danger)_45%,transparent)]"
-    >
-      <OctagonX aria-hidden size={28} className="shrink-0 text-danger" />
-      <div>
-        <p className="text-[17px] font-bold tracking-[-0.01em] text-danger">NOT GROUNDED</p>
-        <p className="mt-1 max-w-[65ch] text-[15px] text-ink">
-          This report contains numbers no tool returned, so it was rejected. Its proposed action is
-          hidden and no action was created.
-        </p>
-        {investigation.ungrounded_numbers.length > 0 && (
-          <p className="mt-2 text-[14px] text-ink-2">
-            Unsourced:{" "}
-            {investigation.ungrounded_numbers.map((number) => (
-              <span key={number} className="tabular mr-2 font-semibold text-danger line-through decoration-2">
-                {number}
-              </span>
-            ))}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function ProposedAction({ investigation }: { investigation: Investigation }) {
   const report = investigation.report!;
@@ -119,11 +79,9 @@ export function InvestigationPage() {
         {header}
         <Panel>
           <EmptyState icon={<FileSearch size={22} />} title="Not investigated yet">
-            <p>The agent has not investigated this flag. Run it from a terminal:</p>
-            <code className="mt-3 inline-flex items-center gap-2 rounded-[10px] bg-[color-mix(in_srgb,var(--ink)_9%,transparent)] px-3 py-2 text-left font-mono text-[13px] text-ink">
-              <Terminal aria-hidden size={14} />
-              python -m provenance.agent.run --event-id {eventId}
-            </code>
+            <div className="mt-3 flex flex-col items-center">
+              <AgentInvestigate eventId={eventId} />
+            </div>
           </EmptyState>
         </Panel>
       </>

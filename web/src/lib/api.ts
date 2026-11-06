@@ -1,4 +1,5 @@
 import type {
+  AgentSummary,
   Approvals,
   Audit,
   DatasetDetail,
@@ -10,6 +11,7 @@ import type {
   FlagList,
   Health,
   Investigation,
+  InvestigationRunState,
   MappingRecord,
   MappingState,
   MarketMix,
@@ -48,7 +50,10 @@ export function isMock(): boolean {
   }
 }
 
-/** `?mock=locked` makes approve/reject answer 409; `?mock=busy` also makes a dataset run 409 'busy'. */
+/**
+ * `?mock=locked` makes approve/reject answer 409; `?mock=busy` also makes dataset and
+ * agent runs answer 409 'busy'; `?mock=nokey` makes an agent run answer 400 (no key).
+ */
 export function mockVariant(): string | null {
   try {
     return sessionStorage.getItem(MOCK_KEY);
@@ -141,6 +146,13 @@ export const api = {
     request<MarketMix>(`/api/suppliers/${enc(key)}/markets/${enc(quarter)}`),
   investigation: (eventId: string) =>
     request<Investigation>(`/api/investigations/${enc(eventId)}`),
+  startInvestigation: (eventId: string) =>
+    post<{ run_id: string; event_id: string; status: string }>(
+      `/api/investigations/${enc(eventId)}/run`,
+      {},
+    ),
+  investigationRun: (runId: string) => request<InvestigationRunState>(`/api/runs/${enc(runId)}`),
+  agentSummary: () => request<AgentSummary>("/api/agent/summary"),
   approvals: () => request<Approvals>("/api/approvals"),
   approve: (actionId: string, by: string, reason: string) =>
     request<{ status: string; action_id: string; effect?: string | null }>(

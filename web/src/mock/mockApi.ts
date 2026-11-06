@@ -2,7 +2,8 @@
 // the warehouse by web/scripts/generate_mock_fixtures.py) and keeps approve /
 // reject decisions in memory for the session.
 import { ApiError, mockVariant } from "../lib/api";
-import type { Approvals, AuditEntry } from "../lib/types";
+import type { Approvals, Audit, AuditEntry, FlagDetail } from "../lib/types";
+import { agentAuditEntries, completedInvestigation, mockAgentFetch } from "./agentMock";
 import { mockDatasetFetch } from "./datasetsMock";
 import fixtures from "./fixtures.json";
 
@@ -83,6 +84,21 @@ function decide(path: string, init: RequestInit): unknown {
 
 const servedOnce = new Set<string>();
 
+const agentContext = {
+  route: (path: string) => routes[path],
+  approvals: approvalsState,
+  flag: (event: string): FlagDetail | undefined => {
+    const path = `/api/flags/${encodeURIComponent(event)}`;
+    const route = routes[path];
+    if (route?.status === 200) return { ...(route.body as FlagDetail), event_id: event };
+    try {
+      return mockDatasetFetch(path) as FlagDetail | undefined;
+    } catch {
+      return undefined;
+    }
+  },
+};
+
 export async function mockFetch<T>(path: string, init?: RequestInit): Promise<T> {
   await wait(LATENCY_MS);
   if (mockVariant() === "busy" && init?.method !== "POST") {
@@ -95,6 +111,18 @@ export async function mockFetch<T>(path: string, init?: RequestInit): Promise<T>
     }
     servedOnce.add(path);
   }
+  const agent = mockAgentFetch(
+    path,
+    init,
+    agentContext,
+    Object.entries(routes)
+      .filter(([route]) => route.startsWith("/api/investigations/"))
+      .map(([, route]) => route),
+  );
+  if (agent !== undefined) return clone(agent) as T;
+  const investigated = path.match(/^\/api\/investigations\/([^/]+)$/);
+  const finished = investigated && completedInvestigation(decodeURIComponent(investigated[1]));
+  if (finished) return clone(finished) as T;
   const dataset = mockDatasetFetch(path, init);
   if (dataset !== undefined) return clone(dataset) as T;
   if (init?.method === "POST") return decide(path, init) as T;
@@ -114,6 +142,11 @@ export async function mockFetch<T>(path: string, init?: RequestInit): Promise<T>
     route = { status: 200, body: { items, count: items.length } };
   }
   if (!route) throw new ApiError(404, "Not in the mock fixtures.");
+  if (path === "/api/audit?limit=50") {
+    const audit = clone(route.body) as Audit;
+    audit.entries.unshift(...clone(agentAuditEntries()));
+    return audit as T;
+  }
   if (route.status >= 400) {
     const detail = (route.body as { detail?: string }).detail ?? "Not found";
     throw new ApiError(route.status, detail);

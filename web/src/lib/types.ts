@@ -435,3 +435,32 @@ export interface DatasetHistory {
   dataset_id: string;
   scored_quarters: { quarter: string; tier: Tier; score: number }[];
 }
+
+// ---------------------------------------------------------------------------
+// The agent in the console (Phase 10d).
+
+export interface InvestigationRunState {
+  run_id: string;
+  kind: "investigation";
+  event_id: string;
+  status: "queued" | "running" | "succeeded" | "failed";
+  stage: "investigating" | "recording" | null;
+  error: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  stages: { name: string; status: StageStatus }[];
+  investigation_id: string | null;
+  investigation_status: InvestigationStatus | null;
+  grounded: boolean | null;
+  action_id: string | null;
+}
+
+export interface AgentSummary {
+  model: string;
+  investigations: number;
+  grounded: number;
+  grounded_rate: number | null;
+  pending_approvals: number;
+  last_investigation_at: string | null;
+  last_agent_action: { seq: number; ts: string; event: string; event_id: string | null } | null;
+}

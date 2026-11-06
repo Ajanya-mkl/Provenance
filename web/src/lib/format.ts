@@ -90,3 +90,22 @@ export function shortId(id: string): string {
 export function eventLabel(event: string): string {
   return event.replace(/_/g, " ");
 }
+
+/** The audit log's actor for everything the agent itself did. */
+export const AGENT_ACTOR = "agent";
+
+const AUDIT_TEXT: Record<string, string> = {
+  investigation_proposed: "Grounded investigation recorded",
+  investigation_rejected_ungrounded: "Investigation rejected: not grounded",
+  investigation_no_report: "Investigation produced no report",
+  action_proposed: "Action proposed",
+  action_type_rejected: "Disallowed action replaced with no action",
+  action_approved: "Action approved",
+  action_applied: "Action applied",
+  action_rejected: "Action rejected",
+  apply_refused: "Apply refused: not approved",
+};
+
+export function auditText(event: string): string {
+  return AUDIT_TEXT[event] ?? eventLabel(event);
+}

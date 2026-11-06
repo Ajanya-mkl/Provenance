@@ -1,5 +1,6 @@
 import {
   BadgeCheck,
+  Bot,
   CircleX,
   FileCheck2,
   FileWarning,
@@ -11,7 +12,7 @@ import {
 import type { ReactNode } from "react";
 import { Link } from "react-router";
 
-import { dateTime, date, eventLabel, quarterFromIso, shortId } from "../lib/format";
+import { AGENT_ACTOR, auditText, dateTime, date, quarterFromIso, shortId } from "../lib/format";
 import { useSupplierName } from "../lib/names";
 import type { AuditEntry, SupplierHistory } from "../lib/types";
 import { useCountUp } from "../lib/useCountUp";
@@ -65,25 +66,14 @@ const AUDIT_ICON: Record<string, typeof Zap> = {
   apply_refused: CircleX,
 };
 
-const AUDIT_TEXT: Record<string, string> = {
-  investigation_proposed: "Grounded investigation recorded",
-  investigation_rejected_ungrounded: "Investigation rejected: not grounded",
-  investigation_no_report: "Investigation produced no report",
-  action_proposed: "Action proposed",
-  action_type_rejected: "Disallowed action replaced with no action",
-  action_approved: "Action approved",
-  action_applied: "Action applied",
-  action_rejected: "Action rejected",
-  apply_refused: "Apply refused: not approved",
-};
-
 function auditSubject(
   detail: Record<string, unknown>,
   nameOf: (key: string) => string,
 ): string | null {
   const event = typeof detail.event_id === "string" ? detail.event_id : null;
   if (event) {
-    const [, , quarter, supplier] = event.split(":");
+    // A dataset event is 'ds_<id>:risk_flag:...'; the parts after the prefix are the same.
+    const [, , quarter, supplier] = event.replace(/^ds_[0-9a-f]{12}:/, "").split(":");
     if (supplier) return `${nameOf(supplier)} · ${quarterFromIso(quarter)}`;
     return event;
   }
@@ -96,7 +86,8 @@ export function ActivityFeed({ entries, compact = false }: { entries: AuditEntry
   return (
     <ol className="flex flex-col">
       {entries.map((entry) => {
-        const Icon = AUDIT_ICON[entry.event] ?? Zap;
+        const agent = entry.actor === AGENT_ACTOR;
+        const Icon = agent ? Bot : (AUDIT_ICON[entry.event] ?? Zap);
         const subject = auditSubject(entry.detail, nameOf);
         const warn = /rejected|refused/.test(entry.event);
         return (
@@ -104,16 +95,25 @@ export function ActivityFeed({ entries, compact = false }: { entries: AuditEntry
             <span
               aria-hidden
               className={`mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full ${
-                warn ? "bg-danger/15 text-danger" : "bg-[color-mix(in_srgb,var(--ink)_9%,transparent)] text-ink-2"
+                warn
+                  ? "bg-danger/15 text-danger"
+                  : agent
+                    ? "bg-accent/15 text-accent"
+                    : "bg-[color-mix(in_srgb,var(--ink)_9%,transparent)] text-ink-2"
               }`}
             >
               <Icon size={15} />
             </span>
             <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-medium text-ink">{AUDIT_TEXT[entry.event] ?? eventLabel(entry.event)}</p>
+              <p className="text-[14px] font-medium text-ink">{auditText(entry.event)}</p>
               <p className="text-[13px] text-ink-3">
                 {subject && <span className="text-ink-2">{subject} · </span>}
-                {entry.actor} · <span className="whitespace-nowrap">{dateTime(entry.ts)}</span>
+                {agent ? (
+                  <span className="inline-flex items-center gap-1 font-semibold text-ink-2">Agent</span>
+                ) : (
+                  entry.actor
+                )}{" "}
+                · <span className="whitespace-nowrap">{dateTime(entry.ts)}</span>
                 {!compact && <span className="tabular whitespace-nowrap"> · #{entry.seq}</span>}
               </p>
             </div>

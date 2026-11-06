@@ -1,9 +1,11 @@
 """Read-only API for the Provenance console: python -m provenance.api (127.0.0.1:8000).
 
-Every GET opens DuckDB read-only. Approve and reject are the only writes, and
-they go through provenance.agent.approval (which writes through store.writer());
-this module holds no write SQL. Nothing from .env is returned except the model
-name and the approval mode the health check reports.
+Every GET opens DuckDB read-only. This module holds no write SQL: approve and
+reject go through provenance.agent.approval (which writes through store.writer()),
+dataset writes through datasets_routes, and POST /api/investigations/{id}/run starts
+a background process (agent.background) that can only propose, never approve.
+Nothing from .env is returned except the model name and the approval mode the
+health check reports.
 
 There is no login. The API binds to localhost only and refuses requests from
 any other address; never expose the console or this API to a network.
@@ -29,7 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from provenance.agent import approval
+from provenance.agent import approval, background
 from provenance.agent.eval.eval_runner import RESULTS_DIR
 from provenance.agent.llm import DEFAULT_MODEL
 from provenance.agent.store import table_exists, verify_audit_log
@@ -38,8 +40,9 @@ from provenance.agent.tools.investigation_tools import (
     dataset_id_for_event,
     parse_quarter,
 )
-from provenance.api import dataset_queries, queries
+from provenance.api import agent_queries, dataset_queries, queries
 from provenance.api.datasets_routes import register_dataset_routes
+from provenance.datasets import runs
 from provenance.datasets.identifiers import DATASET_ID_PATTERN
 from provenance.datasets.onboard import Paths
 from provenance.db import connect_read_only
@@ -89,8 +92,12 @@ def create_app(
     results_dir: Path = RESULTS_DIR,
     mapping_llm_factory: Callable[[], Any] | None = _default_llm_factory,
     paths: Paths | None = None,
+    agent_llm_check: Callable[[], bool] = background.llm_configured,
+    agent_runner: Callable[[Path, Path, str], str] = background.start,
 ) -> FastAPI:
     database = Path(db_path or os.environ.get("PROVENANCE_DUCKDB_PATH", DEFAULT_DB_PATH))
+    env_paths = Paths.from_env()
+    paths = paths or Paths(database, env_paths.data_root, env_paths.quarantine_root)
     app = FastAPI(title="Provenance console API", version="0.1.0")
 
     @app.middleware("http")
@@ -208,6 +215,50 @@ def create_app(
         if result is None:
             raise HTTPException(status_code=404, detail="No investigation for this event yet.")
         return result
+
+    @app.post("/api/investigations/{event_id}/run")
+    def investigate(event_id: str) -> Any:
+        """Start the agent on one flag, in a background process. It only proposes."""
+        with read() as connection:
+            row = (
+                connection.execute(
+                    "SELECT event_type, resolved_at FROM agent.events WHERE event_id = ?",
+                    [event_id],
+                ).fetchone()
+                if table_exists(connection, "agent", "events")
+                else None
+            )
+        if row is None:
+            raise HTTPException(status_code=404, detail="No such event.")
+        if row[0] != "risk_flag":
+            raise HTTPException(status_code=400, detail="Only a risk flag can be investigated.")
+        if row[1] is not None:
+            raise HTTPException(
+                status_code=400, detail="This flag is resolved; there is nothing to investigate."
+            )
+        if not agent_llm_check():
+            raise HTTPException(
+                status_code=400,
+                detail="The agent is not configured: LLM_API_KEY is not set. Add it to .env "
+                "and restart the API.",
+            )
+        busy = runs.busy_reason(database, paths.data_root)
+        if busy:
+            return JSONResponse(
+                status_code=409,
+                content={
+                    "code": "busy",
+                    "detail": f"Another writer is running ({busy}). Try again when it finishes.",
+                },
+            )
+        run_id = agent_runner(database, paths.data_root, event_id)
+        return {"run_id": run_id, "event_id": event_id, "status": "queued"}
+
+    @app.get("/api/agent/summary")
+    def agent_summary() -> dict[str, Any]:
+        model = os.environ.get("LLM_MODEL_NAME", "").strip() or DEFAULT_MODEL
+        with read() as connection:
+            return agent_queries.agent_summary(connection, model)
 
     @app.get("/api/approvals")
     def approvals() -> dict[str, Any]:

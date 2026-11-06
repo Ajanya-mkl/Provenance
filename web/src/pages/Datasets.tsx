@@ -12,6 +12,12 @@ import type { DatasetItem, GateRuleResult, UploadReport } from "../lib/types";
 import { useApi } from "../lib/useApi";
 
 const MAX_UPLOAD_MB = 50;
+const FLOW_STEPS = [
+  { title: "Upload", text: "A CSV is profiled and checked by rules generated from its own columns." },
+  { title: "Map", text: "Match its columns to the shipment contract, then a named reviewer approves." },
+  { title: "Run", text: "Build silver, metrics, scores and flags in the background." },
+  { title: "Results", text: "Read scores, flags and what was left out, then let the agent investigate." },
+];
 
 function nextStep(item: DatasetItem): { to: string; label: string } {
   const base = `/datasets/${item.dataset_id}`;
@@ -37,10 +43,23 @@ export function DatasetsPage() {
         meta="Your own shipment files, onboarded next to DataCo: profiled, gated, mapped and scored."
         actions={
           <Link to="/datasets/upload" className="glass-pill pill-accent px-4 py-2 text-sm">
-            <Upload aria-hidden size={16} /> Upload a CSV
+            <Upload aria-hidden size={16} /> Upload dataset
           </Link>
         }
       />
+      <ol aria-label="How it works" className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {FLOW_STEPS.map((step, index) => (
+          <li key={step.title} className="glass-lite p-4">
+            <p className="text-[15px] font-semibold">
+              <span aria-hidden className="tabular mr-2 text-ink-3">
+                {index + 1}
+              </span>
+              {step.title}
+            </p>
+            <p className="mt-1 text-[13px] text-ink-2">{step.text}</p>
+          </li>
+        ))}
+      </ol>
       <section aria-label="Dataset list" className="glass p-2">
         {datasets.error ? (
           <ErrorState error={datasets.error} onRetry={datasets.reload} />

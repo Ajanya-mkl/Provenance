@@ -1,6 +1,7 @@
-import { ArrowUpRight, FileSearch } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Link, useParams } from "react-router";
 
+import { AgentInvestigate } from "../components/AgentInvestigate";
 import { Timeline } from "../components/blocks";
 import { FactorStack, MarketMixChart, ScoreRing } from "../components/charts";
 import {
@@ -132,14 +133,12 @@ export function FlagDetailBody({ eventId, wide = false }: { eventId: string; wid
             <ConfidenceBadge confidence={data.confidence} />
           </div>
           <TopFactorSentence flag={data} />
-          <Link
-            to={`/investigations/${encodeURIComponent(eventId)}`}
-            className="glass-pill px-4 py-2 text-sm font-medium"
-          >
-            <FileSearch aria-hidden size={16} /> Agent investigation
-          </Link>
         </div>
       </div>
+
+      <Panel variant={wide ? "lite" : "flat"} title="Agent investigation">
+        <AgentInvestigate eventId={eventId} resolved={data.investigation_status === "resolved"} />
+      </Panel>
 
       {isDataset ? (
         <DatasetPanels flag={data} wide={wide} />

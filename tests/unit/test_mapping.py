@@ -7,6 +7,8 @@ import shutil
 from pathlib import Path
 
 import duckdb
+import groq
+import httpx
 import pytest
 from fastapi.testclient import TestClient
 
@@ -632,3 +634,81 @@ def test_the_contract_and_prompt_state_the_order_date_preference():
         in contract.CONTRACT_DESCRIPTION["required"]["event_date"]
     )
     assert "choose the order/creation date" in SYSTEM_PROMPT
+
+
+# --- every model failure falls back to the heuristic -------------------------------
+
+REQUEST = httpx.Request("POST", "http://127.0.0.1:9/chat")
+SECRET_TEXT = "provider-message-that-must-not-be-stored"
+
+
+def _status_error(kind, code):
+    return kind(SECRET_TEXT, response=httpx.Response(code, request=REQUEST), body=None)
+
+
+@pytest.mark.parametrize(
+    ("error", "reason"),
+    [
+        (groq.APIConnectionError(message=SECRET_TEXT, request=REQUEST), "could not be reached"),
+        (groq.APITimeoutError(request=REQUEST), "timed out"),
+        (_status_error(groq.RateLimitError, 429), "rate limited"),
+        (_status_error(groq.InternalServerError, 500), "returned an error"),
+        (_status_error(groq.AuthenticationError, 401), "returned an error"),
+        (ConnectionResetError(SECRET_TEXT), "could not be reached"),
+        (LLMError("LLM call failed after 5 attempts: rate limited (429)"), "rate limited"),
+        (IndexError(SECRET_TEXT), "invalid response"),
+    ],
+    ids=lambda value: type(value).__name__ if isinstance(value, Exception) else "",
+)
+def test_every_model_failure_falls_back_with_a_note(context, error, reason):
+    proposal = propose_mapping(context, llm_factory=lambda: ScriptedLLM([error]), mode="agent")
+
+    assert proposal.source == "heuristic" and proposal.decided_by == "heuristic_fallback"
+    assert reason in proposal.fallback_reason and reason in proposal.mapping["notes"]
+    assert proposal.validation.mappable.ok
+    assert SECRET_TEXT not in proposal.fallback_reason + proposal.mapping["notes"]
+
+
+def test_a_factory_that_cannot_build_a_client_falls_back(context):
+    def broken():
+        raise LLMError("LLM_API_KEY is not set; add it to .env.")
+
+    proposal = propose_mapping(context, llm_factory=broken, mode="agent")
+    assert proposal.source == "heuristic" and "LLM_API_KEY" in proposal.fallback_reason
+
+
+def test_a_mapping_of_the_wrong_shape_gets_the_retry_then_falls_back(context):
+    bad = _with(outcome={"kind": ["delay_value"], "col": "delay_days"})
+
+    fixed = ScriptedLLM([_answer(bad), _answer(GOOD)])
+    proposal = propose_mapping(context, llm_factory=lambda: fixed, mode="agent")
+    assert proposal.source == "agent" and len(proposal.attempts) == 1
+
+    again = ScriptedLLM([_answer(bad), _answer(bad)])
+    proposal = propose_mapping(context, llm_factory=lambda: again, mode="agent")
+    assert proposal.source == "heuristic" and "twice" in proposal.fallback_reason
+
+
+def test_a_tool_call_with_a_bad_argument_falls_back(context):
+    call = ToolCall("c1", "get_column_profile", '{"column": ["supplier_code"]}')
+    llm = ScriptedLLM([LLMResponse(None, [call], 100, 10, "tool_calls")])
+    proposal = propose_mapping(context, llm_factory=lambda: llm, mode="agent")
+
+    assert proposal.source == "heuristic" and "invalid response" in proposal.fallback_reason
+
+
+@pytest.mark.parametrize("mode", ["agent", "heuristic_first"])
+def test_api_propose_survives_a_real_connection_failure(db, template, tmp_path, mode):
+    # The real client against the unreachable address set in tests/conftest.py: the
+    # SDK raises its own connection error, and the API still answers with a proposal.
+    client = TestClient(create_app(db, results_dir=tmp_path / "no-results"))
+    response = client.post(
+        f"/api/datasets/{template['marks']}/mapping/propose", json={"by": "Ajanya", "mode": mode}
+    )
+
+    assert response.status_code == 200, response.text
+    body = response.json()
+    assert body["source"] == "heuristic" and body["decided_by"] == "heuristic_fallback"
+    assert "could not be reached" in body["proposal"]["notes"]
+    assert "APIConnectionError" in body["validation"]["fallback_reason"]
+    assert body["mappable"] is False  # student marks: honest, not a 500

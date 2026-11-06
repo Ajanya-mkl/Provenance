@@ -8,9 +8,8 @@ import { api, ApiError } from "../lib/api";
 import { dateTime } from "../lib/format";
 import type { RunState, StageName, StageStatus } from "../lib/types";
 import { useDatasetDetail } from "../lib/datasetUi";
+import { useRun } from "../lib/useRun";
 import { DatasetHeader } from "./DatasetProfile";
-
-const POLL_MS = 1000;
 
 const STAGE_TEXT: Record<StageName, { label: string; what: string }> = {
   silver: { label: "Silver", what: "Parse every row into the canonical shipment table; unparseable rows go to rejects." },
@@ -63,43 +62,12 @@ export function RunStepper({ run }: { run: RunState }) {
   );
 }
 
-function useRun(runId: string | null) {
-  const [run, setRun] = useState<RunState | null>(null);
-  const [error, setError] = useState<ApiError | null>(null);
-  useEffect(() => {
-    if (!runId) return;
-    let active = true;
-    let timer: number | undefined;
-    const poll = async () => {
-      try {
-        const next = await api.run(runId);
-        if (!active) return;
-        setRun(next);
-        setError(null);
-        if (next.status !== "succeeded" && next.status !== "failed") timer = window.setTimeout(poll, POLL_MS);
-      } catch (caught) {
-        if (!active) return;
-        const apiError = caught instanceof ApiError ? caught : new ApiError(0, String(caught));
-        setError(apiError);
-        // A locked read while the run writes is expected; keep polling.
-        if (apiError.status === 409) timer = window.setTimeout(poll, POLL_MS);
-      }
-    };
-    poll();
-    return () => {
-      active = false;
-      window.clearTimeout(timer);
-    };
-  }, [runId]);
-  return { run: run?.run_id === runId ? run : null, error };
-}
-
 export function RunPage() {
   const { id = "" } = useParams();
   const [params, setParams] = useSearchParams();
   const runId = params.get("run");
   const detail = useDatasetDetail(id);
-  const { run, error } = useRun(runId);
+  const { run, error } = useRun(runId, api.run);
   const [starting, setStarting] = useState(false);
   const [refusal, setRefusal] = useState<ApiError | null>(null);
 

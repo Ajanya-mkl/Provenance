@@ -6,7 +6,9 @@ caller explicitly passes sample_values=True. It returns mapping JSON only; it
 never writes SQL or code. The validator checks the proposal (grounding its
 evidence against exactly what the tools returned); on failure the model gets one
 retry with the validator's message, then the heuristic mapper takes over and the
-proposal is marked source='heuristic'.
+proposal is marked source='heuristic'. Any other failure of the model (no connection,
+a timeout, a rate limit, an invalid response) also falls back to the heuristic, with
+a note saying why, so proposing a mapping never fails because of the model.
 """
 
 from __future__ import annotations
@@ -20,6 +22,8 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
 
+import groq
+
 from provenance.agent.llm import LLMError
 from provenance.datasets.contract import CONTRACT_DESCRIPTION
 from provenance.datasets.heuristic_mapper import heuristic_assessment, heuristic_mapping
@@ -31,6 +35,10 @@ SAMPLE_VALUES = 5
 SAMPLE_CHARS = 30
 MODES = ("heuristic_first", "agent", "heuristic")
 DEFAULT_CONFIDENCE_THRESHOLD = 0.8
+WRONG_SHAPE = (
+    "The mapping has a value of the wrong type: column names and kinds must be text. "
+    "Reply with only the corrected mapping JSON."
+)
 
 
 def confidence_threshold() -> float:
@@ -200,9 +208,27 @@ def _parse(content: str | None) -> tuple[dict[str, Any] | None, str | None]:
     )
 
 
+def _failure_reason(error: Exception) -> str:
+    """Why the model failed, in plain words. An SDK's message is never passed on."""
+    kind = type(error).__name__
+    if isinstance(error, LLMError):  # our own wording: a missing key, retries used up
+        return f"the agent failed: {str(error)[:200]} ({kind})"
+    if isinstance(error, groq.APITimeoutError):
+        return f"the agent timed out ({kind})"
+    if isinstance(error, groq.APIConnectionError | OSError):
+        return f"the agent could not be reached ({kind})"
+    if isinstance(error, groq.RateLimitError):
+        return f"the agent was rate limited ({kind})"
+    if isinstance(error, groq.APIStatusError):
+        return f"the model service returned an error ({kind})"
+    return f"the agent returned an invalid response ({kind})"
+
+
 def heuristic_proposal(context: DatasetContext, reason: str | None = None) -> MappingProposal:
     started = time.perf_counter()
     mapping = heuristic_mapping(context)
+    if reason:
+        mapping["notes"] = f"{mapping['notes']}; fell back to the heuristic: {reason}"
     proposal = MappingProposal(
         mapping=mapping,
         source="heuristic",
@@ -306,7 +332,16 @@ def _agent_proposal(
             if mapping is None:
                 errors = [problem]
             else:
-                validation = validate(mapping, context, extra_facts=tools.results)
+                try:
+                    validation = validate(mapping, context, extra_facts=tools.results)
+                except (TypeError, ValueError, AttributeError, KeyError) as error:
+                    # A value of the wrong shape (a list as a column name) is a bad answer.
+                    LOGGER.warning("Mapping could not be validated: %s", type(error).__name__)
+                    attempts.append({"mapping": mapping, "errors": [WRONG_SHAPE]})
+                    if len(attempts) >= 2:
+                        break
+                    messages.append({"role": "user", "content": WRONG_SHAPE})
+                    continue
                 if validation.ok:
                     return MappingProposal(
                         mapping=validation.mapping,
@@ -336,8 +371,8 @@ def _agent_proposal(
             if len(attempts) >= 2
             else "the agent did not return a mapping within its step limit"
         )
-    except (LLMError, OSError) as error:
-        reason = f"the agent could not be reached ({type(error).__name__})"
+    except Exception as error:  # noqa: BLE001 - every model failure falls back, plainly
+        reason = _failure_reason(error)
     LOGGER.warning("Mapping agent fell back to the heuristic: %s", reason)
     proposal = heuristic_proposal(context, reason)
     proposal.attempts = attempts

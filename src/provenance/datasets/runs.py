@@ -113,6 +113,8 @@ def stage_view(status: str, stage: str | None, error: str | None = None) -> list
 def run_state(db_path: Path, data_root: Path, run_id: str) -> dict[str, Any] | None:
     """The run as the console shows it: status file first, meta.runs when readable."""
     live = read_status(data_root, run_id)
+    if live and live.get("kind") == "investigation":
+        return _investigation_state(run_id, live)
     row = None
     try:
         row = registry.get_run(db_path, run_id)
@@ -142,6 +144,42 @@ def run_state(db_path: Path, data_root: Path, run_id: str) -> dict[str, Any] | N
     return state
 
 
+INVESTIGATION_STAGES = ("investigating", "recording")
+
+
+def _investigation_state(run_id: str, live: dict[str, Any]) -> dict[str, Any]:
+    """An agent investigation run (provenance.agent.background): status file only."""
+    status, stage, error = live.get("status"), live.get("stage"), live.get("error")
+    if status not in FINAL and not pid_alive(live.get("pid")) and status != "queued":
+        status = "failed"
+        error = error or "The investigation process stopped unexpectedly; nothing was recorded."
+    reached = INVESTIGATION_STAGES.index(stage) if stage in INVESTIGATION_STAGES else -1
+    stages = []
+    for index, name in enumerate(INVESTIGATION_STAGES):
+        if status == "succeeded" or index < reached:
+            state = "done"
+        elif index == reached:
+            state = "failed" if status == "failed" else "running"
+        else:
+            state = "pending"
+        stages.append({"name": name, "status": state})
+    return {
+        "run_id": run_id,
+        "kind": "investigation",
+        "event_id": live.get("event_id"),
+        "status": status,
+        "stage": stage,
+        "error": error,
+        "started_at": live.get("started_at"),
+        "finished_at": live.get("updated_at") if status in FINAL else None,
+        "stages": stages,
+        "investigation_id": live.get("investigation_id"),
+        "investigation_status": live.get("investigation_status"),
+        "grounded": live.get("grounded"),
+        "action_id": live.get("action_id"),
+    }
+
+
 def busy_reason(db_path: Path, data_root: Path) -> str | None:
     """Why a new writer run must not start now, or None."""
     for status_file in runs_dir(data_root).glob("*.json") if runs_dir(data_root).exists() else []:
@@ -150,7 +188,10 @@ def busy_reason(db_path: Path, data_root: Path) -> str | None:
         except (OSError, ValueError):
             continue
         if live.get("status") not in FINAL and pid_alive(live.get("pid")):
-            return f"scoring run {status_file.stem} is still running"
+            kind = (
+                "an agent investigation" if live.get("kind") == "investigation" else "scoring run"
+            )
+            return f"{kind} {status_file.stem} is still running"
     from provenance.agent.run import writer_activity
 
     return writer_activity(db_path)
