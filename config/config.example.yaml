@@ -1,20 +1,6 @@
-warehouse:
-  duckdb_path: "data/provenance.duckdb"
-  schemas:
-    bronze: "bronze"
-    silver: "silver"
-    gold: "gold"
-    agent: "agent"
-
-storage:
-  base_path: "data"
-  raw: "data/raw"
-  bronze: "data/bronze"
-  silver: "data/silver"
-  gold: "data/gold"
-  quarantine: "data/quarantine"
-
+# Non-secret settings, read by provenance.settings.
 orchestration:
+  # Cron (UTC) for the provenance_full_pipeline_weekly schedule, stopped by default.
   weekly_pipeline_cron: "0 2 * * 1"
 
 ingestion:

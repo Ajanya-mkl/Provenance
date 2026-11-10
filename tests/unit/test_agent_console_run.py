@@ -23,6 +23,7 @@ from provenance.api.main import create_app
 from provenance.datasets import runs
 from provenance.datasets.onboard import Paths
 from tests.unit.agent_fixtures import EVENT_ID
+from tests.unit.test_console_api import _process_running
 
 RUN_URL = f"/api/investigations/{quote(EVENT_ID, safe='')}/run"
 
@@ -168,12 +169,13 @@ def test_the_real_subprocess_reports_a_failure_plainly(paths, monkeypatch, tmp_p
     monkeypatch.setenv("GROQ_BASE_URL", "http://127.0.0.1:9")
     run_id = background.start(paths.db_path, paths.data_root, EVENT_ID)
     client = _client(paths, tmp_path)
+    # Watch the process, not its files: see _wait in test_console_api.py.
+    pid = runs.read_status(paths.data_root, run_id)["pid"]
     deadline = time.monotonic() + 120
-    while True:
-        state = client.get(f"/api/runs/{run_id}").json()
-        if state["status"] in ("succeeded", "failed") or time.monotonic() > deadline:
-            break
+    while _process_running(pid):
+        assert time.monotonic() < deadline, "the investigation did not finish"
         time.sleep(0.5)
+    state = client.get(f"/api/runs/{run_id}").json()
 
     assert state["status"] == "failed" and state["event_id"] == EVENT_ID
     assert "could not be reached" in state["error"] and "not-a-real-key" not in state["error"]

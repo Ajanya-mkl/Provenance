@@ -3,7 +3,7 @@
 Provenance live demo (read-only). Run from the project folder, venv active,
 and with `dagster dev` STOPPED (DuckDB allows one writer):
 
-    python demo_queries.py
+    python scripts/demo_queries.py
 
 Press Enter at each step. Nothing in the database is changed.
 """

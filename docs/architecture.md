@@ -1,466 +1,307 @@
-# Architecture: Phase 1
+# Architecture
 
-The local platform runs PostgreSQL as both the `provenance` warehouse and the
-separate `airflow` metadata database. PostgreSQL initialization creates the
-warehouse schemas `bronze`, `silver`, `gold`, and `agent`; later phases add
-tables. MinIO stores object data in the four layer buckets. Airflow uses the
-LocalExecutor and discovers DAGs under `src/provenance/dags`.
+Provenance runs on one Windows machine with no containers or servers beyond two local processes: a warehouse file (DuckDB), Parquet folders, Dagster for orchestration, dbt for SQL models, a FastAPI service and a React console. It is organised as two paths into one scoring engine: the **DataCo flagship pipeline** and **dataset onboarding** for any CSV.
 
-Postgres 16.4 Alpine and dated MinIO server/client releases are pinned to avoid
-floating image tags; the `mc` release is from the same release period as the
-server image for compatibility.
+- [Data flow](#data-flow)
+- [Storage and layers](#storage-and-layers)
+- [Ingestion](#ingestion)
+- [Quality gate](#quality-gate)
+- [Silver](#silver)
+- [Gold](#gold)
+- [Risk engine](#risk-engine)
+- [Orchestration](#orchestration)
+- [Concurrency: one writer](#concurrency-one-writer)
+- [Investigation agent](#investigation-agent)
+- [Dataset onboarding](#dataset-onboarding)
+- [API](#api)
+- [Console](#console)
+- [Configuration](#configuration)
+- [Design decisions and history](#design-decisions-and-history)
 
-The Airflow image is pinned to Apache Airflow 2.9.3 on Python 3.11. Airflow
-provider installation uses the official constraints file matching that exact
-Airflow and Python version. Project runtime dependencies are installed in
-`/opt/venvs/provenance`, separately from Airflow's Python environment: dbt,
-Great Expectations, and the LangGraph stack have dependency constraints that
-can conflict with Airflow, and must not alter Airflow's constrained packages.
-Future DAG tasks that need those libraries should invoke the isolated
-environment explicitly.
+## Data flow
 
-Great Expectations 1.23.2 is paired with pandas 2.2.3 because earlier 1.x
-releases such as 1.3.2 required pandas below 2.2. dbt-core 1.8.8 is pinned
-alongside dbt-postgres 1.8.2 because that adapter's broad core requirement can
-otherwise select a dbt 2.0 release candidate. The dependency pins keep the
-application install deterministic; `requirements.txt` is also used as the
-source of package dependencies by `pyproject.toml`. The
-container services persist PostgreSQL, MinIO, and Airflow logs with named
-volumes. The repository `logs/` directory is separately bind-mounted for
-application logs.
+```mermaid
+flowchart TD
+    CSV[DataCo CSV] --> PC[pre-check]
+    PC --> BR[(bronze)]
+    US[USASpending API] --> BR
+    WB[World Bank LPI API] --> BR
+    BR --> GATE{quality gate}
+    GATE -- hard rule fails --> QU[data/quarantine<br/>dq_failure event]
+    GATE -- validated or<br/>passed_with_warnings --> STG[silver: staging views]
+    SEED[seeds: country map,<br/>World Bank list] --> STG
+    STG --> FACT[fact_shipments<br/>fact_purchase_orders]
+    STG --> INT[int_supplier_quarter_metrics]
+    INT --> SCD[dim_supplier_scd2]
+    INT --> MART[gold.mart_supplier_risk]
+    FACT --> MART
+    SCD --> MART
+    STG --> MART
+    MART --> SCORE[risk_engine/scorer.py<br/>score, tier, hysteresis]
+    SCORE --> GS[gold.supplier_risk_score<br/>gold.supplier_risk_flags]
+    SCORE --> EV[agent.events]
+    EV --> AGENT[investigation agent]
+    GS --> API[FastAPI]
+    EV --> API
+    API --> WEB[React console]
+```
 
-## Phase 4: silver layer (dbt-duckdb)
+USASpending is ingested, gated and modelled in staging, but nothing downstream reads it: its vendors do not join to DataCo (see [data_profile.md](data_profile.md)).
 
-The dbt project lives in `src/provenance/transform/` and writes to the `silver`
-schema of `data/provenance.duckdb`. Bronze tables are dbt sources. Every staging
-model reads only batches whose `bronze.dq_results.status` is in
-`var('approved_gate_statuses')`, which is `validated` or `passed_with_warnings`.
-A quarantined batch never reaches silver, even if its rows are still in bronze.
+## Storage and layers
 
-Model flow:
+| Schema | Holds | Written by |
+|---|---|---|
+| `bronze` | Raw data plus lineage; gate verdicts in `dq_results` | Loaders, gate |
+| `silver` | Staging views, facts, `dim_supplier_scd2`, seeds | dbt |
+| `gold` | Two marts (dbt); scores and flags (scorer) | dbt, scorer |
+| `agent` | Events, investigations, actions and their effects, audit log | Scorer and gate (events), `agent/store.py` |
+| `meta` | Dataset registry, profiles, mappings, frozen rules, runs | `datasets/registry.py`, `datasets/mapping_store.py` |
+| `ds_<id>` | One onboarded dataset | `datasets/` |
+
+Every table and column is in [data_dictionary.md](data_dictionary.md). Parquet batches live under `data/bronze/<source>/batch_id=<hash>/`, and failed batches under `data/quarantine/`. `data/` is git-ignored.
+
+## Ingestion
+
+`src/provenance/ingestion/`. Each source writes an idempotent Parquet batch whose id is a content hash, then refreshes its bronze table. An unchanged source rewrites the same batch.
+
+- **DataCo** reads the CSV with Latin-1. `precheck.py` runs first and fails with a readable list of problems, before anything is written: the exact ordered columns (read from the gate's own suite), the strict `%m/%d/%Y %H:%M` date format staging parses, blanks or non-integers in the integer columns, and `Order Country` names missing from the seed.
+- **USASpending** requests the last complete calendar month and pages through it, so overlapping batches accumulate; staging keeps one row per `generated_internal_id` from the most recently loaded approved batch. Offline mode (`ingestion.usaspending_offline`, or `PROVENANCE_USASPENDING_OFFLINE`) loads the cached sample `data/raw/usaspending_sample.json` instead: the sample's hash is the batch id, so every offline run rewrites one identical batch. A missing sample fails the run rather than calling the API.
+- **World Bank** loads every page of `LP.LPI.OVRL.XQ`.
+
+Only the two API assets have a `RetryPolicy` (3 retries, exponential backoff from 1 s). The last retry may fall back to a cache (the USASpending sample, or the latest World Bank batch), and the materialization then records `cache_fallback_used`, `cache_fallback_source` and `cache_fallback_reason`. With no cache, the run fails visibly.
+
+## Quality gate
+
+`src/provenance/data_quality/gate.py` runs Great Expectations suites built from `expectations/bronze_suite.json` (50 rules for DataCo, 12 + 3 for USASpending, 5 + 3 for World Bank).
+
+- Verdicts go to `bronze.dq_results`: `validated`, `passed_with_warnings` or `quarantined`. Staging reads only the first two, so a quarantined batch never reaches silver.
+- A failing batch is **moved** (never copied) from `data/bronze` to `data/quarantine` with its `validation_result.json`, and a `dq_failure` event is written.
+- Each batch is gated once: only batches with no `dq_results` row are checked, so a bad batch does not block later runs. The loader refuses to put a once-quarantined batch back. `rebuild_bronze_table` reads approved batches plus those still waiting for their first check.
+- **Cross-batch duplicates:** a new DataCo batch is compared with approved batches by `Order Item Id` over every source column. Identical rows are dropped with a `cross_batch_duplicates` warning; the same id with any different value quarantines the whole batch.
+
+The gate asset raises `dagster.Failure` on quarantine, so Dagster skips everything downstream.
+
+## Silver
+
+The dbt project is in `src/provenance/transform/` (`profiles.yml` is committed and has no secrets; it reads `PROVENANCE_DUCKDB_PATH`).
 
 ```
-bronze.* (sources) ──► stg_dataco_order_items ──► fact_shipments, fact_purchase_orders
-                   │                          └─► int_supplier_quarter_metrics ──► dim_supplier_scd2
-                   ├─► stg_usaspending_awards   (date_valid flag; not linked to suppliers)
-                   └─► stg_worldbank_lpi        (economies only; aggregates removed via seed)
+bronze.* ──► stg_dataco_order_items ──► fact_shipments, fact_purchase_orders
+         │                          └─► int_supplier_quarter_metrics ──► dim_supplier_scd2
+         ├─► stg_usaspending_awards   (date_valid flag; not linked to suppliers)
+         └─► stg_worldbank_lpi        (economies only; aggregates removed via seed)
 seeds: country_iso3_map (DataCo Spanish names → ISO3), wb_country_reference (World Bank list)
 ```
 
-In Dagster, `silver_dbt_assets` (dagster-dbt) maps each bronze source to its
-Phase 3 gate asset. The `gates_and_silver` job therefore runs dbt only after
-all three gates succeed, and a gate failure skips silver.
+Personal data (customer email, password, names, street, zipcode) is never selected out of bronze, and a singular test enforces it.
 
-### Why dim_supplier_scd2 is built in SQL, not with dbt snapshots
+**Supplier proxy.** `supplier_key` is `cat_` plus the slugged category name. DataCo has no supplier identifier, so a category stands in for one.
 
-A dbt snapshot compares the current state of a table with its previous
-snapshot each time it runs, and stamps changes with the run time. It can only
-record history from the first run onward. Our history is in the past: DataCo
-order dates run from 2015 to January 2018, and the supplier attributes are
-derived per quarter from those dates. A snapshot taken today would collapse
-the whole series into one version dated today, and it cannot back-date
-versions to 2015Q3 or 2017Q4.
+**Metrics.** `int_supplier_quarter_metrics` gives one row per supplier-quarter. Late rate and delay exclude cancelled shipments, which still count toward `shipment_count`. A supplier-quarter under 50 shipments is `low_volume`. A quarter is `partial` when the data starts after it begins, ends before it finishes, or under 90% of its days have an order.
 
-So `dim_supplier_scd2` is rebuilt deterministically from the quarterly series
-on every run, using the gaps-and-islands pattern:
+**SCD2.** `dim_supplier_scd2` is rebuilt deterministically on every run from the quarterly series by a recursive query:
 
-1. Rate each supplier-quarter: `delivery_band` from the late rate and
-   `volume_band` from the shipment count, with thresholds from dbt vars.
-2. A low-volume or partial quarter gets no rating; it carries the previous
-   bands forward and so can never open a version.
-3. Hash the two bands (`row_hash`). A version starts wherever the hash differs
-   from the previous quarter's.
-4. `effective_from` is the first quarter of the version. `effective_to` is the
-   next version's `effective_from` (exclusive), and is null on the current row.
+1. A full-volume, complete quarter rates `delivery_band` from the late rate (`low` < 0.50 ≤ `medium` < 0.65 ≤ `high`). `volume_band` is kept as context only.
+2. A new delivery band must persist for 2 eligible quarters before it opens a version. Low-volume and partial quarters neither confirm nor reset a pending change.
+3. `effective_from` is the first confirming quarter; `effective_to` is the next version's start (exclusive), null when current.
 
-Because the build is a pure function of the gated bronze data and the vars,
-re-running gives identical history, and changing a threshold reproducibly
-re-derives all past versions. Singular dbt tests enforce the SCD2 invariants:
-one current row per supplier, `effective_to` null exactly when current, no
-gaps or overlaps, and consecutive versions always differ.
+The same inputs and vars always give the same history. Singular dbt tests enforce one current row per supplier, `effective_to` null exactly when current, no gaps or overlaps, and consecutive versions that differ. Thresholds are dbt vars in `dbt_project.yml`; [data_profile.md](data_profile.md) explains how they were chosen.
 
-## Orchestration (Phase 6)
+## Gold
 
-### One job
+`gold.mart_supplier_risk` has one row per eligible supplier-quarter (not low volume, not partial, late rate known). Country risk is **destination-based**, not supplier-origin: for each destination, the latest LPI at or before the quarter gives `(5 − LPI) / 4`; a destination with no LPI gets the quarter's median, and `country_coverage` reports the share of shipments with a real score. It is shipment-weighted over the last 4 eligible quarters, because the dataset's destination mix swings sharply from quarter to quarter.
 
-`provenance_full_pipeline` (in `src/provenance/dags/definitions.py`) selects
-every asset. Asset dependencies, not a hand-written op list, fix the order:
+`gold.mart_shipment_delay` is a shipment-level mart for ad hoc analysis.
+
+## Risk engine
+
+`src/provenance/risk_engine/` holds `rules.yaml` (version 1.2) and `scorer.py`.
+
+- **Score:** each factor is normalised to its bounds and clipped, then weighted.
+
+  | Factor | Weight | Bounds |
+  |---|---|---|
+  | Late rate | 0.25 | 0.50 – 0.64 |
+  | Delay variability (standard deviation) | 0.35 | 1.38 – 1.65 |
+  | Trailing country risk | 0.40 | 0.32 – 0.53 |
+
+- **Tiers:** `low` < 0.38 ≤ `medium` < 0.68 ≤ `high`.
+- **Confidence:** `low` under 3 eligible quarters to date or 95% country coverage, otherwise `full`.
+- **Flags and hysteresis:** the replay compares each eligible quarter with that supplier's previous one. A tier rise flags at once only when the score rises by more than 0.15; otherwise the new tier must hold for 2 consecutive eligible quarters. A first-ever quarter never flags.
+- **Top factor:** for a rise, only factors whose weighted contribution increased can be named, and the largest change wins. If none rose, the largest current contributor is named and marked `largest_contributor_fallback`.
+
+**Events are append-only.** The payload hash is 10 hex characters of SHA-256 over sorted-key JSON, with floats rounded to 10 decimals for the hash only (a mart rebuild sums floats in a different order, moving scores by about 1e-16). An unchanged payload keeps its event, untouched. A changed payload resolves the old event with `superseded: payload changed; replaced by <new id>`, keeping its investigations, and creates `<old id>:p<hash>`. A flag of the current rules version that stops qualifying is resolved, in both the event and the flag row. All scorer writes are one transaction. Re-scoring unchanged data adds no flags or events.
+
+`FlagTarget` parameterises tables, key column, event prefix and source, so the same code scores datasets. Its defaults are the flagship. Dataset events use source `dataset_risk_engine`, so neither path can supersede the other's.
+
+## Orchestration
+
+`src/provenance/dags/definitions.py`. `provenance_full_pipeline` selects every asset; dependencies fix the order, and the job uses the in-process executor so only one step writes at a time:
 
 ```
 dataco_shipments → usaspending_contracts → worldbank_lpi        (bronze)
   → gate_dataco_shipments → gate_usaspending_contracts → gate_worldbank_lpi
-  → silver_dbt_assets (dbt build: seeds, staging, intermediate, silver)
-  → gold_dbt_assets   (dbt build: gold marts and their tests)
+  → silver_dbt_assets (seeds, staging, intermediate, silver, tests)
+  → gold_dbt_assets   (gold marts and their tests)
   → supplier_risk_scoring (scores, flag replay, risk_flag events)
 ```
 
-The bronze loaders and the gates are chained one after another on purpose, so
-that only one step writes to DuckDB at a time. The job uses the in-process
-executor. A gate that quarantines a batch raises `dagster.Failure`; Dagster
-then skips every downstream step and marks the run failed. Because a gate
-validates every batch folder under `data/bronze/<source>/`, the run keeps
-failing until the bad batch is removed from bronze. It is already preserved
-under `data/quarantine/`, so removing it from bronze is the recovery step.
+- `python -m provenance.run_pipeline` runs that job in-process and prints each step (exit 0 success, 1 failure, 2 another writer active). The first run on an empty warehouse needs one manual `dbt build` ([limitations](limitations.md#running-it)).
+- Smaller jobs: `ingest_all_sources`, `bronze_quality_gates`, `gates_and_silver`. Op jobs: `onboard_dataset`, `score_dataset`.
+- `provenance_full_pipeline_weekly` runs on the cron in `config/config.example.yaml`, stopped by default.
+- `agent_investigation_sensor`, stopped by default, moves `open` events to `queued` and starts `agent_investigation_job`, which **only logs the cases**. The agent itself is started from the CLI or the console (see [limitations](limitations.md)).
+- **Reruns are idempotent:** batch ids are content hashes, dbt rebuilds from bronze, the gate upserts by `(source, batch_id)`, and the scorer's hashing adds nothing for unchanged inputs.
 
-Three smaller asset jobs stay because unit tests run them:
-`ingest_all_sources` (test_ingestion), `bronze_quality_gates`
-(test_data_quality_gate) and `gates_and_silver` (test_silver_assets). The
-duplicate `ingest_and_validate_all_sources` and `phase5_risk_pipeline` jobs
-were removed. The implicit `__ASSET_JOB`, which the UI uses for ad hoc
-"Materialize" clicks, is redefined only to carry the writer tag.
+**All-or-nothing silver and gold.** `dags/restore_point.py` wraps both dbt assets. Before the silver build it copies every dbt-built table in `silver` and `gold` into a `_restore_point` schema. A failure in either build, a failing test included, restores them in one transaction; gold's success drops the copies. Without it, a failing test on one branch of the dbt graph could leave new silver beside old gold. Tables with a primary key (the scorer's) are not copied. A lock error means dbt never opened the file, so the restore point is kept and the step retried.
 
-### Retries and the offline cache
+## Concurrency: one writer
 
-Only `usaspending_contracts` and `worldbank_lpi` call external APIs, so only
-they have a `RetryPolicy`: 3 retries, exponential backoff from 1 s. Gates, dbt
-and the scorer are deterministic: retrying them would repeat the same failure.
-The first three attempts fail on a network error. The last retry may fall back
-to the cache: the Phase 2 USASpending sample (`data/raw/usaspending_sample.json`)
-or the latest World Bank bronze batch. The materialization then records
-`cache_fallback_used`, `cache_fallback_source` and `cache_fallback_reason`. If
-there is no cache, the run fails visibly.
+DuckDB allows one writer process, and fails at once, not after a wait, in both directions: a reader cannot open while a writer holds the file, and a writer cannot open while any reader does.
 
-USASpending pages are re-fetched for the last complete month on each run, so
-overlapping monthly batches accumulate in bronze. `stg_usaspending_awards`
-keeps one row per `generated_internal_id`, taken from the most recently loaded
-approved batch. No silver, gold or SCD2 model reads USASpending.
+- `.dagster/dagster.yaml` limits the tag `dagster/concurrency_key=duckdb_writer` to one running run. Set `DAGSTER_HOME` to that folder's absolute path, or Dagster uses a temporary instance without the limit.
+- `run_pipeline` bypasses the queue, so it checks for active writer runs and refuses to start.
+- `db.connect_read_only` retries a lock conflict twice (after 0.25 s and 0.5 s). The API reads through it, and answers 409 `locked` if the file is still held.
+- The agent's tools open a read-only connection per tool call and close it at once, so nothing holds the file while the model thinks.
+- Gate, scorer and dataset assets turn a lock error into `RetryRequested` (3 retries, 5 s apart).
+- The console keeps the last loaded data on a 409, shows "Pipeline running, showing last loaded data", and checks again every 10 s.
 
-For reproducible runs, `ingestion.usaspending_offline` (config, default
-`false`; the env var `PROVENANCE_USASPENDING_OFFLINE` overrides it) skips the
-API and loads the cached sample directly. The sample's content hash is its
-batch id, so every offline run rewrites one identical 100-award batch, and
-the cache file is not refreshed. A missing sample fails the run instead of
-falling back to the live API. World Bank LPI and DataCo are unaffected.
+## Investigation agent
 
-### Reruns
+Described fully in [agent_design.md](agent_design.md).
 
-Every stage is idempotent: bronze batch ids are content hashes, so an
-unchanged source rewrites the same batch; dbt rebuilds tables from bronze; the
-gate upserts `bronze.dq_results` by `(source, batch_id)`; and the scorer's flag
-replay emits a flag or event only for a tier change it has not recorded
-before. A rerun on unchanged inputs therefore adds no rows, flags or events.
-New rows appear only if an API returns new content.
+```mermaid
+flowchart TD
+    E[risk_flag event] --> PRE[prelude: get_flag and<br/>recall_past_investigations]
+    PRE --> LOOP{model call,<br/>at most 6 steps}
+    LOOP -- tool calls --> TOOLS[read-only tools:<br/>fixed, parameterised SQL]
+    TOOLS --> LOOP
+    LOOP -- JSON report --> VALID{valid schema?}
+    VALID -- no --> LOOP
+    VALID -- yes --> GROUND{grounding check:<br/>every number from a tool?}
+    LOOP -- out of steps --> NR[status no_report]
+    GROUND -- no --> RU[status rejected_ungrounded<br/>no action]
+    GROUND -- yes --> ACT[status proposed<br/>action row: proposed]
+    ACT --> HUMAN{named human}
+    HUMAN -- approve --> AP[approved, then apply_action:<br/>watchlist or review request]
+    HUMAN -- reject --> REJ[rejected]
+    AP --> AUD[(hash-chained audit log)]
+    REJ --> AUD
+    ACT --> AUD
+    RU --> AUD
+```
 
-### Single writer
+Runs start from `python -m provenance.agent.run` or from the console, which starts `provenance.agent.background` as a subprocess; the API process never runs the model.
 
-DuckDB allows one writer process. `DAGSTER_HOME` points to the repository's
-`.dagster/` folder (as an absolute path, for example
-`C:\Users\<you>\...\provenance-structure\.dagster`). Only its
-`dagster.yaml` is committed; run history and schedule state are git-ignored. It
-configures the `QueuedRunCoordinator` with a limit of one running run for the
-tag `dagster/concurrency_key=duckdb_writer`. The full pipeline, the investigation job and
-the implicit asset job all carry that tag, so runs from the UI, the schedule
-and the sensor queue behind each other.
+## Dataset onboarding
 
-`python -m provenance.run_pipeline` runs in-process and so bypasses the queue.
-Instead, it checks the instance for queued or running writer runs and refuses
-to start (exit code 2) if it finds any. DuckDB's own file lock is the last line
-of defence: a second writer process fails with a lock error rather than
-corrupting the file.
+`src/provenance/datasets/` onboards any CSV next to the flagship without touching it. It runs from the console, the CLIs, or the op jobs `onboard_dataset` and `score_dataset`.
 
-### Schedule
+```mermaid
+flowchart TD
+    U[CSV: console upload or CLI] --> PRE{pre-checks}
+    PRE -- refused --> NOPE[readable report<br/>nothing written]
+    PRE --> PROF[profile: types, empties,<br/>ranges, date formats]
+    PROF --> RULES[generated Great Expectations rules:<br/>hard and tolerance]
+    RULES --> GATE{gate}
+    GATE -- hard rule fails --> Q[quarantine, dq_failure event,<br/>audit entry]
+    GATE -- passes --> B[(ds_id.bronze_raw, all text)]
+    B --> H[heuristic mapper]
+    H --> UNSURE{unmapped field, tie,<br/>or confidence below 0.8?}
+    UNSURE -- no --> PROP[proposal, version n]
+    UNSURE -- yes --> AG[mapping agent: statistics only]
+    AG --> VAL{validator}
+    VAL -- rejects --> RETRY[one retry]
+    RETRY --> VAL
+    VAL -- passes --> PROP
+    RETRY -- rejected again --> FB[heuristic fallback, with a note]
+    AG -- any model failure --> FB
+    FB --> PROP
+    PROP --> REVIEW{named reviewer}
+    REVIEW -- edit, re-validated --> PROP
+    REVIEW -- reject --> RJ[rejected]
+    REVIEW -- approve --> MAPPED[dataset: mapped]
+    MAPPED --> RUN[background run, one transaction]
+    RUN --> SIL[silver_shipments, silver_rejects]
+    SIL --> MET[quarter_metrics, mart_risk<br/>flagship definitions]
+    MET --> SC[risk_score, risk_flags, events<br/>flagship scorer, frozen bounds]
+```
 
-`provenance_full_pipeline_weekly` takes its cron from
-`config/config.example.yaml` (`orchestration.weekly_pipeline_cron`) and
-runs in UTC. It is `STOPPED` by default, because this is a local project.
+**Pre-checks and profile** (`profile.py`). Only `.csv/.tsv/.txt`, at most 50 MB and 200 columns by default. Binary content and blank or duplicate headers are refused before anything is written. Encoding is UTF-8 with a Latin-1 fallback; the delimiter is the one that splits the first lines into a consistent column count. Every cell is read as text, types come from at least 80% of non-empty values, and statistics are rounded so the same bytes give the same profile. Only a 5-row preview is kept.
 
-### Agent handoff
+**Generated rules** (`gen_suite.py`). Built in code as a Great Expectations suite. *Hard* rules quarantine: columns present, no empty values where there were none (from the exact count), fully typed columns keep their type, the identifier stays unique, and dates parse with the detected format. *Tolerance* rules warn: up to 1% empty values, mixed-type columns, and numeric values within the profiled range padded by 10%. Each rule states why it exists.
 
-`agent.events` has `investigation_status` (`open` → `queued` →
-`investigated`). The migration in `ensure_agent_events_table` adds the column
-with default `open` to existing tables and backfills nulls. Statuses already
-set are left alone. New tables also get a `CHECK` constraint on the three
-values.
+**Registry** (`registry.py`). The only writer for `meta.*`. One row per file SHA-256; the same bytes again are reported as already registered.
 
-`agent_investigation_sensor` (stopped by default, 30 s interval) runs one
-transaction per tick. It selects `risk_flag` and `dq_failure` events that are
-`open` and have no `resolved_at` or `resolution`, and marks them `queued`. It
-then requests one `agent_investigation_job` run with every case payload in the
-run config. A second tick finds nothing open and skips. Resolved events are
-never queued; seeded demo events are queued like any other. If a gate fails
-again on an event that is already queued, the event stays queued and is not
-requeued. If a pipeline run holds the DuckDB lock, the tick skips and retries
-later. The Phase 6 job only logs the cases; Phase 7 replaces it with the agent
-and sets `investigated`.
+**Bronze and safety** (`bronze.py`, `identifiers.py`). Each dataset gets `ds_<first 12 hex of the hash>`; `bronze_raw` holds every column as text plus lineage. Schema names are generated and validated. A column name reaches SQL only if the profile recorded it, quoted with embedded quotes doubled; all values are bound parameters.
 
-## Phase 9a: safe re-runs and new data
+**The contract** (`contract.py`). Required `entity`, `event_date` (column and strftime format; the order or creation date is preferred) and `outcome`: `late_flag` with `late_when`, `days_pair` (scheduled and actual), or `delay_value`, in days or hours. Optional `country`, and `cancelled: {col, value}` (rows counted as shipments but not toward lateness). *Mappable* means every required field maps to a valid column. *Scoreable* means mappable, at least 3 quarters where some entity has 50 rows, and most entities around 50 rows per quarter.
 
-Each change below has tests in `tests/unit/test_phase9a_hardening.py`. None of
-them changes a score, a tier, a rule value or the dbt metric logic.
+**Mapping and approval.** See [agent_design.md](agent_design.md#mapping-agent). `mapping_store.py` keeps every version in `meta.mappings`; only approving a mappable mapping, with a reviewer name, moves the dataset to `mapped`. Propose, edit, approve and reject each append to the audit log.
 
-### Top factor follows the direction of the tier change
+**Canonical silver** (`build_silver.py`). A fixed SQL template builds `silver_shipments`. Late means actual > scheduled, a delay > 0, or the flag's `late_when`; hours divide by 24. Rows that do not parse go to `silver_rejects` with the first reason that applied.
 
-`select_top_factor` in `risk_engine/scorer.py` names the factor behind a flag.
-For a rise it ranks only factors whose weighted contribution increased (for a
-fall, only those that decreased) and picks the largest such change. If none
-moved that way it names the largest current contributor and adds
-`"selection": "largest_contributor_fallback"` to the factor. Previously the
-largest absolute change won, so `cat_boxing_mma` 2017-Q3 (low → medium) was
-explained by `country_risk`, which had fallen by 0.232; it is now
-`delay_stddev` (+0.216). Only that flag's payload changed, so rescoring
-supersedes that one event (see below) and `rules_version` stays 1.2.
+**Country** (`country.py`). The flagship's Spanish seed (exact spelling first), then ISO3, ISO2, and names compared without case or accents (seed English names, World Bank names, aliases, and Babel's names in seven languages). World Bank aggregates never match. Below 80% of rows matched (`--min-country-match`), with no country column, or with no LPI table, country risk is left out.
 
-### Quarantine moves batches, and each batch is gated once
+**Metrics** (`metrics.py`). The flagship's two models rewritten over the canonical table, with thresholds read from `dbt_project.yml` so the paths cannot drift. The SCD2 join is omitted: it only checks that a version covers the quarter, and its band is not used for scoring.
 
-A batch that fails the gate is moved (never copied) from `data/bronze` to
-`data/quarantine`, with its `validation_result.json`. The gate only validates
-batches that have no `bronze.dq_results` row, so nothing is validated twice
-and a bad batch can no longer block every later run (before, the gate
-re-checked all batches in hash order and stopped at the first failure). The
-loader also refuses to put a once-quarantined batch back into bronze.
-`rebuild_bronze_table` reads approved batches plus batches still waiting for
-their first gate check; after each gate run nothing is pending, so the bronze
-table then holds approved batches only. (Pending batches stay readable between
-ingestion and gate because the existing loader contract returns them; silver
-reads approved batches only either way.)
+**Rules and bounds** (`score.py`, `meta.dataset_rules`). Bounds are the 5th and 95th percentile of each metric over eligible rows, frozen at first scoring as `<rules.yaml version>-ds<n>` and reused until `--refreeze`, so added rows do not move them. `bounds_mode=flagship` uses `rules.yaml`. **Scores are comparable within one dataset only.** A factor the dataset cannot provide is left out: remaining weights renormalise, confidence is `low`, and `contributing_factors` carries an `excluded` entry with the reason.
 
-### Cross-batch duplicate order items
+**Runs** (`runs.py`). Scoring refuses a dataset that is not mapped or not scoreable, and refuses while a flagship restore point exists. From the console, the API records a queued row in `meta.runs` and starts `python -m provenance.datasets.runs` as a subprocess. Because nobody can read DuckDB during that write, the live stage is in `data/datasets/runs/<run_id>.json`. The row's final state is written in the same transaction as the scores, or by the runner on failure. A run whose process died is reported as failed. While any writer is active, a new run gets 409 `busy`.
 
-`check_cross_batch_duplicates` compares a new DataCo batch with approved
-batches by `Order Item Id`, over every source column (lineage columns
-ignored). Rows identical to an approved row are dropped from the new batch's
-parquet with a `cross_batch_duplicates` warning (status
-`passed_with_warnings`). The same id with any different value quarantines the
-whole batch, with a message naming example ids.
+Polling `GET /api/runs/{id}` during a run can itself make the run fail; [limitations.md](limitations.md#running-it) has the measurement and the fix.
 
-### Flag events are append-only
+**Equivalence.** `tests/integration/test_dataco_equivalence.py` maps DataCo through the contract on a copy of the warehouse and checks that the generic path reproduces the flagship's silver, mart, scores (within 1e-9), tiers and flags.
 
-The scorer hashes each flag's event payload (10 hex characters of SHA-256 over
-sorted-key JSON). An unchanged payload keeps its event id and its row is not
-touched. A changed payload never rewrites the old event: the old event is
-resolved with `superseded: payload changed; replaced by <new id>`, keeping its
-payload, status and investigations, and a new event `<old id>:p<hash>` is
-created. Flags of the current rules version that no longer qualify are
-resolved (`resolved: no longer qualifies under rules 1.2`), both the event and
-the `gold.supplier_risk_flags` row, which gains `event_id`, `status`,
-`resolved_at` and `resolution` columns and is never deleted. The scorer's
-writes now run in one transaction. Flags from an older rules version are still
-removed as before.
+## API
 
-### Lock handling
+`src/provenance/api/`, run with `python -m provenance.api`. It binds to 127.0.0.1:8000, has no option for another interface, and refuses any request not from a loopback address. **There is no login: never expose it to a network.** GETs are read-only and the module holds no write SQL; writes go through `agent/approval.py`, `datasets/` or a subprocess. A lock returns 409 `locked`, a second writer 409 `busy`.
 
-DuckDB fails at once, not after a wait, when another process holds the file,
-in both directions: a reader cannot open while a writer holds it, and a writer
-cannot open while any reader holds it.
+| Endpoints | Purpose |
+|---|---|
+| `GET /api/health` | Model name, approval mode, warehouse reachable; no secrets |
+| `GET /api/flags`, `/api/flags/{event_id}` | Flags; `?dataset=` selects a dataset, and a `ds_<id>:` event resolves to its own |
+| `GET /api/suppliers/{key}/history`, `/score/{quarter}`, `/markets/{quarter}` | Agent tool results; accept `?dataset=` |
+| `GET /api/investigations/{event_id}`, `POST .../run` | Latest report with number-level sources; start the agent in a subprocess |
+| `GET /api/agent/summary` | The Overview's Agent card |
+| `GET /api/approvals`, `POST .../{id}/approve`, `.../reject` | Decisions, requiring a name |
+| `GET /api/audit`, `/api/quality`, `/api/evaluation` | Audit log with chain check, gate history, evaluation metrics |
+| `GET /api/datasets`, `POST /api/datasets/upload`, `GET /api/datasets/{id}` | List, upload (`.csv` only, `DATASET_UPLOAD_MAX_MB`, default 50), profile and gate report |
+| `GET .../mapping`, `POST .../mapping/propose`, `.../{mapping_id}/approve`, `/reject`, `/edit` | Mapping review |
+| `POST /api/datasets/{id}/run`, `GET /api/runs/{run_id}`, `GET /api/datasets/{id}/results` | Scoring runs and results |
 
-- `provenance.db.connect_read_only` retries a lock conflict twice (after 0.25 s
-  and 0.5 s) before raising. The API uses it for every read, so a short
-  overlap with the pipeline no longer returns 409.
-- The agent's tools open a read-only connection per tool call and close it at
-  once, so no connection is held while the model thinks; `run.py` refuses to
-  start (exit 3) when Dagster has an active writer run or the file is locked.
-- The gate and scorer assets turn a lock error into `RetryRequested` (3
-  retries, 5 s apart); other failures still fail. dbt lock errors are handled
-  by the restore-point guard below.
-- The console keeps the last loaded data when a request gets 409, shows
-  "Pipeline running, showing last loaded data", and checks again every 10 s.
-  A screen with nothing loaded yet shows a "Pipeline running" state instead of
-  an error. `?mock=busy` demonstrates it without a pipeline.
+An upload is streamed to a generated name in `data/datasets/incoming/`, onboarded, and the incoming copy deleted.
 
-### All-or-nothing silver and gold
+## Console
 
-`dags/restore_point.py` wraps both dbt assets. Before the silver build it
-copies every dbt-built table in `silver` and `gold` into a `_restore_point`
-schema; a failure in the silver or the gold build (a failing test included)
-restores them in one transaction and drops the copies; gold's success drops
-them. Without this, a failing test on one branch of the dbt graph left the
-tables of the other branches rebuilt: new `silver.fact_shipments` beside old
-gold.
+`web/`: React 19, TypeScript, Vite, Tailwind, Recharts, a liquid-glass design with a blur budget, light and dark themes, a solid mode, and reduced-motion support (`DESIGN.md`, `PRODUCT.md`). Vite proxies `/api` to the API. Screens: Overview, Flags and flag detail, Investigations, Approvals, Pipeline, and Datasets & pipelines (Upload → Profile → Mapping → Run → Results). A selector in the sidebar switches Overview and Flags between DataCo and a scored dataset; see [user_guide.md](user_guide.md).
 
-Chosen over building into a staging schema and swapping: dbt-duckdb resolves
-refs to fixed schema names and DuckDB has no atomic schema rename, so a swap
-would need a second dbt target and table-by-table renames. Copying about 20
-tables (some 200k rows) takes well under a second and leaves the dbt project
-unchanged. Tables with a primary key or unique constraint (the scorer's own)
-are not dbt-built and are not copied. A lock error means dbt never opened the
-file, so it keeps the restore point and retries instead of restoring.
+**Mock mode** (`npm run dev:mock`, or `?mock=1`) needs no API. It replays fixtures generated from the real API by `web/scripts/generate_mock_fixtures.py` and `generate_dataset_fixtures.py`, and keeps decisions in memory. `?mock=busy`, `?mock=locked`, `?mock=nokey` and `?mock=runfail` demonstrate refusal states.
 
-### Early input checks
+## Configuration
 
-`ingestion/precheck.py` checks a DataCo CSV before anything is written: the
-exact ordered columns (read from the gate's own suite), the strict
-`%m/%d/%Y %H:%M` date format staging parses, blanks or non-integers in the
-integer columns, and `Order Country` names missing from `country_iso3_map`.
-It returns a pass/fail result with a readable list of problems; the
-`dataco_shipments` asset runs it first and fails with that list.
+Secrets are in `.env` (git-ignored); see `.env.example`. Thresholds are in `transform/dbt_project.yml` (metrics, bands) and `risk_engine/rules.yaml` (weights, bounds, tiers, hysteresis, confidence). `config/config.example.yaml` holds the schedule and offline switch, and is read as it is. Environment overrides such as `PROVENANCE_DUCKDB_PATH` are read at process start, so set them in the shell.
 
-## Phase 10a: dataset onboarding
+## Design decisions and history
 
-`src/provenance/datasets/` onboards any CSV next to the flagship DataCo
-pipeline, which it does not touch: pre-checks → profile → generated quality
-suite → gate → generic bronze. Run it with
-`python -m provenance.datasets.onboard file.csv --name "My data"` (`--list`
-shows the registry) or the Dagster job `onboard_dataset` (run config
-`csv_path`, `dataset_name`; `duckdb_writer` tag; a lock error retries). The
-job is an op job, not an asset selection, so it never re-ingests DataCo,
-USASpending or World Bank.
+**Docker, Airflow, Postgres and MinIO → local DuckDB and Dagster.** The first design ran Airflow, Postgres and MinIO in containers. Airflow does not run natively on Windows and the capstone needed no shared infrastructure, so it became one DuckDB file, Parquet folders and Dagster, whose asset model also fixes step order from dependencies. The price is a single writer, handled above.
 
-- **Pre-checks and profile** (`profile.py`): only `.csv/.tsv/.txt`, at most
-  50 MB and 200 columns by default; binary content, blank or duplicate header
-  names are refused before anything is written. Encoding is UTF-8 with a
-  Latin-1 fallback; the delimiter is the one that splits the first lines into
-  a consistent column count. Every cell is read as text, types (int, float,
-  bool, date with its format, string) are inferred from at least 80% of
-  non-empty values, and statistics are rounded so the same bytes always give
-  the same profile. Only a 5-row preview of the data is kept.
-- **Generated suite** (`gen_suite.py`): built in code as a Great Expectations
-  suite. Hard rules quarantine: columns present (as a set), no empty values
-  where there were none, fully typed columns keep their type, the identifier
-  column stays unique (an id-like name with at least 90% distinct values, or
-  the first fully unique column), dates parse with the detected format.
-  Tolerance rules warn: up to 1% empty values, mixed-type columns, numeric
-  values within the profiled range padded by 10% (never below 0 when the data
-  never was; identifiers get no range). The report states each rule, why it
-  exists and its result.
-- **Registry and writer** (`registry.py`): `meta.datasets` (status
-  `uploaded → profiled → gated | quarantined | failed`, one row per file
-  SHA-256; a second upload of the same bytes is reported as already
-  registered) and `meta.dataset_columns`. All writes go through one
-  connection and transaction, like the agent's `store.py`.
-- **Generic bronze** (`bronze.py`): each dataset gets schema
-  `ds_<first 12 hex of the file hash>`; `bronze_raw` holds every column as
-  text plus `_batch_id, _source, _source_file, _loaded_at`, from parquet under
-  `data/datasets/<id>/`. A failed gate moves the batch to
-  `data/quarantine/datasets/<id>/` with its report, writes a `dq_failure`
-  event and a hash-chained audit entry, and creates no bronze table.
-- **Safety** (`identifiers.py`): schema names are generated and validated;
-  a column name can only appear in SQL if the profile recorded it, quoted with
-  embedded quotes doubled; all values (names, paths) are bound parameters, and
-  file names under `data/datasets/` are generated, never user-supplied.
+**Category as supplier proxy.** DataCo has no supplier identifier and USASpending vendors do not join to it. A product category stands in for a supplier, stated openly everywhere, rather than a simulated bridge table. See [data_profile.md](data_profile.md#dataco-supplier-proxy-candidates) and the October 2017 catalogue change there.
 
-## Phase 10b: column mapping
+**SCD2 from quarterly metrics, not dbt snapshots.** A snapshot compares current state with its last run and stamps the run time, so it can only record history from its first run. This history is in the past (2015 to January 2018), so the dimension is rebuilt from the series with a recursive query. Tracking delivery band only, with two-quarter confirmation, took it from 119 versions to 56 across 50 suppliers.
 
-A gated dataset is mapped onto the standard shipment contract
-(`datasets/contract.py`): required `entity` (supplier, vendor or category),
-`event_date` (column + strftime format) and `outcome` (one of `late_flag` with
-`late_when`, `days_pair` scheduled/actual, or `delay_value`, in days or hours);
-optional `country`. Run `python -m provenance.datasets.map <dataset_id>
-[--heuristic-only]`, then `--edit <id> --set field=value --by NAME`,
-`--approve <id> --by NAME` or `--reject <id> --by NAME --reason ...`; the API
-exposes the same under `/api/datasets/{id}/mapping`.
+**Trailing country risk and flag hysteresis.** The first replay had 43 flags, 27 of them (62.8%) in two quarters, and country risk was the largest change for 36: DataCo's destination mix swings across the whole dataset (100% LATAM in 2015-Q1, 100% Europe in 2015-Q3), which says nothing about a supplier. A 4-quarter trailing window plus hysteresis gave 20 flags, at most 6 in a quarter, and no supplier with more than 2. Bounds and weights were recalibrated on all 211 eligible supplier-quarters ([data_profile.md](data_profile.md#historical-risk-scoring-and-calibration)).
 
-- **Two mappers, one shape.** The agent (`mapping_agent.py`, Groq through
-  `llm.py`) has three read-only tools: `get_contract`, `get_dataset_profile`,
-  `get_column_profile`. It sees names, types, null %, distinct counts and
-  numeric/date ranges; for text columns only length statistics, never values,
-  unless `sample_values` is explicitly on. It returns mapping JSON only, never
-  SQL or code. The heuristic (`heuristic_mapper.py`) matches names (English
-  plus common Spanish, German and French words) and profile types
-  deterministically.
-- **Deterministic validator** (`validator.py`): columns exist and are used
-  once, types fit roles, the date format parses at least 95% of the column,
-  a late flag is boolean-like with a polarity consistent with its name and
-  with any numeric delay in the data, and every number in `evidence` appears
-  in the profile or the agent's tool results (the `grounding.py` check). A
-  required field set to null is a valid "no column fits" answer: not
-  mappable, with the reason. A rejected agent answer gets one retry with the
-  validator's messages, then the heuristic takes over (`source='heuristic'`).
-- **Verdicts.** Mappable: every required field maps to a valid column.
-  Scoreable: mappable, at least 3 quarters in which some entity has 50 rows,
-  and most entities with about 50 rows per active quarter.
-- **Approval** (`mapping_store.py`, writes through `registry.writer`):
-  `meta.mappings` keeps every version (`proposed | approved | rejected |
-  superseded`, source `agent | heuristic | human`). A human edit is
-  re-validated before it is written, becomes a new `human` version and
-  supersedes the old one; nothing is overwritten. Only approving a mappable
-  mapping, with a reviewer name, moves the dataset to `mapped`. Propose, edit,
-  approve and reject each append to the hash-chained audit log.
-- **Evaluation**: `python -m provenance.datasets.eval.run [--limit N]
-  [--fresh]` runs both mappers on synthetic fixtures in temporary databases;
-  results are in `docs/mapping_evaluation.md`.
+**Phase 9a hardening.** Re-running on new data exposed fragile assumptions, and none of the fixes changed a score, tier or rule value:
 
-## Phase 10c-1: silver, metrics, scores and flags for a dataset
+- A bad batch used to block every later run, because the gate re-checked all batches and stopped at the first failure. Quarantine now moves batches and each batch is gated once.
+- Flag events became append-only, and flags resolve rather than disappear.
+- Silver and gold became all-or-nothing through the restore point.
+- Lock handling and early CSV pre-checks were added.
+- The top factor now follows the direction of the change: `cat_boxing_mma` 2017-Q3 (low → medium) had been explained by `country_risk`, which had fallen by 0.232; it is now `delay_stddev` (+0.216).
 
-`python -m provenance.datasets.score <dataset_id> [--bounds-mode dataset|flagship]
-[--refreeze]` (or the Dagster op job `score_dataset`, run config `dataset_id`,
-`duckdb_writer` tag, lock retry) scores one dataset. It refuses unless the
-dataset is `mapped` and its approved mapping is scoreable, and while a flagship
-restore point exists. Everything after that is one transaction on one connection:
+**Phase 9b: float-stable payload hash and the event repair.** A gold rebuild sums floats in a different order each time, moving scores by about 1e-16. Hashing raw floats therefore superseded flag events whose payload had not really changed, detaching investigations. The hash now rounds floats to 10 decimals. `agent/repair_noise_events.py`, a one-off, undid the false supersedes: it reopened each original, resolved its replacement as a duplicate, deleted nothing, and wrote one audit entry.
 
-- **Canonical silver** (`build_silver.py`): `ds_<id>.silver_shipments`
-  (entity_key, entity_name, event_date, quarter, is_late, delay_days,
-  is_cancelled, country_iso3, _batch_id) from `bronze_raw` and the approved
-  mapping. Fixed SQL template; column names only from the validated mapping,
-  quoted against the profile; every value (format, polarity words, cancelled
-  value, null tokens, the hours divisor) bound. Rows that do not parse go to
-  `silver_rejects` with a reason. The contract gained one optional field,
-  `cancelled: {col, value}`: cancelled rows count as shipments but not toward
-  late rate or delay, as the flagship treats DataCo's "Shipping canceled".
-- **Country** (`country.py`): the flagship's Spanish seed (exact spelling first),
-  then ISO3, ISO2 and names (seed English names, World Bank names, aliases),
-  never World Bank aggregates. Below `--min-country-match` (default 80% of rows)
-  or without a country column or LPI, country risk is left out.
-- **Metrics and mart** (`metrics.py`): `int_supplier_quarter_metrics` and
-  `mart_supplier_risk` rewritten over the canonical table with the same
-  definitions, thresholds read from `dbt_project.yml` vars.
-- **Bounds** (`meta.dataset_rules`): 5th/95th percentile of each metric over the
-  dataset's eligible rows, frozen at its first scoring (rules version
-  `<rules.yaml version>-ds<n>`) and reused until `--refreeze`, so adding rows
-  does not move them. `bounds_mode=flagship` uses rules.yaml's bounds. **Scores
-  are comparable within one dataset only.** A factor the dataset cannot provide
-  is left out: remaining weights renormalised, confidence `low`, and an
-  `excluded` entry with the reason in `contributing_factors`.
-- **Scorer** (`risk_engine/scorer.py`): the flagship's tiering, hysteresis,
-  payload hashing, superseding and resolving, parameterised by a `FlagTarget`.
-  Dataset events are `ds_<id>:risk_flag:<rules>:<quarter>:<entity>` from source
-  `dataset_risk_engine`, so neither path can supersede or resolve the other's
-  events; DataCo ids and tables are unchanged. The investigation tools take an
-  optional `dataset_id` (derived from the event id), and
-  `agent.investigations.dataset_id` records it.
-- **Equivalence**: `tests/integration/test_dataco_equivalence.py` maps DataCo
-  through the contract on a copy of the warehouse and checks that the generic
-  path reproduces the flagship's mart, scores (within 1e-9), tiers and flags.
+**Heuristic-first mapping.** The evaluation showed the deterministic mapper is right on most fixtures, so the agent is asked only when a required field is unmapped, two candidates tie, or confidence is below 0.8. On the 11 cases that gives the same accuracy as always asking (10/11) for 3 agent calls instead of 11. The agent still earns its place on abbreviated names and misleading columns.
 
-## Phase 10c-2: console flow for datasets
-
-The console gains **Datasets** (list with status chips), **Upload → Profile →
-Mapping → Run → Results** under `/datasets/...`, and a dataset selector in the
-sidebar that switches Overview and Flags from DataCo (the default) to a scored
-dataset. DataCo screens, outputs and event ids are unchanged.
-
-- **No login, localhost only.** `python -m provenance.api` binds 127.0.0.1:8000
-  (there is no option for another interface) and the app refuses any request
-  not from a loopback address. Never expose the console or the API to a
-  network.
-- **Upload** (`POST /api/datasets/upload`, multipart): `.csv` only, at most
-  `DATASET_UPLOAD_MAX_MB` (default 50 MB), streamed to a generated name in
-  `data/datasets/incoming/` and onboarded (pre-check, profile, generated rules,
-  gate, bronze); the incoming copy is then deleted (bronze or quarantine keeps
-  its own). A rejected file writes nothing; the same bytes again answer
-  `already_registered` with the existing id. The response is the plain-language
-  gate report (rule, why it exists, result, hard or tolerance) and, for a
-  quarantined file, where it went.
-- **Mapping**: `POST .../mapping/propose` is heuristic-first and returns which
-  path decided (`heuristic`, `agent`, `heuristic_fallback`; edits are `human`).
-  The heuristic now finds a country column by its values (at least 80% of a
-  text column's rows are countries, in seven languages via Babel's CLDR names,
-  reported as `country_match_pct` evidence) and reads `YYYYMMDD` integer dates;
-  the contract and the agent prompt prefer the order or creation date over ship
-  or delivery dates.
-- **Runs** (`POST /api/datasets/{id}/run`, `GET /api/runs/{run_id}`): scoring
-  never runs in the API process. The API refuses a dataset that is not mapped
-  or not scoreable, answers 409 `busy` while another writer is active (a live
-  scoring run, a Dagster writer run, or any process holding the file), records
-  a queued row in `meta.runs` and starts `python -m provenance.datasets.runs`.
-  DuckDB lets nobody read while that process writes, so the live stage
-  (silver, metrics, scoring, flags) is in `data/datasets/runs/<run_id>.json`;
-  the row's final state is written by `score_dataset` in the same transaction
-  as the scores (succeeded, with a summary) or by the runner (failed, with a
-  plain-language error). A run whose process died is reported failed.
-- **Results** (`GET /api/datasets/{id}/results`): row counts, rejects by reason,
-  country match rate, every factor (used, or excluded with its reason; base
-  weight and the renormalised weight used), bounds and rules version, scores by
-  entity and quarter, active flags, and the note "Scores are comparable within
-  this dataset only." A scored dataset stays `mapped` in the registry and is
-  shown as `scored`.
-- **`?dataset=`** on `/api/flags` and `/api/suppliers/...` reads a dataset's
-  tables (default DataCo); a `ds_<id>:` event id resolves to its own dataset.
-- **Mock mode** replays `web/src/mock/datasets.json`, generated by
-  `web/scripts/generate_dataset_fixtures.py` from the real API on a temporary
-  warehouse: a scored dataset with an excluded factor, a gated dataset that is
-  mappable but not scoreable, student marks (not mappable; the agent's
-  proposal), a quarantined upload. `?mock=busy` shows the busy run state and
-  `?mock=runfail` a failed run.
-- **Tests**: the DataCo equivalence test is marked `integration` and deselected
-  by default (`[tool.pytest.ini_options]` in `pyproject.toml`, which replaces
-  `pytest.ini`): `pytest -q` skips it; `pytest -m integration` runs it.
+**Equivalence test.** Two copies of the metric logic could drift silently. Running DataCo through the generic path with `bounds_mode='flagship'` and comparing to the flagship proves they do not: 211 of 211 scores within 2.4e-15, the same tiers, the same 20 flags. It also forced the contract's `cancelled` field, because the flagship excludes cancelled shipments from lateness.

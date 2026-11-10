@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "provenance"
-version = "0.1.0"
-description = "Supply chain risk data pipeline"
+version = "1.0.0"
+description = "Local supply-chain risk pipeline with a grounded investigation agent and dataset onboarding"
 readme = "README.md"
 requires-python = ">=3.11,<3.13"
 dynamic = ["dependencies"]

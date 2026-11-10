@@ -27,6 +27,7 @@ from provenance.dags.trigger_agent_investigation import (
     build_investigation_request,
 )
 from provenance.data_quality.gate import GateResult, ensure_agent_events_table
+from provenance.ingestion.precheck import PrecheckResult
 
 
 def test_full_pipeline_asset_order_and_selected_assets() -> None:
@@ -117,6 +118,10 @@ def test_retry_policy_is_limited_to_api_ingestion_assets() -> None:
 def test_full_pipeline_gate_failure_skips_all_downstream_assets(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    # The DataCo CSV is not in the repository, so its pre-check is stubbed too.
+    monkeypatch.setattr(
+        ingestion_assets, "precheck_dataco_csv", lambda *_args, **_kwargs: PrecheckResult(True, 0)
+    )
     monkeypatch.setattr(ingestion_assets, "load_dataco_shipments", lambda **_kwargs: 1)
     monkeypatch.setattr(
         ingestion_assets, "load_usaspending_contracts", lambda **_kwargs: 1

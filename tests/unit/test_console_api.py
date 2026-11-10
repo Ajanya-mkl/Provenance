@@ -65,17 +65,31 @@ def _scoreable_csv(tmp_path: Path) -> Path:
     )
 
 
-def _wait(client, run_id: str) -> dict:
+def _process_running(pid: int) -> bool:
+    if os.name != "nt":
+        # The run is this process's child: an exited child stays visible until reaped.
+        try:
+            reaped, _status = os.waitpid(pid, os.WNOHANG)
+        except ChildProcessError:
+            return False
+        if reaped:
+            return False
+    return runs.pid_alive(pid)
+
+
+def _wait(client, paths: Paths, run_id: str) -> dict:
+    """Watch the process until it exits, then read the API once.
+
+    Polling during a run would itself disturb it (docs/limitations.md): a read of the
+    warehouse can refuse the subprocess's writer, and on Windows a read of the status
+    file can refuse its replace. The pid is written before the subprocess starts.
+    """
+    pid = runs.read_status(paths.data_root, run_id)["pid"]
     deadline = time.monotonic() + RUN_TIMEOUT_S
-    seen = set()
-    while time.monotonic() < deadline:
-        state = client.get(f"/api/runs/{run_id}").json()
-        seen.add((state["status"], state.get("stage")))
-        if state["status"] in ("succeeded", "failed"):
-            state["seen"] = seen
-            return state
+    while _process_running(pid):
+        assert time.monotonic() < deadline, f"run {run_id} did not finish"
         time.sleep(0.5)
-    raise AssertionError(f"run {run_id} did not finish: {seen}")
+    return client.get(f"/api/runs/{run_id}").json()
 
 
 # --- upload ------------------------------------------------------------------------
@@ -202,7 +216,7 @@ def test_full_flow_upload_propose_edit_approve_run_results(client, paths, tmp_pa
     assert approved.json()["dataset_status"] == "mapped"
 
     started = client.post(f"/api/datasets/{dataset_id}/run").json()
-    state = _wait(client, started["run_id"])
+    state = _wait(client, paths, started["run_id"])
     assert state["status"] == "succeeded", state
     assert [stage["status"] for stage in state["stages"]] == ["done"] * 4
     assert state["dataset_id"] == dataset_id and state["finished_at"]
@@ -249,7 +263,7 @@ def test_full_flow_upload_propose_edit_approve_run_results(client, paths, tmp_pa
         assert score["excluded_factors"]["country_risk"]
 
     # A second run of the same dataset creates no new events.
-    again = _wait(client, client.post(f"/api/datasets/{dataset_id}/run").json()["run_id"])
+    again = _wait(client, paths, client.post(f"/api/datasets/{dataset_id}/run").json()["run_id"])
     assert again["status"] == "succeeded"
     assert client.get(f"/api/flags?dataset={dataset_id}").json()["items"] == flags
 
@@ -263,7 +277,7 @@ def test_a_failed_run_reports_a_plain_error(client, paths, tmp_path):
         f"/api/datasets/{dataset_id}/mapping/propose", json={"by": "Ajanya"}
     ).json()["mapping_id"]
     client.post(f"/api/datasets/{dataset_id}/mapping/{mapping_id}/approve", json={"by": "Ajanya"})
-    state = _wait(client, client.post(f"/api/datasets/{dataset_id}/run").json()["run_id"])
+    state = _wait(client, paths, client.post(f"/api/datasets/{dataset_id}/run").json()["run_id"])
 
     assert state["status"] == "failed"
     assert "only 2 eligible quarter(s)" in state["error"]

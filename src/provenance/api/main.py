@@ -98,7 +98,7 @@ def create_app(
     database = Path(db_path or os.environ.get("PROVENANCE_DUCKDB_PATH", DEFAULT_DB_PATH))
     env_paths = Paths.from_env()
     paths = paths or Paths(database, env_paths.data_root, env_paths.quarantine_root)
-    app = FastAPI(title="Provenance console API", version="0.1.0")
+    app = FastAPI(title="Provenance console API", version="1.0.0")
 
     @app.middleware("http")
     async def localhost_only(request: Request, call_next):

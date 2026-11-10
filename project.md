@@ -1,3 +1,5 @@
+> **Historical document.** This is the original build playbook, kept for the record. Its phase order and file list are out of date; see [README.md](README.md) and [docs/architecture.md](docs/architecture.md) for the system as it is.
+
 # Provenance — Project Playbook (local, no Docker)
 
 Working document for the whole build. Read it once top to bottom, then use the phase sections as your checklist. Keep this file in the repo root next to `README.md`.
