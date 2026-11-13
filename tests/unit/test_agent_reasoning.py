@@ -314,7 +314,7 @@ def test_llm_repr_hides_the_client(monkeypatch):
 
     llm = GroqLLM.from_env()
 
-    assert llm.model == "llama-3.3-70b-versatile"
+    assert llm.model == "openai/gpt-oss-120b"
     assert "gsk_secret_value" not in repr(llm)
 
 

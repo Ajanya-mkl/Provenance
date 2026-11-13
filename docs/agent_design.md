@@ -2,7 +2,7 @@
 
 Provenance has two agents. Both use the same LLM client and both are bounded by deterministic code: the model can read and propose, and code decides what counts.
 
-**Provider and model.** Groq through `agent/llm.py`, with the model from `LLM_MODEL_NAME` (`openai/gpt-oss-120b` in `.env.example`, and the one every evaluation used; the code's default if unset is `llama-3.3-70b-versatile`). Temperature 0, at most 1,024 tokens per reply. The client retries a 429 and Groq's malformed tool-call error up to 3 attempts, honouring `retry-after`, with backoff from 2 s capped at 60 s. Temperature 0 does not make it deterministic, so evaluations cache answers.
+**Provider and model.** Groq through `agent/llm.py`, with the model from `LLM_MODEL_NAME` (`openai/gpt-oss-120b`, also the default if unset, and the one every evaluation used). Temperature 0, at most 1,024 tokens per reply. The client retries a 429 and Groq's malformed tool-call error up to 3 attempts, honouring `retry-after`, with backoff from 2 s capped at 60 s. Temperature 0 does not make it deterministic, so evaluations cache answers.
 
 ## Investigation agent
 

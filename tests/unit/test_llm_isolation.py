@@ -10,6 +10,7 @@ import pytest
 
 from provenance.agent import background, llm
 from provenance.agent.llm import GroqLLM, LLMError
+from provenance.api import __main__ as api_cli
 from provenance.datasets import map as map_cli
 from provenance.datasets import score as score_cli
 from provenance.datasets.onboard import PROJECT_ROOT
@@ -29,7 +30,7 @@ def test_a_real_client_gets_the_dummy_key_and_the_unreachable_address():
 
 
 def test_every_load_dotenv_in_the_code_is_disabled():
-    for module in (llm, background, map_cli, score_cli):
+    for module in (llm, background, map_cli, score_cli, api_cli):
         assert module.load_dotenv("anything") is False, module.__name__
 
 

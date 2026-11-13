@@ -17,7 +17,7 @@ import groq
 from dotenv import load_dotenv
 
 LOGGER = logging.getLogger(__name__)
-DEFAULT_MODEL = "llama-3.3-70b-versatile"
+DEFAULT_MODEL = "openai/gpt-oss-120b"
 DEFAULT_MAX_TOKENS = 1024
 MAX_ATTEMPTS = 3
 BASE_DELAY_SECONDS = 2.0
