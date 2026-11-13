@@ -63,3 +63,9 @@ Desktop.ini
 /web/node_modules
 /web/dist
 .impeccable/
+
+# Demo and reel videos (scripts/video): never commit video files or renders
+/docs/video/build/
+/docs/video/*.mp4
+/docs/video/*.webm
+/scripts/video/node_modules/

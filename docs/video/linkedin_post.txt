@@ -1,0 +1,11 @@
+For my PG Diploma in Data Science at the University of Calicut, I built Provenance: a supply chain risk console that explains every score it gives.
+
+It takes shipment data, checks each batch with a quality gate, and scores every supplier each quarter on three factors: delay variability, late deliveries and destination country risk. Each flag shows which factor moved and by how much.
+
+My first version raised 43 flags, many of them noise. Adding confirmation rules (a rise must be large, or hold for two quarters) brought that down to 20.
+
+An AI agent investigates flags with read-only tools. Every number in its report must trace back to a tool result, or the report is rejected. It can only propose. Nothing happens until a named person approves it, and every decision goes into a hash-chained audit log.
+
+Built with DuckDB, Dagster, dbt and React.
+
+#DataScience #DataEngineering #SupplyChain #ResponsibleAI

@@ -1,0 +1,10 @@
+{
+  "name": "provenance-video",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Playwright scripts that record the Provenance console for the demo and reel videos.",
+  "devDependencies": {
+    "playwright": "1.65.0"
+  }
+}
